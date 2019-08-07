@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 # TODO: Support single username and/or single password
-# Based on the research from grimhacker:
-#   https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/
-#   https://bitbucket.org/grimhacker/office365userenum/src/master/
 
 # -------------------------------
 __author__  = "km-zdh"
