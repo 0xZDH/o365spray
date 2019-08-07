@@ -5,7 +5,7 @@ __author__  = "km-zdh"
 __date__    = "August 7, 2019"
 __version__ = "1.0"
 # -------------------------------
-"""A basic username enumeration and password spraying tool aimed at spraying Microsoft's authentication."""
+"""A basic username enumeration and password spraying tool aimed at spraying Microsoft O365."""
 
 # Based on the research from grimhacker:
 # https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/
@@ -197,7 +197,7 @@ class Sprayer:
 
 
 if __name__ == "__main__":
-  parser = ArgumentParser(description="Microsoft User Enumerator and Password Sprayer.")
+  parser = ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer.")
   parser.add_argument("-u", "--username", type=str, help="File containing list of usernames", required=False)
   parser.add_argument("-p", "--password", type=str, help="File containing list of passwords", required=False)
   parser.add_argument("--proxy", type=str, help="Proxy to pass traffic through: <ip:port>", required=False)

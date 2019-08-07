@@ -1,6 +1,6 @@
 # o365spray
 
-This is a basic username enumeration and password spraying tool aimed at Microsoft authentication. For educational purposes only.
+This is a basic username enumeration and password spraying tool aimed at Microsoft O365. For educational purposes only.
 
 Based on the research from grimhacker:<br>
 https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/<br>
@@ -24,7 +24,7 @@ usage: o365spray.py [-h] [-u USERNAME] [-p PASSWORD] [--proxy PROXY]
                     [--count COUNT] [--lockout LOCKOUT] [--domain DOMAIN]
                     [--threads THREADS] [--debug] (-e | -s | -v)
 
-Microsoft User Enumerator and Password Sprayer.
+Microsoft O365 User Enumerator and Password Sprayer.
 
 optional arguments:
   -h, --help            show this help message and exit
