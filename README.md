@@ -11,7 +11,7 @@ Validate a domain is using O365:<br>
 `python3 o365spray.py --validate --domain test.com`
 
 Perform username enumeration:<br>
-`python3 msspray.py --enum --username usernames.txt`
+`python3 o365spray.py --enum --username usernames.txt`
 
 Perform password spray:<br>
 `python3 o365spray.py --spray --username usernames.txt --password passwords.txt --count 2 --lockout 5`
