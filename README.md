@@ -2,6 +2,8 @@
 
 This is a basic username enumeration and password spraying tool aimed at Microsoft O365. For educational purposes only.
 
+Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. If an account on a non-O365 domain is attempted Microsoft will not flag this as an invalid username (404 HTTP response), but instead return responses making it seem as if the account is is valid and the password was incorrect or the account requires 2FA. This allows for false positives when spraying/enumerating so this tool includes the `--validate` flag in order to identify if a specific domain is using Microsoft O365 prior to performing spraying/enumeration.
+
 NOTE: User enumeration is performed by submitting a single authentication attempt per user. If user enumeration is performed prior to password spraying please consider that all valid users have already submitted a single authentication attempt.
 
 ## Usage
