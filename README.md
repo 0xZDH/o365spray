@@ -6,6 +6,8 @@ Based on the research from grimhacker:<br>
 https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/<br>
 https://bitbucket.org/grimhacker/office365userenum/src/master/
 
+NOTE: User enumeration is performed by submitting a single authentication attempt per user. If user enumeration is performed prior to password spraying please consider that all valid users have already submitted a single authentication attempt.
+
 ## Usage
 Validate a domain is using O365:<br>
 `python3 o365spray.py --validate --domain test.com`
