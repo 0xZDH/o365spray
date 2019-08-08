@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 
 # TODO: Support single username and/or single password
-
-# -------------------------------
-__author__  = "km-zdh"
-__date__    = "August 7, 2019"
-__version__ = "1.1"
-# -------------------------------
 """A basic username enumeration and password spraying tool aimed at spraying Microsoft O365."""
 
 import time
