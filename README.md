@@ -59,5 +59,5 @@ optional arguments:
 ## Acknowledgments
 
 **grimhacker** - *Research and discovery of user enumeration within Office 365 via ActiveSync.* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and the [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/) tool.<br>
-[SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)<br>
-[Ruler](https://github.com/sensepost/ruler/)
+**byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)<br>
+**sensepost** - [Ruler](https://github.com/sensepost/ruler/)
