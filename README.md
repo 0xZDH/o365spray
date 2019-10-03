@@ -26,7 +26,8 @@ Perform password spray:<br>
 usage: o365spray.py [-h] [-u USERNAME] [-p PASSWORD] [-U USERNAMES]
                     [-P PASSWORDS] [-c COUNT] [-l LOCKOUT] [-d DOMAIN]
                     [--proxy PROXY] [--threads THREADS] [--output OUTPUT]
-                    [--debug] (-e | -s | -v)
+                    [--debug] [--spray-secondary] [--validate-secondary]
+                    (-e | -s | -v)
 
 Microsoft O365 User Enumerator and Password Sprayer
 
@@ -42,15 +43,20 @@ optional arguments:
                         File containing list of passwords
   -c COUNT, --count COUNT
                         Number of password attempts to run before resetting
-                        lockout timer
+                        lockout timer. Default: 1
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy reset time (in minutes)
+                        Lockout policy reset time (in minutes). Default: 5
+                        minutes
   -d DOMAIN, --domain DOMAIN
                         Domain name to validate against O365
   --proxy PROXY         Proxy to pass traffic through: <ip:port>
   --threads THREADS     Number of threads to run. Default: 10
   --output OUTPUT       Output file name for enumeration and spraying
   --debug               Debug output
+  --spray-secondary     Use `ActiveSync` for password spraying instead of
+                        `Autodiscover`
+  --validate-secondary  Use `openid-configuration` for domain validation
+                        instead of `getuserrealm`
   -e, --enum            Perform username enumeration
   -s, --spray           Perform password spraying
   -v, --validate        Validate a domain is running O365
