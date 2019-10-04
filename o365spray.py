@@ -220,14 +220,13 @@ class Sprayer:
                 self.valid_creds[user] = password
 
             else:
-                output = "[%s%s%s] %s:%s" % (text_colors.red, "INVALID", text_colors.reset, user, password)
+                err,msg = ("BAD_PASSWD", password)
 
                 if status not in [401, 404]:
-                    output += " (Unknown Error [%s])" % status
+                    msg += " (Unknown Error [%s])" % status
 
                 # Handle Autodiscover errors that are returned by the server
                 if "X-AutoDiscovery-Error" in rsp.headers:
-                    err,msg = ("INVALID", password)
                     # Handle Basic Auth blocking - remove user from future rotations
                     if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked","BasicAuthBlockStatus - Deny","BlockBasicAuth - User blocked"]):
                         err = "BLOCKED"
@@ -243,9 +242,7 @@ class Sprayer:
                                 self.user_list.remove(user)
                                 break
 
-                    output = "[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, user, msg)
-
-                print(output)
+                print("[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, user, msg))
 
         except Exception as e:
             if self.debug: print("[ERROR] %s" % e)
