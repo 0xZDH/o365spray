@@ -26,8 +26,8 @@ Perform password spray:<br>
 usage: o365spray.py [-h] [-u USERNAME] [-p PASSWORD] [-U USERNAMES]
                     [-P PASSWORDS] [-c COUNT] [-l LOCKOUT] [-d DOMAIN]
                     [--proxy PROXY] [--threads THREADS] [--output OUTPUT]
-                    [--debug] [--spray-secondary] [--validate-secondary]
-                    (-e | -s | -v)
+                    [--debug] [--paired] [--spray-secondary]
+                    [--validate-secondary] (-e | -s | -v)
 
 Microsoft O365 User Enumerator and Password Sprayer
 
@@ -53,6 +53,7 @@ optional arguments:
   --threads THREADS     Number of threads to run. Default: 10
   --output OUTPUT       Output file name for enumeration and spraying
   --debug               Debug output
+  --paired              Password spray pairing usernames and passwords (1:1).
   --spray-secondary     Use `ActiveSync` for password spraying instead of
                         `Autodiscover`
   --validate-secondary  Use `openid-configuration` for domain validation
