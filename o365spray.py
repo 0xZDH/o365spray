@@ -303,7 +303,7 @@ if __name__ == "__main__":
     # Perform domain validation
     if args.validate:
         validator = Validator(args.domain, proxy=args.proxy, debug=args.debug, secondary=args.validate_secondary)
-        print("[*] Performing O365 validation use for: %s" % args.domain)
+        print("[*] Performing O365 validation for: %s" % args.domain)
         validator.validate()
         # Ensure we do not perform any other function if domain is not O365
         if not validator.o365:
