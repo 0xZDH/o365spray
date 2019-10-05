@@ -23,16 +23,19 @@ Perform password spray:<br>
 
 
 ```
-usage: o365spray.py [-h] [-u USERNAME] [-p PASSWORD] [-U USERNAMES]
-                    [-P PASSWORDS] [-c COUNT] [-l LOCKOUT] [-d DOMAIN]
-                    [--proxy PROXY] [--threads THREADS] [--output OUTPUT]
-                    [--debug] [--paired] [--spray-secondary]
-                    [--validate-secondary] (-e | -s | -v)
+usage: o365spray.py [-h] [-v] [-e] [-s] [-u USERNAME] [-p PASSWORD]
+                    [-U USERNAMES] [-P PASSWORDS] [-c COUNT] [-l LOCKOUT]
+                    [-d DOMAIN] [--proxy PROXY] [--threads THREADS]
+                    [--output OUTPUT] [--paired] [--debug] [--spray-secondary]
+                    [--validate-secondary]
 
 Microsoft O365 User Enumerator and Password Sprayer
 
 optional arguments:
   -h, --help            show this help message and exit
+  -v, --validate        Validate a domain is running O365
+  -e, --enum            Perform username enumeration
+  -s, --spray           Perform password spraying
   -u USERNAME, --username USERNAME
                         Username(s) delimited using commas
   -p PASSWORD, --password PASSWORD
@@ -52,15 +55,12 @@ optional arguments:
   --proxy PROXY         Proxy to pass traffic through: <ip:port>
   --threads THREADS     Number of threads to run. Default: 10
   --output OUTPUT       Output file name for enumeration and spraying
-  --debug               Debug output
   --paired              Password spray pairing usernames and passwords (1:1).
+  --debug               Debug output
   --spray-secondary     Use `ActiveSync` for password spraying instead of
                         `Autodiscover`
   --validate-secondary  Use `openid-configuration` for domain validation
                         instead of `getuserrealm`
-  -e, --enum            Perform username enumeration
-  -s, --spray           Perform password spraying
-  -v, --validate        Validate a domain is running O365
 ```
 
 ## Acknowledgments
