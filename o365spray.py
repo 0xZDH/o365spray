@@ -323,6 +323,8 @@ if __name__ == "__main__":
         # Use validated users if enumeration was run
         if args.enum:
             username_list = enum.valid_accts
+            print("[*] Enumeration was run. Resetting lockout before password spraying.")
+            helper.lockout_reset_wait(args.lockout)
 
         else:
             username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
