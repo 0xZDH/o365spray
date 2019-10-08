@@ -1,1 +1,4 @@
-.DS_Store
+*.pyc
+__pycache__/
+core/*.pyc
+core/__pycache__/

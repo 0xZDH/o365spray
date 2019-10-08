@@ -23,28 +23,27 @@ Perform password spray:<br>
 
 
 ```
-usage: o365spray.py [-h] [-v] [-e] [-s] -d DOMAIN [-u USERNAME] [-p PASSWORD]
-                    [-U USERNAMES] [-P PASSWORDS] [-c COUNT] [-l LOCKOUT]
-                    [--proxy PROXY] [--threads THREADS] [--output OUTPUT]
-                    [--paired] [--debug] [--spray-secondary]
-                    [--validate-secondary]
+usage: o365spray.py [-h] -d DOMAIN [-v] [-e] [-s] [-u USERNAME] [-p PASSWORD]
+                    [-U USERFILE] [-P PASSFILE] [-c COUNT] [-l LOCKOUT]
+                    [--secondary] [--timeout TIMEOUT] [--proxy PROXY]
+                    [--output OUTPUT] [--paired] [--debug]
 
 Microsoft O365 User Enumerator and Password Sprayer
 
 optional arguments:
   -h, --help            show this help message and exit
+  -d DOMAIN, --domain DOMAIN
+                        Target O365 domain
   -v, --validate        Validate a domain is running O365
   -e, --enum            Perform username enumeration
   -s, --spray           Perform password spraying
-  -d DOMAIN, --domain DOMAIN
-                        Domain name to validate against O365
   -u USERNAME, --username USERNAME
                         Username(s) delimited using commas
   -p PASSWORD, --password PASSWORD
                         Password(s) delimited using commas
-  -U USERNAMES, --usernames USERNAMES
+  -U USERFILE, --userfile USERFILE
                         File containing list of usernames
-  -P PASSWORDS, --passwords PASSWORDS
+  -P PASSFILE, --passfile PASSFILE
                         File containing list of passwords
   -c COUNT, --count COUNT
                         Number of password attempts to run before resetting
@@ -52,15 +51,14 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy reset time (in minutes). Default: 5
                         minutes
+  --secondary           Use `ActiveSync` for password spraying instead of
+                        `Autodiscover`. User `OpenID-Config` for validation
+                        instead of `getuserrealm`.
+  --timeout TIMEOUT     Request timeout. Default: 25
   --proxy PROXY         Proxy to pass traffic through: <ip:port>
-  --threads THREADS     Number of threads to run. Default: 10
-  --output OUTPUT       Output file name for enumeration and spraying
+  --output OUTPUT       Output directory. Default: .
   --paired              Password spray pairing usernames and passwords (1:1).
   --debug               Debug output
-  --spray-secondary     Use `ActiveSync` for password spraying instead of
-                        `Autodiscover`
-  --validate-secondary  Use `openid-configuration` for domain validation
-                        instead of `getuserrealm`
 ```
 
 ## Acknowledgments
