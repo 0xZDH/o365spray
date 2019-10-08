@@ -16,17 +16,17 @@ Validate a domain is using O365:<br>
 `python3 o365spray.py --validate --domain test.com`
 
 Perform username enumeration:<br>
-`python3 o365spray.py --enum -U usernames.txt`
+`python3 o365spray.py --enum -U usernames.txt --domain test.com`
 
 Perform password spray:<br>
-`python3 o365spray.py --spray -U usernames.txt -P passwords.txt --count 2 --lockout 5`
+`python3 o365spray.py --spray -U usernames.txt -P passwords.txt --count 2 --lockout 5 --domain test.com`
 
 
 ```
-usage: o365spray.py [-h] [-v] [-e] [-s] [-u USERNAME] [-p PASSWORD]
+usage: o365spray.py [-h] [-v] [-e] [-s] -d DOMAIN [-u USERNAME] [-p PASSWORD]
                     [-U USERNAMES] [-P PASSWORDS] [-c COUNT] [-l LOCKOUT]
-                    [-d DOMAIN] [--proxy PROXY] [--threads THREADS]
-                    [--output OUTPUT] [--paired] [--debug] [--spray-secondary]
+                    [--proxy PROXY] [--threads THREADS] [--output OUTPUT]
+                    [--paired] [--debug] [--spray-secondary]
                     [--validate-secondary]
 
 Microsoft O365 User Enumerator and Password Sprayer
@@ -36,6 +36,8 @@ optional arguments:
   -v, --validate        Validate a domain is running O365
   -e, --enum            Perform username enumeration
   -s, --spray           Perform password spraying
+  -d DOMAIN, --domain DOMAIN
+                        Domain name to validate against O365
   -u USERNAME, --username USERNAME
                         Username(s) delimited using commas
   -p PASSWORD, --password PASSWORD
@@ -50,8 +52,6 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy reset time (in minutes). Default: 5
                         minutes
-  -d DOMAIN, --domain DOMAIN
-                        Domain name to validate against O365
   --proxy PROXY         Proxy to pass traffic through: <ip:port>
   --threads THREADS     Number of threads to run. Default: 10
   --output OUTPUT       Output file name for enumeration and spraying
