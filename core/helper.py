@@ -2,7 +2,6 @@
 
 import sys
 import time
-from datetime import datetime
 from datetime import timedelta
 
 class Helper:
@@ -39,14 +38,10 @@ class Helper:
             minutes=lockout,
             seconds=0
         )
-        target  = datetime.now()
-        one_sec = timedelta(seconds=1)
         for remaining in range(int(delay.total_seconds()), 0, -1):
-            target += one_sec
             sys.stdout.write(f"\r[*] Next spray in: {timedelta(seconds=remaining - 1)}")
             sys.stdout.flush()
-            duration = (target - datetime.now()).total_seconds()
-            if duration > 0: time.sleep(duration)
+            time.sleep(1)
         sys.stdout.write('\n')
         sys.stdout.flush()
 

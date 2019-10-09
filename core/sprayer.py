@@ -88,16 +88,16 @@ class Sprayer:
 
             # Invalid credentials
             else:
-                err,msg = ("BAD_PASSWD", password)
+                err,msg = ("BAD_PASSWD", "%s%s" % (password, self.helper.space))
                 if status not in [401, 404]:
-                    msg += " (Unknown Error [%s])" % status
+                    msg += " (Unknown Error [%s])%s" % (status, self.helper.space)
 
                 # Handle Autodiscover errors that are returned by the server
                 if "X-AutoDiscovery-Error" in rsp.headers:
                     # Handle Basic Auth blocking
                     if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked","BasicAuthBlockStatus - Deny","BlockBasicAuth - User blocked"]):
                         err = "BLOCKED"
-                        msg = " Basic Auth blocked for this user. Removing from spray rotation."
+                        msg = " Basic Auth blocked for this user. Removing from spray rotation.%s\n" % self.helper.space
                         self.userlist.remove(user)
 
                     else:
@@ -105,11 +105,11 @@ class Sprayer:
                         for code in self.settings["AADSTS_codes"].keys():
                             if code in rsp.headers.get("X-AutoDiscovery-Error"):
                                 err = self.settings["AADSTS_codes"][code][0]
-                                msg = " %s. Removing from spray rotation." % self.settings["AADSTS_codes"][code][1]
+                                msg = " %s. Removing from spray rotation.%s\n" % (self.settings["AADSTS_codes"][code][1], self.helper.space)
                                 self.userlist.remove(user)
                                 break
 
-                sys.stdout.write("\r[%s%s%s] %s:%s%s" % (text_colors.red, err, text_colors.reset, email, msg, self.helper.space))
+                sys.stdout.write("\r[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, email, msg))
                 sys.stdout.flush()
 
         except Exception as e:
