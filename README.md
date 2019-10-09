@@ -1,20 +1,12 @@
 # o365spray
 
-This is a basic username enumeration and password spraying tool aimed at Microsoft O365. For educational purposes only.
+This is a username enumeration and password spraying tool aimed at Microsoft O365. For educational purposes only.
 
-Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. If an account on a non-O365 domain is attempted Microsoft will not flag this as an invalid username (404 HTTP response), but instead return responses making it seem as if the account is is valid and the password was incorrect. This allows for false positives during enumeration so this tool includes the `--validate` flag in order to identify if a specific domain is using Microsoft O365 prior to performing spraying/enumeration.
+Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. If an account on a non-O365 domain is attempted Microsoft will not flag this as an invalid username (404 HTTP response), but instead returns false positives making it seem as if the account is is valid and the password was incorrect.
 
-The best way to use this script is to:
-1. Validate any and all domains
-2. Enumerate potential users
-3. Spray valid users
-
-NOTE: User enumeration is performed by submitting a single authentication attempt per user. If user enumeration is performed prior to password spraying please consider that all valid users have already submitted a single authentication attempt.
+NOTE: User enumeration is performed by submitting a single authentication attempt per user. If user enumeration is performed prior to password spraying please consider that all valid users have already submitted a single authentication attempt. If enumeration and spraying are run together, the tool will automatically reset the lockout timer prior to password spraying.
 
 ## Usage
-Validate a domain is using O365:<br>
-`python3 o365spray.py --validate --domain test.com`
-
 Perform username enumeration:<br>
 `python3 o365spray.py --enum -U usernames.txt --domain test.com`
 
@@ -23,7 +15,7 @@ Perform password spray:<br>
 
 
 ```
-usage: o365spray.py [-h] -d DOMAIN [-v] [-e] [-s] [-u USERNAME] [-p PASSWORD]
+usage: o365spray.py [-h] -d DOMAIN [-e] [-s] [-u USERNAME] [-p PASSWORD]
                     [-U USERFILE] [-P PASSFILE] [-c COUNT] [-l LOCKOUT]
                     [--secondary] [--timeout TIMEOUT] [--proxy PROXY]
                     [--output OUTPUT] [--paired] [--debug]
@@ -34,7 +26,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -d DOMAIN, --domain DOMAIN
                         Target O365 domain
-  -v, --validate        Validate a domain is running O365
   -e, --enum            Perform username enumeration
   -s, --spray           Perform password spraying
   -u USERNAME, --username USERNAME
