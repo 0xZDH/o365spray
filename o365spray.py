@@ -134,7 +134,7 @@ if __name__ == "__main__":
                     # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
 
             except KeyboardInterrupt:
-                print("\n [!] CTRL-C caught. Exitting...")
+                print("\n[!] CTRL-C caught. Exitting...")
                 pass
 
             print("\n[+] Valid Credentials: %d" % len(spray.valid_creds))
