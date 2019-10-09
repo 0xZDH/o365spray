@@ -59,9 +59,16 @@ if __name__ == "__main__":
         password = "Password1" if not args.password else args.password
         print("\n[*] Performing user enumeration against %d potential users" % (len(userlist)))
         enum = Enumerator(timeout=args.timeout, proxy=args.proxy, debug=args.debug)
-        enum.loop.run_until_complete(enum.run(userlist, args.domain, password))
+        try:
+            enum.loop.run_until_complete(enum.run(userlist, args.domain, password))
 
-        print("[+] Valid Accounts: %d" % len(enum.valid_accts))
+        except KeyboardInterrupt:
+            print("\n[*] Ctrl-C detected. Exitting enumeration...")
+            enum.loop.close()
+            args.spray = False
+            pass
+
+        print("\n[+] Valid Accounts: %d" % len(enum.valid_accts))
         helper.write_data(enum.valid_accts, "%s/valid_users.txt" % (args.output))
 
     # Perform password spray
@@ -83,20 +90,26 @@ if __name__ == "__main__":
             spray = Sprayer(userlist, timeout=args.timeout, proxy=args.proxy, debug=args.debug, secondary=args.secondary)
 
             print("\n[*] Performing password spray against %d users" % (len(userlist)))
-            if not args.paired:
-                for password_chunk in helper.get_chunks_from_list(passlist, args.count):
-                    print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
-                    spray.loop.run_until_complete(spray.run(password_chunk, args.domain))
-                    if not helper.check_last_chunk(password_chunk, passlist):
-                        print("[*] Sleeping for %.1f minutes" % (args.lockout))
-                        helper.lockout_reset_wait(args.lockout)
+            try:
+                if not args.paired:
+                    for password_chunk in helper.get_chunks_from_list(passlist, args.count):
+                        print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
+                        spray.loop.run_until_complete(spray.run(password_chunk, args.domain))
+                        if not helper.check_last_chunk(password_chunk, passlist):
+                            print("\n[*] Sleeping for %.1f minutes" % (args.lockout))
+                            helper.lockout_reset_wait(args.lockout)
 
-            else:
-                print("[*] Password spraying using paired usernames and passwords.")
-                spray.loop.run_until_complete(spray.run_paired(passlist, args.domain))
-                # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
+                else:
+                    print("[*] Password spraying using paired usernames and passwords.")
+                    spray.loop.run_until_complete(spray.run_paired(passlist, args.domain))
+                    # Since we are pairing usernames and passwords, we can ignore the lockout reset wait call
 
-            print("[+] Valid Credentials: %d" % len(spray.valid_creds))
+            except KeyboardInterrupt:
+                print("\n[*] Ctrl-C detected. Exitting password spray...")
+                spray.loop.close()
+                pass
+
+            print("\n[+] Valid Credentials: %d" % len(spray.valid_creds))
             helper.write_data(spray.valid_creds, "%s/valid_credentials.txt" % (args.output))
 
         else:

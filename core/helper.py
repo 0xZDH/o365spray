@@ -5,6 +5,8 @@ import time
 class Helper:
     """ Helper functions """
 
+    space = ' ' * 10
+
     def write_data(self, creds, _file):
         if len(creds) > 0:
             if type(creds) == dict: creds = ['%s:%s' % (k, v) for k, v in creds.items()]

