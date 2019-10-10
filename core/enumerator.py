@@ -19,8 +19,9 @@ class Enumerator:
     helper = Helper() # Helper functions
 
     def __init__(self, args):
-        self.args    = args
-        self.proxy   = None if not args.proxy else {
+        self.settings = activesync
+        self.args     = args
+        self.proxy    = None if not args.proxy else {
             "http": args.proxy, "https": args.proxy
         }
 
@@ -44,7 +45,7 @@ class Enumerator:
             email   = self.helper.check_email(user, self.args.domain)
             headers = {"MS-ASProtocolVersion": "14.0"}
             auth    = (email, password)
-            rsp     = requests.options(enum_url, headers=headers, auth=auth, timeout=self.args.timeout, proxies=self.proxy, verify=False)
+            rsp     = self.settings["method"](self.settings["url"], headers=headers, auth=auth, timeout=self.args.timeout, proxies=self.proxy, verify=False)
 
             status = rsp.status_code
             if status in [200, 401, 403]:

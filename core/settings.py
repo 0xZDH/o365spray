@@ -14,21 +14,12 @@ headers = {
     "Upgrade-Insecure-Requests": "1"
 }
 
-# == Validate Settings
-
-validate_url = [
+# MSOnline data
+msonline = {
     # getuserrealm seems to be considerably faster when identifying if a domain uses O365
-    "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1",
-    "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration"
-]
-
-
-# == Enum Settings
-
-enum_url = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
-
-
-# == Spray Settings
+    "url":  "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1",
+    "url2": "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration"
+}
 
 # Autodiscover data
 autodiscover = {

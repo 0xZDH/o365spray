@@ -11,13 +11,13 @@ class Validator:
 
     def __init__(self, args):
         self.args  = args
-        self.url   = validate_url[0]
+        self.url   = msonline["url"]
         self.o365  = False
         self.proxy = None if not args.proxy else {
             "http": args.proxy, "https": args.proxy
         }
         if args.secondary:
-            self.url = validate_url[1]
+            self.url = msonline["url2"]
 
     def validate(self):
         try:
