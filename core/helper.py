@@ -12,7 +12,7 @@ class Helper:
     def write_data(self, creds, _file):
         if len(creds) > 0:
             if type(creds) == dict: creds = ['%s:%s' % (k, v) for k, v in creds.items()]
-            with open(_file, 'w') as f:
+            with open(_file, 'a') as f:
                 for account in creds:
                     f.write("%s\n" % account)
 

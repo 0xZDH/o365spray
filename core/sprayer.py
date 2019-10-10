@@ -81,23 +81,23 @@ class Sprayer:
                 if status != 200:
                     msg += " (Manually confirm [2FA, Locked, etc.])"
 
-                sys.stdout.write("\r[%s%s%s] %s:%s%s\n" % (text_colors.green, ok, text_colors.reset, email, msg, self.helper.space))
+                sys.stdout.write("[%s%s%s] %s:%s%s\n" % (text_colors.green, ok, text_colors.reset, email, msg, self.helper.space))
                 sys.stdout.flush()
                 self.valid_creds[email] = password
                 self.userlist.remove(user) # Remove valid user from being sprayed again
 
             # Invalid credentials
             else:
-                err,msg = ("BAD_PASSWD", "%s%s" % (password, self.helper.space))
+                err,msg = ("BAD_PASSWD", password)
                 if status not in [401, 404]:
-                    msg += " (Unknown Error [%s])%s" % (status, self.helper.space)
+                    msg += " (Unknown Error [%s])" % (status)
 
                 # Handle Autodiscover errors that are returned by the server
                 if "X-AutoDiscovery-Error" in rsp.headers:
                     # Handle Basic Auth blocking
                     if any(_str in rsp.headers.get("X-AutoDiscovery-Error") for _str in ["Basic Auth Blocked","BasicAuthBlockStatus - Deny","BlockBasicAuth - User blocked"]):
                         err = "BLOCKED"
-                        msg = " Basic Auth blocked for this user. Removing from spray rotation.%s\n" % self.helper.space
+                        msg = " Basic Auth blocked for this user. Removing from spray rotation.\n"
                         self.userlist.remove(user)
 
                     else:
@@ -105,13 +105,13 @@ class Sprayer:
                         for code in self.settings["AADSTS_codes"].keys():
                             if code in rsp.headers.get("X-AutoDiscovery-Error"):
                                 err = self.settings["AADSTS_codes"][code][0]
-                                msg = " %s. Removing from spray rotation.%s\n" % (self.settings["AADSTS_codes"][code][1], self.helper.space)
+                                msg = " %s. Removing from spray rotation.\n" % (self.settings["AADSTS_codes"][code][1])
                                 self.userlist.remove(user)
                                 break
 
-                sys.stdout.write("\r[%s%s%s] %s:%s" % (text_colors.red, err, text_colors.reset, email, msg))
+                sys.stdout.write("[%s%s%s] %s:%s%s\r" % (text_colors.red, err, text_colors.reset, email, msg, self.helper.space))
                 sys.stdout.flush()
 
         except Exception as e:
-            if self.args.debug: print("[ERROR] %s" % e)
+            if self.args.debug: print("\n[ERROR] %s" % e)
             pass

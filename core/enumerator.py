@@ -48,18 +48,18 @@ class Enumerator:
 
             status = rsp.status_code
             if status in [200, 401, 403]:
-                sys.stdout.write("\r[%s%s-%d%s] %s%s\n" % (text_colors.green, "VALID_USER", status, text_colors.reset, email, self.helper.space))
+                sys.stdout.write("[%s%s-%d%s] %s%s\n" % (text_colors.green, "VALID_USER", status, text_colors.reset, email, self.helper.space))
                 sys.stdout.flush()
                 self.valid_accts.append(user)
 
             elif status == 404 and rsp.headers.get("X-CasErrorCode") == "UserNotFound":
-                sys.stdout.write("\r[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space))
+                sys.stdout.write("[%s%s%s] %s%s\r" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space))
                 sys.stdout.flush()
 
             else:
-                sys.stdout.write("\r[%s%s%s] %s%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space))
+                sys.stdout.write("[%s%s%s] %s%s\r" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space))
                 sys.stdout.flush()
 
         except Exception as e:
-            if self.args.debug: print("[ERROR] %s" % e)
+            if self.args.debug: print("\n[ERROR] %s" % e)
             pass
