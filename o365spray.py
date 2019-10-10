@@ -11,7 +11,7 @@ from core.validator import Validator
 from core.enumerator import Enumerator
 
 
-# From: https://github.com/byt3bl33d3r/SprayingToolkit/blob/master/core/utils/time.py
+# From: https://github.com/byt3bl33d3r/SprayingToolkit/blob/master/atomizer.py
 def add_handlers(loop, callback):
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(sig, callback)
