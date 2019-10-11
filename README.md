@@ -42,8 +42,8 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy reset time (in minutes). Default: 5
                         minutes
-  --secondary           Use `ActiveSync` for password spraying instead of
-                        `Autodiscover`. User `OpenID-Config` for validation
+  --secondary           Use `ActiveSync` for password spraying. Use 
+                        `OpenID-Config` for validation
                         instead of `getuserrealm`.
   --timeout TIMEOUT     Request timeout. Default: 25
   --proxy PROXY         Proxy to pass traffic through: <ip:port>
