@@ -42,7 +42,7 @@ class Helper:
             sys.stdout.write(f"\r[*] Next spray in: {timedelta(seconds=remaining - 1)}")
             sys.stdout.flush()
             time.sleep(1)
-        sys.stdout.write('\n')
+        sys.stdout.write('\n\n')
         sys.stdout.flush()
 
     def check_email(self, user, domain):

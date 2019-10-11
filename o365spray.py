@@ -119,7 +119,7 @@ if __name__ == "__main__":
                     for password_chunk in helper.get_chunks_from_list(passlist, args.count):
                         print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
                         loop.run_until_complete(spray.run(loop, password_chunk))
-                        sys.stdout.write('\n')
+                        sys.stdout.write('\n\n')
                         sys.stdout.flush()
                         remove_handlers(loop)
                         if not spray.running: break
