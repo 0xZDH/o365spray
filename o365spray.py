@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("-P", "--passfile", type=str, help="File containing list of passwords")
     parser.add_argument("-c", "--count",    type=int,   help="Number of password attempts to run before resetting lockout timer. Default: 1", default=1)
     parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 5 minutes", default=5.0)
-    parser.add_argument("--secondary",      action="store_true", help="Use `ActiveSync` for password spraying. Use `OpenID-Config` for validation instead of `getuserrealm`.")
+    parser.add_argument("--secondary",      action="store_true", help="Use `ActiveSync` for password spraying. Use `OpenID-Config` for validation.")
 
     parser.add_argument("--timeout", type=int, help="Request timeout. Default: 25", default=25)
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>")
