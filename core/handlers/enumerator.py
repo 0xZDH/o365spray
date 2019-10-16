@@ -63,10 +63,10 @@ class Enumerator:
                     self.valid_accts.append(user)
 
                 elif status == 404 and "X-CasErrorCode" in response.headers.keys() and response.headers["X-CasErrorCode"] == "UserNotFound":
-                    print("[%s%s%s] %s%s\r" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
+                    print("[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
 
                 else:
-                    print("[%s%s%s] %s%s\r" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space), end='\r')
+                    print("[%s%s%s] %s%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space), end='\r')
 
                 await response.text()
 
