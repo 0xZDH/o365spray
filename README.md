@@ -57,5 +57,5 @@ optional arguments:
 
 **grimhacker** - *Research and discovery of user enumeration within Office 365 via ActiveSync.* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and the [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/) tool.<br>
 **byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)<br>
-**sensepost** - [Ruler](https://github.com/sensepost/ruler/)
+**sensepost** - [Ruler](https://github.com/sensepost/ruler/)<br>
 **cgarciae** - [Pypeln](https://github.com/cgarciae/pypeln/blob/master/pypeln/asyncio_task.py#L638) -> https://medium.com/@cgarciae/making-an-infinite-number-of-requests-with-python-aiohttp-pypeln-3a552b97dc95
