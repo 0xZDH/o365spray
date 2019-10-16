@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+# This only sends a single request so we can leave it using the requests function and avoid asyncio
 import requests
 import xml.etree.ElementTree as ET
-from .colors import text_colors
-from .settings import *
+from core.utils.colors import text_colors
+from core.utils.config import *
 
 
 class Validator:

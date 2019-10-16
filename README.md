@@ -17,8 +17,8 @@ Perform password spray:<br>
 ```
 usage: o365spray.py [-h] -d DOMAIN [-e] [-s] [-u USERNAME] [-p PASSWORD]
                     [-U USERFILE] [-P PASSFILE] [-c COUNT] [-l LOCKOUT]
-                    [--secondary] [--timeout TIMEOUT] [--proxy PROXY]
-                    [--output OUTPUT] [--paired] [--debug]
+                    [--limit LIMIT] [--secondary] [--timeout TIMEOUT]
+                    [--proxy PROXY] [--output OUTPUT] [--paired] [--debug]
 
 Microsoft O365 User Enumerator and Password Sprayer
 
@@ -42,10 +42,12 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy reset time (in minutes). Default: 5
                         minutes
-  --secondary           Use `ActiveSync` for password spraying. Use
-                        `OpenID-Config` for validation.
+  --limit LIMIT         Number of concurrent connections during enum and
+                        spray. Default: 100
+  --secondary           Use `ActiveSync` for password spraying. Use `OpenID-
+                        Config` for validation.
   --timeout TIMEOUT     Request timeout. Default: 25
-  --proxy PROXY         Proxy to pass traffic through: <ip:port>
+  --proxy PROXY         Proxy to pass traffic through: [http(s)://ip:port]
   --output OUTPUT       Output directory. Default: .
   --paired              Password spray pairing usernames and passwords (1:1).
   --debug               Debug output

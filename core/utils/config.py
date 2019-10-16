@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import requests
-
 # == Global Settings
 
 headers = {
@@ -24,7 +22,6 @@ msonline = {
 # Autodiscover data
 autodiscover = {
 	"url": "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml",
-	"method": requests.get,
     "status_codes": {
         200: "VALID_CREDS",
         456: "FOUND_CREDS"
@@ -40,7 +37,6 @@ autodiscover = {
 # ActiveSync data
 activesync = {
 	"url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
-	"method": requests.options,
 	"status_codes": {
         200: "VALID_CREDS",
         403: "FOUND_CREDS"

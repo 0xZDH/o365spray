@@ -38,12 +38,12 @@ class Helper:
             minutes=lockout,
             seconds=0
         )
+        sys.stdout.write('\n\n')
         for remaining in range(int(delay.total_seconds()), 0, -1):
             sys.stdout.write(f"\r[*] Next spray in: {timedelta(seconds=remaining - 1)}")
             sys.stdout.flush()
             time.sleep(1)
         sys.stdout.write('\n\n')
-        sys.stdout.flush()
 
     def check_email(self, user, domain):
         if '@' in user:

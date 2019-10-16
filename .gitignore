@@ -4,4 +4,10 @@ __pycache__/
 core/.DS_Store
 core/*.pyc
 core/__pycache__/
+core/utils/.DS_Store
+core/utils/*.pyc
+core/utils/__pycache__/
+core/handlers/.DS_Store
+core/handlers/*.pyc
+core/handlers/__pycache__/
 test/
