@@ -22,9 +22,14 @@ msonline = {
 # Autodiscover data
 autodiscover = {
 	"url": "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml",
+    "enum_url": "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1",
     "status_codes": {
         200: "VALID_CREDS",
         456: "FOUND_CREDS"
+    },
+    "enum_codes": {
+        "good": [200],
+        "bad": [302]
     },
     # https://docs.microsoft.com/en-us/azure/active-directory/develop/reference-aadsts-error-codes
     "AADSTS_codes": {
@@ -37,10 +42,13 @@ autodiscover = {
 # ActiveSync data
 activesync = {
 	"url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
+    "enum_url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
 	"status_codes": {
         200: "VALID_CREDS",
         403: "FOUND_CREDS"
-        # 401: "BAD_PASSWD"
-        # 404: "INVALID_USER"
+    },
+    "enum_codes": {
+        "good": [200, 403, 401],
+        "bad": [404]
     }
 }

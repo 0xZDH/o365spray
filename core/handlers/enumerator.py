@@ -21,9 +21,11 @@ class Enumerator:
     helper = Helper() # Helper functions
 
     def __init__(self, args):
-        self.args   = args
-        self.config = activesync
+        self.args       = args
+        self.config     = autodiscover if not args.secondary else activesync
         self.task_limit = self.args.limit
+        if self.args.secondary:
+            headers["MS-ASProtocolVersion"] = "14.0"
 
     def shutdown(self, key=False):
         # Print new line after ^C
@@ -46,27 +48,34 @@ class Enumerator:
         """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
         try:
 
-            headers["MS-ASProtocolVersion"] = "14.0"
-            email = self.helper.check_email(user, self.args.domain)
-            auth  = (email, password)
-            async with session.options(
-                        self.config["url"],
-                        auth=aiohttp.BasicAuth(email, password),
+            email  = self.helper.check_email(user, self.args.domain)
+            method = session.get if not self.args.secondary else session.options
+            auth   = None if not self.args.secondary else aiohttp.BasicAuth(email, password)
+            async with method(
+                        self.config["enum_url"].format(EMAIL=email),
+                        auth=auth,
                         headers=headers,
                         proxy=self.args.proxy,
+                        allow_redirects=False,
                         timeout=self.args.timeout
                     ) as response:
 
                 status = response.status
-                if status in [200, 401, 403]:
+                if status in self.config["enum_codes"]["good"]:
                     print("[%s%s-%d%s] %s%s" % (text_colors.green, "VALID_USER", status, text_colors.reset, email, self.helper.space))
                     self.valid_accts.append(user)
 
-                elif status == 404 and "X-CasErrorCode" in response.headers.keys() and response.headers["X-CasErrorCode"] == "UserNotFound":
-                    print("[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
+                elif status in self.config["enum_codes"]["bad"]:
 
-                else:
-                    print("[%s%s%s] %s%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space), end='\r')
+                    if status == 404:
+                        if "X-CasErrorCode" in response.headers.keys() and response.headers["X-CasErrorCode"] == "UserNotFound":
+                            print("[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
+
+                        else:
+                            print("[%s%s%s] %s%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space), end='\r')
+
+                    else:
+                        print("[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
 
                 await response.text()
 

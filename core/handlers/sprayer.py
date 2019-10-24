@@ -61,6 +61,7 @@ class Sprayer:
                 auth=aiohttp.BasicAuth(email, password),
                 headers=headers,
                 proxy=self.args.proxy,
+                allow_redirects=False,
                 timeout=self.args.timeout
             ) as response:
 

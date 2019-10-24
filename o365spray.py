@@ -105,10 +105,12 @@ if __name__ == "__main__":
 
         # Use validated users if enumeration was run
         if args.enum:
-            print("\n[*] Enumeration was run. Resetting lockout before password spraying.")
-            print("[*] Sleeping for %.1f minutes" % (args.lockout))
             userlist = enum.valid_accts
-            helper.lockout_reset_wait(args.lockout)
+            # Sleep if ActiveSync was used for enumeration
+            if args.secondary:
+                print("\n[*] Enumeration was run. Resetting lockout before password spraying.")
+                print("[*] Sleeping for %.1f minutes" % (args.lockout))
+                helper.lockout_reset_wait(args.lockout)
 
         else:
             userlist = helper.get_list_from_file(args.userfile) if args.userfile else args.username.split(',')

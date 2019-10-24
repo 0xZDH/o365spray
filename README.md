@@ -2,11 +2,12 @@
 
 This is a username enumeration and password spraying tool aimed at Microsoft O365. For educational purposes only.
 
-Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. If an account on a non-O365 domain is attempted Microsoft will not flag this as an invalid username (404 HTTP response), but instead returns false positives making it seem as if the account is is valid and the password was incorrect.
+Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. User enumeration and password spraying can both be done using Microsoft's Autodiscover and ActiveSync APIs. Microsoft returns false positives for non-O365 domain accounts so this tool has an auto-validate feature to ensure the target domain is using O365.
 
-NOTE: User enumeration is performed by submitting a single authentication attempt per user. If user enumeration is performed prior to password spraying please consider that all valid users have already submitted a single authentication attempt. If enumeration and spraying are run together, the tool will automatically reset the lockout timer prior to password spraying.
+NOTE: ActiveSync (secondary) user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray. Autodiscover user enumeration works without any authentication attempts and does not require a lockout reset before password spraying.
 
 ## Usage
+
 Perform username enumeration:<br>
 `python3 o365spray.py --enum -U usernames.txt --domain test.com`
 
@@ -56,6 +57,7 @@ optional arguments:
 ## Acknowledgments
 
 **grimhacker** - *Research and discovery of user enumeration within Office 365 via ActiveSync.* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and the [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/) tool.<br>
+**Raikia** - [UhOh365](https://github.com/Raikia/UhOh365) - User enumeration using Autodiscover without an authentication attempt<br>
 **byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)<br>
 **sensepost** - [Ruler](https://github.com/sensepost/ruler/)<br>
 **cgarciae** - [Pypeln](https://github.com/cgarciae/pypeln/blob/master/pypeln/asyncio_task.py#L638) -> https://medium.com/@cgarciae/making-an-infinite-number-of-requests-with-python-aiohttp-pypeln-3a552b97dc95
