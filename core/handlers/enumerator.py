@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Based on: https://bitbucket.org/grimhacker/office365userenum/
+#           https://github.com/Raikia/UhOh365
 
 import sys
 import signal

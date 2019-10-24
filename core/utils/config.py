@@ -21,7 +21,7 @@ msonline = {
 
 # Autodiscover data
 autodiscover = {
-	"url": "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml",
+    "url": "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml",
     "enum_url": "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1",
     "status_codes": {
         200: "VALID_CREDS",
@@ -41,9 +41,9 @@ autodiscover = {
 
 # ActiveSync data
 activesync = {
-	"url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
+    "url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
     "enum_url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
-	"status_codes": {
+    "status_codes": {
         200: "VALID_CREDS",
         403: "FOUND_CREDS"
     },
