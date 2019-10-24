@@ -78,6 +78,9 @@ class Enumerator:
                     else:
                         print("[%s%s%s] %s%s" % (text_colors.red, "INVALID_USER", text_colors.reset, email, self.helper.space), end='\r')
 
+                else:
+                    print("[%s%s%s] %s%s" % (text_colors.yellow, "UNKNOWN", text_colors.reset, email, self.helper.space), end='\r')
+
                 await response.text()
 
         except Exception as e:
