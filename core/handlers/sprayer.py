@@ -19,10 +19,11 @@ class Sprayer:
 
     def __init__(self, userlist, args):
         self.args       = args
+        self.lockout    = False
         self.task_limit = self.args.limit
         self.userlist   = userlist
-        self.config     = autodiscover if not args.secondary else activesync
-        if args.secondary:
+        self.config     = autodiscover if not args.secondary and not args.spray_secondary else activesync
+        if args.secondary or args.spray_secondary:
             headers["MS-ASProtocolVersion"] = "14.0"
 
 
@@ -54,7 +55,7 @@ class Sprayer:
     async def spray(self, session, user, password):
         try:
 
-            method = session.get if not self.args.secondary else session.options
+            method = session.get if not self.args.secondary and not self.args.spray_secondary else session.options
             email  = self.helper.check_email(user, self.args.domain)
             async with method(
                 self.config["url"],
@@ -104,6 +105,12 @@ class Sprayer:
                             for code in self.config["AADSTS_codes"].keys():
 
                                 if code in response.headers["X-AutoDiscovery-Error"]:
+
+                                    # This is where we handle lockout termination
+                                    # For now, we will just stop future sprays if a single lockout is hit
+                                    if code == "AADSTS50053" and self.args.safe:
+                                        del self.userlist[:] # Clear out userlist to stop future sprays from being queued
+                                        self.lockout = True  # Mark lockout as True to tell main code to stop
 
                                     err = self.config["AADSTS_codes"][code][0]
                                     msg = " %s. Removing from spray rotation.\n" % (self.config["AADSTS_codes"][code][1])

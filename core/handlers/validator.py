@@ -17,7 +17,7 @@ class Validator:
         self.proxy = None if not args.proxy else {
             "http": args.proxy, "https": args.proxy
         }
-        if args.secondary:
+        if args.secondary or args.validate_secondary:
             self.url = msonline["url2"]
 
     def validate(self):

@@ -18,8 +18,10 @@ Perform password spray:<br>
 ```
 usage: o365spray.py [-h] -d DOMAIN [-e] [-s] [-u USERNAME] [-p PASSWORD]
                     [-U USERFILE] [-P PASSFILE] [-c COUNT] [-l LOCKOUT]
-                    [--limit LIMIT] [--secondary] [--timeout TIMEOUT]
-                    [--proxy PROXY] [--output OUTPUT] [--paired] [--debug]
+                    [--limit LIMIT] [--validate] [--secondary]
+                    [--validate-secondary] [--enum-secondary]
+                    [--spray-secondary] [--timeout TIMEOUT] [--proxy PROXY]
+                    [--output OUTPUT] [--safe] [--paired] [--debug]
 
 Microsoft O365 User Enumerator and Password Sprayer
 
@@ -41,15 +43,22 @@ optional arguments:
                         Number of password attempts to run before resetting
                         lockout timer. Default: 1
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy reset time (in minutes). Default: 5
+                        Lockout policy reset time (in minutes). Default: 15
                         minutes
   --limit LIMIT         Number of concurrent connections during enum and
                         spray. Default: 100
-  --secondary           Use `ActiveSync` for password spraying. Use `OpenID-
-                        Config` for validation.
+  --validate            Perform domain validation only.
+  --secondary           Use all secondary targets.
+  --validate-secondary  Use `OpenID-Config` for validation instead of
+                        `getuserrealm`.
+  --enum-secondary      Use `ActiveSync` for user enumeration instead of
+                        `Autodiscover`.
+  --spray-secondary     Use `ActiveSync` for password spraying instead of
+                        `Autodiscover`.
   --timeout TIMEOUT     Request timeout. Default: 25
   --proxy PROXY         Proxy to pass traffic through: [http(s)://ip:port]
-  --output OUTPUT       Output directory. Default: .
+  --output OUTPUT       Output directory. Default: Current directory
+  --safe                Terminate tool if a locked account is identified.
   --paired              Password spray pairing usernames and passwords (1:1).
   --debug               Debug output
 ```

@@ -36,18 +36,26 @@ if __name__ == "__main__":
     parser.add_argument("-U", "--userfile", type=str,   help="File containing list of usernames")
     parser.add_argument("-P", "--passfile", type=str,   help="File containing list of passwords")
     parser.add_argument("-c", "--count",    type=int,   help="Number of password attempts to run before resetting lockout timer. Default: 1", default=1)
-    parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 5 minutes", default=5.0)
-    parser.add_argument("--limit",          type=int,   help="Number of concurrent connections during enum and spray. Default: 100", default=100)
-    parser.add_argument("--secondary",      action="store_true", help="Use `ActiveSync` for password spraying. Use `OpenID-Config` for validation.")
+    parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 15 minutes", default=15.0)
+    parser.add_argument("--limit",    type=int, help="Number of concurrent connections during enum and spray. Default: 100", default=100)
+    parser.add_argument("--validate", action="store_true", help="Perform domain validation only.")
+
+    # Allow for secondary target specification
+    parser.add_argument("--secondary",          action="store_true", help="Use all secondary targets.")
+    parser.add_argument("--validate-secondary", action="store_true", help="Use `OpenID-Config` for validation instead of `getuserrealm`.")
+    parser.add_argument("--enum-secondary",     action="store_true", help="Use `ActiveSync` for user enumeration instead of `Autodiscover`.")
+    parser.add_argument("--spray-secondary",    action="store_true", help="Use `ActiveSync` for password spraying instead of `Autodiscover`.")
 
     parser.add_argument("--timeout", type=int, help="Request timeout. Default: 25", default=25)
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: [http(s)://ip:port]")
-    parser.add_argument("--output",  type=str, help="Output directory. Default: .", default="./")
+    parser.add_argument("--output",  type=str, help="Output directory. Default: Current directory", default="./")
+    parser.add_argument("--safe",    action="store_true", help="Terminate tool if a locked account is identified.")
     parser.add_argument("--paired",  action="store_true", help="Password spray pairing usernames and passwords (1:1).")
     parser.add_argument("--debug",   action="store_true", help="Debug output")
 
     args = parser.parse_args()
 
+    # Lazy banner...
     print("*** O365 Spray ***")
 
     # If enumerating users make sure we have a username or username file
@@ -66,7 +74,7 @@ if __name__ == "__main__":
     print("[*] Performing O365 validation for: %s" % args.domain)
     validator = Validator(args=args)
     validator.validate()
-    if not validator.o365:
+    if not validator.o365 or args.validate:
         (args.enum, args.spray) = (False, False)
 
 
@@ -135,6 +143,10 @@ if __name__ == "__main__":
                         print("[*] Password spraying the following passwords: [%s]" % (", ".join("'%s'" % password for password in password_chunk)))
 
                         loop.run_until_complete(spray.run(password_chunk))
+
+                        # Handle lock outs if --safe is set
+                        if spray.lockout:
+                            break
 
                         # Check if we reached the last password chunk
                         if not helper.check_last_chunk(password_chunk, passlist):

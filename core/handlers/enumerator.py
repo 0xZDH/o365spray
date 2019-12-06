@@ -23,9 +23,9 @@ class Enumerator:
 
     def __init__(self, args):
         self.args       = args
-        self.config     = autodiscover if not args.secondary else activesync
+        self.config     = autodiscover if not args.secondary and not args.enum_secondary else activesync
         self.task_limit = self.args.limit
-        if self.args.secondary:
+        if self.args.secondary or self.args.enum_secondary:
             headers["MS-ASProtocolVersion"] = "14.0"
 
     def shutdown(self, key=False):
@@ -50,8 +50,8 @@ class Enumerator:
         try:
 
             email  = self.helper.check_email(user, self.args.domain)
-            method = session.get if not self.args.secondary else session.options
-            auth   = None if not self.args.secondary else aiohttp.BasicAuth(email, password)
+            method = session.get if not self.args.secondary and not self.args.enum_secondary else session.options
+            auth   = None if not self.args.secondary and not self.args.enum_secondary else aiohttp.BasicAuth(email, password)
             async with method(
                         self.config["enum_url"].format(EMAIL=email),
                         auth=auth,
