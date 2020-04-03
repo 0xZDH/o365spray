@@ -70,8 +70,22 @@ optional arguments:
 
 ## Acknowledgments
 
-**grimhacker** - *Research and discovery of user enumeration within Office 365 via ActiveSync.* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and the [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/) tool.<br>
-**Raikia** - [UhOh365](https://github.com/Raikia/UhOh365) - User enumeration using Autodiscover without an authentication attempt<br>
-**byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)<br>
-**sensepost** - [Ruler](https://github.com/sensepost/ruler/)<br>
-**dafthack** - [MSOLSpray](https://github.com/dafthack/MSOLSpray) -> *This was rewritten in Python by byt3bl33d3r*: https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+#### ActiveSync Code/References
+* **grimhacker**
+* Research and discovery of user enumeration via ActiveSync
+* See [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/).
+
+#### Autodiscover Code/References
+* **Raikia**
+* User enumeration via Autodiscover without authentication attempts
+* [UhOh365](https://github.com/Raikia/UhOh365)
+
+#### MSOL Code/References
+* **dafthack**
+* Password spray via MSOL
+* [MSOLSpray](https://github.com/dafthack/MSOLSpray)
+ * *This was rewritten in Python by byt3bl33d3r*: https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+
+#### Other Code References
+* **byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
+* **sensepost** - [Ruler](https://github.com/sensepost/ruler/)
