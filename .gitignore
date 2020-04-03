@@ -11,3 +11,5 @@ core/handlers/.DS_Store
 core/handlers/*.pyc
 core/handlers/__pycache__/
 test/
+enum/
+spray/
