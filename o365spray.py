@@ -180,6 +180,7 @@ if __name__ == "__main__":
                             loop.run_until_complete(spray.run(password))
                             # Stop if we hit our locked account limit
                             if spray.lockout >= args.safe:
+                                print("[!] Locked account threshold reached. Exiting...")
                                 spray.shutdown()
                                 break
                         else:         # https://stackoverflow.com/a/654002
