@@ -183,13 +183,17 @@ if __name__ == "__main__":
                                 print("[!] Locked account threshold reached. Exiting...")
                                 spray.shutdown()
                                 break
-                        else:         # https://stackoverflow.com/a/654002
-                            continue  # Only executed if the inner loop did NOT break
-                        break         # Only executed if the inner loop DID break
 
-                        # Check if we reached the last password chunk
-                        if not helper.check_last_chunk(password_chunk, passlist):
-                            helper.lockout_reset_wait(args.lockout)
+                        # https://stackoverflow.com/a/654002
+                        # https://docs.python.org/3/tutorial/controlflow.html#break-and-continue-statements-and-else-clauses-on-loops
+                        # Only executed if the inner loop did NOT break
+                        else:
+                            # Check if we reached the last password chunk
+                            if not helper.check_last_chunk(password_chunk, passlist):
+                                helper.lockout_reset_wait(args.lockout)
+                            continue
+
+                        break  # Only executed if the inner loop DID break
 
                 else:
                     print("[*] Password spraying using paired usernames and passwords.")
