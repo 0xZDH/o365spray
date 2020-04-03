@@ -178,6 +178,13 @@ if __name__ == "__main__":
                         # Loop through each password individually so it's easier to keep track and avoid duplicate scans once a removal condition is hit
                         for password in password_chunk:
                             loop.run_until_complete(spray.run(password))
+                            # Stop if we hit our locked account limit
+                            if spray.lockout >= args.safe:
+                                spray.shutdown()
+                                break
+                        else:         # https://stackoverflow.com/a/654002
+                            continue  # Only executed if the inner loop did NOT break
+                        break         # Only executed if the inner loop DID break
 
                         # Check if we reached the last password chunk
                         if not helper.check_last_chunk(password_chunk, passlist):

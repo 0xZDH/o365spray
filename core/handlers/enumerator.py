@@ -43,10 +43,10 @@ class Enumerator:
 
     def shutdown(self, key=False):
         # Print new line after ^C
-        msg = '\n[*] Writing valid accounts found to file \'%s/enum/valid_accts\'...' % self.args.output
+        msg  = '\n[*] Writing valid accounts found to file \'%s/enum/valid_accts\'...' % self.args.output
+        msg += '\n[*] Please see %s/enum/enumerated_accts.txt for all enumerated accounts.' % self.args.output
         if key:
-            msg  = '\n[!] CTRL-C caught.' + msg
-            msg += '\n[*] Please see %s/enum/enumerated_accts.txt for all enumerated accounts.' % self.args.output
+            msg = '\n[!] CTRL-C caught.' + msg
         print(msg)
 
         # https://stackoverflow.com/a/48351410
@@ -57,9 +57,8 @@ class Enumerator:
         atexit.unregister(concurrent.futures.thread._python_exit)
         self.executor.shutdown = lambda wait:None
 
-        if key:
-            # Write the tested accounts
-            self.helper.write_tested(self.tested_accts, "%s/enum/enumerated_accts.txt" % (self.args.output))
+        # Write the tested accounts
+        self.helper.write_tested(self.tested_accts, "%s/enum/enumerated_accts.txt" % (self.args.output))
 
         # Write the valid accounts
         self.helper.write_data(self.valid_accts, "%s/enum/valid_accts.txt" % (self.args.output))

