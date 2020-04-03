@@ -71,21 +71,21 @@ optional arguments:
 ## Acknowledgments
 
 #### ActiveSync Code/References
-* **grimhacker**
+* [@grimhacker](https://bitbucket.org/grimhacker)
 * Research and discovery of user enumeration via ActiveSync
 * See [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/).
 
 #### Autodiscover Code/References
-* **Raikia**
+* [@Raikia](https://github.com/Raikia)
 * User enumeration via Autodiscover without authentication attempts
 * [UhOh365](https://github.com/Raikia/UhOh365)
 
 #### MSOL Code/References
-* **dafthack**
+* [@dafthack](https://github.com/dafthack)
 * Password spray via MSOL
 * [MSOLSpray](https://github.com/dafthack/MSOLSpray)
  * *This was rewritten in Python by byt3bl33d3r*: https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
 
 #### Other Code References
-* **byt3bl33d3r** - [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
-* **sensepost** - [Ruler](https://github.com/sensepost/ruler/)
+* [@byt3bl33d3r](https://github.com/byt3bl33d3r): [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
+* [@sensepost](https://github.com/sensepost): [Ruler](https://github.com/sensepost/ruler/)
