@@ -16,6 +16,13 @@ class Helper:
                 for account in creds:
                     f.write("%s\n" % account)
 
+    def write_tested(self, creds, _file):
+        if len(creds) > 0:
+            if type(creds) == dict: creds = ['%s:%s' % (k, v) for k, v in creds.items()]
+            with open(_file, 'w') as f:
+                for account in creds:
+                    f.write("%s\n" % account)
+
     def get_chunks_from_list(self, _list, n):
         for i in range(0, len(_list), n):
             yield _list[i:i + n]
