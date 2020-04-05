@@ -176,7 +176,7 @@ class Sprayer:
                             # This is where we handle lockout termination
                             # For now, we will just stop future sprays if a single lockout is hit
                             if code == "AADSTS50053":
-                                self.lockout += 1  # Mark lockout as True to tell main code to stop
+                                self.lockout += 1  # Keep track of locked accounts seen
 
                             err = Config.AADSTS_codes[code][0]
                             msg = password + " (%s. Removing from spray rotation.)\n" % (Config.AADSTS_codes[code][1])
@@ -239,7 +239,7 @@ class Sprayer:
                     # This is where we handle lockout termination
                     # For now, we will just stop future sprays if a single lockout is hit
                     if code == "AADSTS50053":
-                        self.lockout += 1  # Mark lockout as True to tell main code to stop
+                        self.lockout += 1  # Keep track of locked accounts seen
 
                     err = Config.AADSTS_codes[code][0]
                     msg = password + " (%s. Removing from spray rotation.)\n" % (Config.AADSTS_codes[code][1])
