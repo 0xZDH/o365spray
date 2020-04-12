@@ -43,7 +43,7 @@ class Enumerator:
 
     def shutdown(self, key=False):
         # Print new line after ^C
-        msg  = '\n[*] Writing valid accounts found to file \'%s/enum/valid_accts\'...' % self.args.output
+        msg  = '\n\n[*] Writing valid accounts found to file \'%s/enum/valid_accts\'...' % self.args.output
         msg += '\n[*] Please see %s/enum/enumerated_accts.txt for all enumerated accounts.' % self.args.output
         if key:
             msg = '\n[!] CTRL-C caught.' + msg

@@ -59,9 +59,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    # Lazy banner...
-    print("\n*** O365 Spray ***\n")
-
     # If enumerating users make sure we have a username or username file
     if args.enum and (not args.username and not args.userfile):
         parser.error("-u/--username or -U/--userfile is required when performing user enumeration via -e/--enum.")
@@ -73,6 +70,9 @@ if __name__ == "__main__":
 
     start  = time.time()
     helper = Helper()
+
+    # Print banner with config settings
+    helper.banner(args)
 
     # Clean output dir
     args.output = args.output.rstrip('/')

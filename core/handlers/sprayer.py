@@ -47,7 +47,7 @@ class Sprayer:
 
     def shutdown(self, key=False):
         # Print new line after ^C
-        msg  = '\n[*] Writing valid credentials found to file \'%s/spray/valid_users\'...' % self.args.output
+        msg  = '\n\n[*] Writing valid credentials found to file \'%s/spray/valid_users\'...' % self.args.output
         msg += '\n[*] Please see %s/spray/sprayed_creds.txt for all spray attempts.' % self.args.output
         if key:
             msg = '\n[!] CTRL-C caught.' + msg

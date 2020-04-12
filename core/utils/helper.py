@@ -59,3 +59,20 @@ class Helper:
         else:
             user = "%s@%s" % (user, domain)
         return user
+
+    def banner(self, args):
+        BANNER = """
+            *** O365 Spray ***
+
+>----------------------------------------<
+"""
+
+        args = vars(args)
+        for arg in args:
+            if args[arg]:
+                space = ' ' * (15 - len(arg))
+                BANNER += "\n   > %s%s:  %s" % (arg, space, str(args[arg]))
+
+        BANNER += "\n\n>----------------------------------------<\n"
+
+        print(BANNER)

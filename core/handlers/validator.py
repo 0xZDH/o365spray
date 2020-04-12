@@ -17,7 +17,7 @@ class Validator:
         }
         # Validation Modules
         self._modules = {
-            'getuserrealm': self._getuserrealm,
+            'getuserrealm':  self._getuserrealm,
             'openid-config': self._openid_config
         }
 
