@@ -152,7 +152,7 @@ class Enumerator:
                     print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
             else:
-                print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
