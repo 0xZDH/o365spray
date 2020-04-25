@@ -61,18 +61,39 @@ class Helper:
         return user
 
     def banner(self, args):
-        BANNER = """
-            *** O365 Spray ***
+        BANNER  = "\n            *** O365 Spray ***            \n"
+        BANNER += "\n>----------------------------------------<\n"
 
->----------------------------------------<
-"""
-
-        args = vars(args)
-        for arg in args:
-            if args[arg]:
+        _args = vars(args)
+        for arg in _args:
+            if _args[arg]:
                 space = ' ' * (15 - len(arg))
-                BANNER += "\n   > %s%s:  %s" % (arg, space, str(args[arg]))
 
-        BANNER += "\n\n>----------------------------------------<\n"
+                # Ignore enum/spray settings if not enabled
+                if arg == 'enum_type' and not _args['enum'] or \
+                   arg == 'spray_type' and not _args['spray']:
+                    pass
+
+                else:
+                    BANNER += "\n   > %s%s:  %s" % (arg, space, str(_args[arg]))
+
+                # Add data meanings
+                if arg == 'count':
+                    BANNER += " passwords/spray"
+
+                if arg == 'lockout':
+                    BANNER += " minutes"
+
+                if arg == 'rate':
+                    BANNER += " threads"
+
+                if arg == 'safe':
+                    BANNER += " locked accounts"
+
+                if arg == 'timeout':
+                    BANNER += " seconds"
+
+        BANNER += "\n"
+        BANNER += "\n>----------------------------------------<\n"
 
         print(BANNER)
