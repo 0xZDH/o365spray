@@ -37,7 +37,8 @@ class Enumerator:
         # Enumeration Modules
         self._modules = {
             'autodiscover': self._autodiscover,
-            'activesync':   self._activesync
+            'activesync':   self._activesync,
+            'onedrive':     self._onedrive
         }
 
 
@@ -158,6 +159,48 @@ class Enumerator:
 
             else:
                 print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+
+        except Exception as e:
+            if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
+            pass
+
+
+    """ Enumerate users on Microsoft using One Drive """
+    # https://github.com/nyxgeek/onedrive_user_enum/blob/master/onedrive_enum.py
+    # https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/
+    def _onedrive(self, user, password):
+        try:
+            # Remove email format from user if present
+            user = user.split('@')[0]
+
+            # Keep track of tested names in case we ctrl-c
+            self.tested_accts.append(user)
+
+            time.sleep(0.250)
+
+            # Collect the pieces to build the One Drive URL
+            domain_array = (self.args.domain.split('.'))
+
+            domain = domain_array[0]        # Collect the domain
+            tenant = domain                 # Use domain as tenant
+            tld    = domain_array[-1]       # Grab the TLD
+            user   = user.replace(".","_")  # Replace any `.` with `_` for use in the URL
+
+            url = "https://{TENANT}-my.sharepoint.com/personal/{USERNAME}_{DOMAIN}_{TLD}/_layouts/15/onedrive.aspx".format(
+                TENANT=tenant, USERNAME=user, DOMAIN=domain, TLD=tld
+            )
+            response = self._send_request(requests.head, url)
+
+            status = response.status_code
+            if status == 403:
+                print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, user, self.helper.space))
+                self.valid_accts.append(user)
+
+            elif status == 404:
+                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, user, self.helper.space), end='\r')
+
+            else:
+                print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, user, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)

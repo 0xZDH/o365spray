@@ -8,6 +8,10 @@ Microsoft makes it possible to identify valid and invalid usernames when the dom
 
 > NOTE: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray. Autodiscover user enumeration works without any authentication attempts and does not require a lockout reset before password spraying.
 
+> NOTE: OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
+
+> FALLBACK: As a fallback solution, see [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against Microsoft Online. This tool leverages selenium to replicate user clicks and step through the DOM-based authentication form on Microsoft's website. This provides more accurate results on both ends, but requires more time as it does not run asynchronously.
+
 ## Usage
 
 Perform username enumeration:<br>
@@ -22,12 +26,12 @@ usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
                     [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
                     [-c COUNT] [-l LOCKOUT]
                     [--validate-type {openid-config,getuserrealm}]
-                    [--enum-type {activesync,autodiscover}]
+                    [--enum-type {activesync,autodiscover,onedrive}]
                     [--spray-type {activesync,autodiscover,msol}]
                     [--rate RATE] [--safe SAFE] [--paired] [--timeout TIMEOUT]
                     [--proxy PROXY] [--output OUTPUT] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.1
+Microsoft O365 User Enumerator and Password Sprayer -- v1.2
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -53,7 +57,7 @@ optional arguments:
   --validate-type {openid-config,getuserrealm}
                         Specify which spray type to perform. Default:
                         getuserrealm
-  --enum-type {activesync,autodiscover}
+  --enum-type {activesync,autodiscover,onedrive}
                         Specify which spray type to perform. Default:
                         Autodiscover
   --spray-type {activesync,autodiscover,msol}
@@ -70,12 +74,28 @@ optional arguments:
   --debug               Debug output
 ```
 
+### Methods
+
+##### Validation
+* openid-config
+* getuserrealm
+
+##### Enumeration
+* activesync
+* autodiscover
+* onedrive
+
+##### Spraying
+* activesync
+* autodiscover
+* msol
+
 ## Acknowledgments
 
 #### ActiveSync Code/References
 * [@grimhacker](https://bitbucket.org/grimhacker)
 * Research and discovery of user enumeration via ActiveSync
-* See [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/).
+* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/).
 
 #### Autodiscover Code/References
 * [@Raikia](https://github.com/Raikia)
@@ -87,6 +107,12 @@ optional arguments:
 * Password spray via MSOL
 * [MSOLSpray](https://github.com/dafthack/MSOLSpray)
  * *This was rewritten in Python by byt3bl33d3r*: https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+
+#### OneDrive Code/References
+* [nyxgeek](https://github.com/nyxgeek/)
+* User enumeration via One Drive
+* [onedrive_user_enum](https://github.com/nyxgeek/onedrive_user_enum)
+* See the [blog post](https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/) discussing this technique.
 
 #### Other Code References
 * [@byt3bl33d3r](https://github.com/byt3bl33d3r): [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
