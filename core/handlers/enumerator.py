@@ -126,6 +126,10 @@ class Enumerator:
     # https://github.com/Raikia/UhOh365
     def _autodiscover(self, user, password):
         try:
+            # Add special header for ActiveSync
+            headers = Config.headers  # Grab external headers from config.py
+            headers["User-Agent"] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
+
             # Build email if not already built
             email = self.helper.check_email(user, self.args.domain)
 
@@ -135,11 +139,12 @@ class Enumerator:
             time.sleep(0.250)
 
             url      = "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1"
-            response = self._send_request(requests.get, url.format(EMAIL=email))
+            response = self._send_request(requests.get, url.format(EMAIL=email), headers=headers)
 
             status = response.status_code
             body   = response.content
-            if status == 200 and "X-MailboxGuid" in response.headers.keys():
+            # "X-MailboxGuid" in response.headers.keys()  # This appears to not be a required header for valid accounts
+            if status == 200:
                 print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
                 self.valid_accts.append(user)
 
