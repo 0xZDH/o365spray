@@ -126,7 +126,7 @@ class Enumerator:
     # https://github.com/Raikia/UhOh365
     def _autodiscover(self, user, password):
         try:
-            # Add special header for ActiveSync
+            # Add special header for Autodiscover
             headers = Config.headers  # Grab external headers from config.py
             headers["User-Agent"] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
 
