@@ -16,6 +16,13 @@ class Helper:
                 for account in creds:
                     f.write("%s\n" % account)
 
+    def write_tested(self, creds, _file):
+        if len(creds) > 0:
+            if type(creds) == dict: creds = ['%s:%s' % (k, v) for k, v in creds.items()]
+            with open(_file, 'w') as f:
+                for account in creds:
+                    f.write("%s\n" % account)
+
     def get_chunks_from_list(self, _list, n):
         for i in range(0, len(_list), n):
             yield _list[i:i + n]
@@ -52,3 +59,41 @@ class Helper:
         else:
             user = "%s@%s" % (user, domain)
         return user
+
+    def banner(self, args):
+        BANNER  = "\n            *** O365 Spray ***            \n"
+        BANNER += "\n>----------------------------------------<\n"
+
+        _args = vars(args)
+        for arg in _args:
+            if _args[arg]:
+                space = ' ' * (15 - len(arg))
+
+                # Ignore enum/spray settings if not enabled
+                if arg == 'enum_type' and not _args['enum'] or \
+                   arg == 'spray_type' and not _args['spray']:
+                    pass
+
+                else:
+                    BANNER += "\n   > %s%s:  %s" % (arg, space, str(_args[arg]))
+
+                # Add data meanings
+                if arg == 'count':
+                    BANNER += " passwords/spray"
+
+                if arg == 'lockout':
+                    BANNER += " minutes"
+
+                if arg == 'rate':
+                    BANNER += " threads"
+
+                if arg == 'safe':
+                    BANNER += " locked accounts"
+
+                if arg == 'timeout':
+                    BANNER += " seconds"
+
+        BANNER += "\n"
+        BANNER += "\n>----------------------------------------<\n"
+
+        print(BANNER)

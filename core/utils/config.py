@@ -1,54 +1,32 @@
 #!/usr/bin/env python3
 
 # == Global Settings
+class Config:
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:69.0) Gecko/20100101 Firefox/69.0",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept-Encoding": "gzip, deflate",
-    "DNT": "1",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1"
-}
+    # HTTP Header Configuration
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:69.0) Gecko/20100101 Firefox/69.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1"
+    }
 
-# MSOnline data
-msonline = {
-    # getuserrealm seems to be considerably faster when identifying if a domain uses O365
-    "url":  "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1",
-    "url2": "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration"
-}
-
-# Autodiscover data
-autodiscover = {
-    "url": "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml",
-    "enum_url": "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1",
-    "status_codes": {
-        200: "VALID_CREDS",
-        456: "FOUND_CREDS"
-    },
-    "enum_codes": {
-        "good": [200],
-        "bad": [302]
-    },
     # https://docs.microsoft.com/en-us/azure/active-directory/develop/reference-aadsts-error-codes
-    "AADSTS_codes": {
-        "AADSTS50053": ["LOCKED", "Account locked"],
-        "AADSTS50055": ["EXPIRED_PASS", "Password expired"],
-        "AADSTS50057": ["DISABLED", "User disabled"]
+    # https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+    # This will be used for both Autodiscover and Azure AD
+    # [Flag, Description, Tab Spacing for Output]
+    AADSTS_codes = {
+        "AADSTS50053": ["LOCKED", "Account locked", "\t\t"],
+        "AADSTS50055": ["EXPIRED_PASS", "Password expired", "\t\t"],
+        "AADSTS50057": ["DISABLED", "User disabled", "\t\t"],
+        "AADSTS50126": ["INVALID_CREDS", "Invalid username or password", "\t\t"],
+        "AADSTS50059": ["MISSING_TENANT", "Tenant for account doesn't exist", "\t"],
+        "AADSTS50128": ["INVALID_DOMAIN", "Tenant for account doesn't exist", "\t"],
+        "AADSTS50034": ["USER_NOT_FOUND", "User does not exist", "\t"],
+        "AADSTS50079": ["VALID_MFA", "Response indicates MFA (Microsoft)", "\t\t"],
+        "AADSTS50076": ["VALID_MFA", "Response indicates MFA (Microsoft)", "\t\t"],
+        "AADSTS50158": ["SEC_CHAL", "Response indicates conditional access (MFA: DUO or other)", "\t\t"]
     }
-}
-
-# ActiveSync data
-activesync = {
-    "url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
-    "enum_url": "https://outlook.office365.com/Microsoft-Server-ActiveSync",
-    "status_codes": {
-        200: "VALID_CREDS",
-        403: "FOUND_CREDS"
-    },
-    "enum_codes": {
-        "good": [200, 403, 401],
-        "bad": [404]
-    }
-}

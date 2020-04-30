@@ -1,4 +1,2 @@
 # Requirements
-
-aiohttp>=3.6.1
 requests>=2.22.0
