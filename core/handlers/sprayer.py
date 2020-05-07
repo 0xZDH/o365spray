@@ -21,8 +21,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class Sprayer:
 
-    valid_creds  = {}  # Valid credentials storage
-    tested_creds = {}  # Tested credentials storage
+    valid_creds  = []  # Valid credentials storage
+    tested_creds = []  # Tested credentials storage
     helper = Helper()  # Helper functions
 
     def __init__(self, loop, userlist, args):
@@ -94,7 +94,7 @@ class Sprayer:
             email = self.helper.check_email(user, self.args.domain)
 
             # Keep track of tested names in case we ctrl-c
-            self.tested_creds[email] = password
+            self.tested_creds.append('%s:%s' % (email, password))
 
             time.sleep(0.250)
 
@@ -105,13 +105,13 @@ class Sprayer:
 
             if status == 200:
                 print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds[email] = password
+                self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             elif status == 403:
                 msg = password + " (Manually confirm [MFA, Locked, etc.])"
                 print("[%sFOUND_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds[email] = password
+                self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             else:
@@ -134,7 +134,7 @@ class Sprayer:
             email = self.helper.check_email(user, self.args.domain)
 
             # Keep track of tested names in case we ctrl-c
-            self.tested_creds[email] = password
+            self.tested_creds.append('%s:%s' % (email, password))
 
             time.sleep(0.250)
 
@@ -145,13 +145,13 @@ class Sprayer:
 
             if status == 200:
                 print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds[email] = password
+                self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             elif status == 456:
                 msg = password + " (Manually confirm [MFA, Locked, etc.])"
                 print("[%sFOUND_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds[email] = password
+                self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             else:
@@ -204,7 +204,7 @@ class Sprayer:
             email = self.helper.check_email(user, self.args.domain)
 
             # Keep track of tested names in case we ctrl-c
-            self.tested_creds[email] = password
+            self.tested_creds.append('%s:%s' % (email, password))
 
             time.sleep(0.250)
 
@@ -227,7 +227,7 @@ class Sprayer:
 
             if status == 200:
                 print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds[email] = password
+                self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             else:
