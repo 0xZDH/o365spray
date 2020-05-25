@@ -194,7 +194,7 @@ class Sprayer:
     """ Spray users on Microsoft using Azure AD """
     # https://github.com/dafthack/MSOLSpray
     # https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
-    def _msol(self):
+    def _msol(self, user, password):
         try:
             # Check if we hit our locked account limit, and stop
             if self.lockout >= self.args.safe:
