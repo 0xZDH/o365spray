@@ -112,7 +112,7 @@ class Sprayer:
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
             else:
-                print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -181,7 +181,7 @@ class Sprayer:
                             self.userlist.remove(user)
 
                         else:
-                            print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                            print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -244,7 +244,7 @@ class Sprayer:
                     self.userlist.remove(user)
 
                 else:
-                    print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                    print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)

@@ -112,10 +112,10 @@ class Enumerator:
                 self.valid_accts.append(user)
 
             elif status == 403:
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
             elif status == 404 and ("X-CasErrorCode" in response.headers.keys() and response.headers['X-CasErrorCode'] == "UserNotFound"):
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
             else:
                 print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, email, self.helper.space), end='\r')
@@ -160,10 +160,10 @@ class Enumerator:
                     self.valid_accts.append(user)
 
                 else:
-                    print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                    print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
             else:
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -202,7 +202,7 @@ class Enumerator:
                 self.valid_accts.append(user)
 
             elif status == 404:
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, user, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, user, self.helper.space), end='\r')
 
             else:
                 print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, user, self.helper.space), end='\r')
