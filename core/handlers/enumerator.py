@@ -111,14 +111,10 @@ class Enumerator:
                 print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
                 self.valid_accts.append(user)
 
-            elif status == 403:
-                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
-
-            elif status == 404 and ("X-CasErrorCode" in response.headers.keys() and response.headers['X-CasErrorCode'] == "UserNotFound"):
-                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
-
+            # Note: Since invalid user's are now identified via 403 responses, we can just default all 403/404/etc. to
+            #       as bad users
             else:
-                print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
