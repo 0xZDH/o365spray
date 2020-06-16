@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # This only sends a single request so we can leave it using the requests function and avoid asyncio
+import html
 import requests
 import xml.etree.ElementTree as ET
 from core.utils.colors import text_colors
@@ -41,12 +42,21 @@ class Validator:
             )
         )
 
-        xml = ET.fromstring(rsp.text)
-        nst = xml.find('NameSpaceType').text
+        xml     = ET.fromstring(rsp.text)
+        nst     = xml.find('NameSpaceType').text
+        authurl = xml.find('AuthURL').text
 
-        if nst in ["Managed", "Federated"]:
+        if nst == "Managed":
             print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
             return True
+
+        # TODO: For the time being, we will just warn the user of federation and display the ADFS URL
+        #       For the next iteration, add an ADFS password spraying module to allow users to dynamically
+        #       switch to ADFS spraying instead of targeting MS API's
+        elif nst == "Federated":
+            print("[%sWARN%s]\t\tThe following domain is using O365, but is Federated: %s" % (text_colors.yellow, text_colors.reset, self.args.domain))
+            print("\t\tAuthUrl: %s" % html.unescape(authurl))
+            return False
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
@@ -63,9 +73,9 @@ class Validator:
         )
         status = rsp.status_code
 
+        # If the domain uses Office 365, let's check the user realm to identify Managed vs. Federated
         if status == 200:
-            print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
-            return True
+            return self._getuserrealm()
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))

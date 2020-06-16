@@ -45,8 +45,8 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 15 minutes", default=15.0)
     # Scan specifications
     parser.add_argument("--validate-type",  type=str.lower, default='getuserrealm', choices=('openid-config', 'getuserrealm'), help="Specify which spray type to perform. Default: getuserrealm")
-    parser.add_argument("--enum-type",      type=str.lower, default='autodiscover', choices=('activesync', 'autodiscover', 'onedrive'), help="Specify which spray type to perform. Default: Autodiscover")
-    parser.add_argument("--spray-type",     type=str.lower, default='autodiscover', choices=('activesync', 'autodiscover', 'msol'),     help="Specify which spray type to perform. Default: Autodiscover")
+    parser.add_argument("--enum-type",      type=str.lower, default='activesync', choices=('activesync', 'onedrive'), help="Specify which spray type to perform. Default: Autodiscover")
+    parser.add_argument("--spray-type",     type=str.lower, default='activesync', choices=('activesync', 'autodiscover', 'msol'),     help="Specify which spray type to perform. Default: Autodiscover")
     parser.add_argument("--rate",           type=int, help="Number of concurrent connections during enum and spray. Default: 10", default=10)
     parser.add_argument("--safe",           type=int, help="Terminate scan if `n` locked accounts are observed. Default: 10", default=10)
     parser.add_argument("--paired",         action="store_true", help="Password spray pairing usernames and passwords (1:1).")

