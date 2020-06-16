@@ -31,7 +31,7 @@ usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
                     [--rate RATE] [--safe SAFE] [--paired] [--timeout TIMEOUT]
                     [--proxy PROXY] [--output OUTPUT] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.2
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -57,12 +57,12 @@ optional arguments:
   --validate-type {openid-config,getuserrealm}
                         Specify which spray type to perform. Default:
                         getuserrealm
-  --enum-type {activesync,autodiscover,onedrive}
+  --enum-type {activesync,onedrive}
                         Specify which spray type to perform. Default:
-                        Autodiscover
+                        ActiveSync
   --spray-type {activesync,autodiscover,msol}
                         Specify which spray type to perform. Default:
-                        Autodiscover
+                        ActiveSync
   --rate RATE           Number of concurrent connections during enum and
                         spray. Default: 10
   --safe SAFE           Terminate scan if `n` locked accounts are observed.
@@ -82,7 +82,7 @@ optional arguments:
 
 ##### Enumeration
 * activesync
-* autodiscover
+* autodiscover -- No longer working - Removed
 * onedrive
 
 ##### Spraying
