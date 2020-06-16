@@ -44,7 +44,6 @@ class Validator:
 
         xml     = ET.fromstring(rsp.text)
         nst     = xml.find('NameSpaceType').text
-        authurl = xml.find('AuthURL').text
 
         if nst == "Managed":
             print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
@@ -54,6 +53,7 @@ class Validator:
         #       For the next iteration, add an ADFS password spraying module to allow users to dynamically
         #       switch to ADFS spraying instead of targeting MS API's
         elif nst == "Federated":
+            authurl = xml.find('AuthURL').text
             print("[%sWARN%s]\t\tThe following domain is using O365, but is Federated: %s" % (text_colors.yellow, text_colors.reset, self.args.domain))
             print("\t\tAuthUrl: %s" % html.unescape(authurl))
             return False

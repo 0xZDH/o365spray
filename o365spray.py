@@ -11,7 +11,7 @@ from core.handlers.validator import *
 from core.handlers.enumerator import *
 
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 # Signal handler for Enum routines
 def enum_signal_handler(signal, frame):
