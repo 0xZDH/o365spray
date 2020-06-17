@@ -4,11 +4,11 @@ This is a username enumeration and password spraying tool aimed at Microsoft O36
 
 This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-> WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray. Autodiscover user enumeration works without any authentication attempts and does not require a lockout reset before password spraying.
+> WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray.
 > 
 > NOTE: OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
 > 
-> FALLBACK: As a fallback solution, see [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against Microsoft Online. This tool leverages selenium to replicate user clicks and step through the DOM-based authentication form on Microsoft's website. This provides more accurate results on both ends, but requires more time as it does not run asynchronously.
+> FALLBACK: As a fallback solution, see [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against Microsoft Online. This tool leverages selenium to replicate user clicks and step through the DOM-based authentication form on Microsoft's website. This tool will require more time as it does not run asynchronously.
 
 ## Usage
 
@@ -90,31 +90,32 @@ optional arguments:
 
 #### ActiveSync Code/References
 * [@grimhacker](https://bitbucket.org/grimhacker)
-* Research and discovery of user enumeration via ActiveSync
-* See the [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/) and [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/).
+* Research and discovery of original user enumeration via ActiveSync.
+    * [office365userenum](https://bitbucket.org/grimhacker/office365userenum/src/master/)
+    * See the original [blog post](https://grimhacker.com/2017/07/24/office365-activesync-username-enumeration/).
 
 #### Autodiscover Code/References
 * [@Raikia](https://github.com/Raikia)
-* User enumeration via Autodiscover without authentication attempts
-* [UhOh365](https://github.com/Raikia/UhOh365)
+* User enumeration via Autodiscover without authentication
+    * [UhOh365](https://github.com/Raikia/UhOh365)
 
 #### MSOL Code/References
 * [@dafthack](https://github.com/dafthack)
 * Password spray via MSOL
-* [MSOLSpray](https://github.com/dafthack/MSOLSpray)
+    * [MSOLSpray](https://github.com/dafthack/MSOLSpray)
     * *This was rewritten in Python by [@byt3bl33d3r](https://github.com/byt3bl33d3r)*
-    * https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+        * https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
 
 #### OneDrive Code/References
 * [@nyxgeek](https://github.com/nyxgeek)
 * User enumeration via One Drive
-* [onedrive_user_enum](https://github.com/nyxgeek/onedrive_user_enum)
-* See the [blog post](https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/) discussing this technique.
+    * [onedrive_user_enum](https://github.com/nyxgeek/onedrive_user_enum)
+    * See the [blog post](https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/) discussing this technique.
 
 #### ADFS Code/References
 * [@Mr-Un1k0d3r](https://github.com/Mr-Un1k0d3r)
 * https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
 
 #### Other Code References
-* [@byt3bl33d3r](https://github.com/byt3bl33d3r): [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
-* [@sensepost](https://github.com/sensepost): [Ruler](https://github.com/sensepost/ruler/)
+* [@byt3bl33d3r](https://github.com/byt3bl33d3r) --- [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
+* [@sensepost](https://github.com/sensepost) --- [Ruler](https://github.com/sensepost/ruler/)
