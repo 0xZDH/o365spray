@@ -29,7 +29,7 @@ usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
                     [--adfs ADFS] [--rate RATE] [--safe SAFE] [--paired]
                     [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.3.1
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3.2
 
 optional arguments:
   -h, --help            show this help message and exit

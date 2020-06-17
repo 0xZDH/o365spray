@@ -11,7 +11,7 @@ from core.handlers.validator import *
 from core.handlers.enumerator import *
 
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 
 # Signal handler for Enum routines
 def enum_signal_handler(signal, frame):
@@ -90,17 +90,18 @@ if __name__ == "__main__":
             (args.enum, args.spray) = (False, False)
 
         # Handle Federated realms since enumeration is not currently working against it
-        # - spray target AuthUrl provided by Microsoft `getuserrealm`
+        # - set the ADFS target to the AuthUrl provided by Microsoft `getuserrealm`
         if (valid and adfs) and not args.validate:
-            args.enum       = False
-            args.adfs       = adfs
-            args.spray_type = 'adfs'
+            args.enum = False
+            args.adfs = adfs
 
-            # If the user has specified to perform password spraying, prompt the user to ensure
-            # they are aware that we are switching to ADFS
-            if args.spray:
-                print("\n[*]\t\tSwitching to ADFS for password spraying")
-                _ = input("\nPress Enter to continue or Ctrl-C to exit...")
+            # If the user has specified to perform password spraying, prompt the user to ask
+            # if they would like to target ADFS or continue targeting Microsoft API's
+            if args.spray and args.spray_type != 'adfs':
+                prompt = "[?]\t\tWould you like to switch to ADFS for password spraying [Y/n] "
+                resp = prompt_question(prompt)
+                if resp[0] == 'y':
+                    args.spray_type = 'adfs'
 
     # Skip domain validation and enfore no enumeration/ADFS spraying when the user provides an ADFS url
     else:
