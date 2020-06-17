@@ -102,7 +102,7 @@ optional arguments:
 * [@dafthack](https://github.com/dafthack)
 * Password spray via MSOL
 * [MSOLSpray](https://github.com/dafthack/MSOLSpray)
-    * *This was rewritten in Python by byt3bl33d3r*
+    * *This was rewritten in Python by [@byt3bl33d3r](https://github.com/byt3bl33d3r)*
     * https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
 
 #### OneDrive Code/References
