@@ -252,7 +252,7 @@ class Sprayer:
             pass
 
 
-   """ Spray users via a managed ADFS server """
+    """ Spray users via a managed ADFS server """
     # https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
     def _adfs(self, user, password):
         try:

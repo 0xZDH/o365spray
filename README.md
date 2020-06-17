@@ -4,12 +4,10 @@ This is a username enumeration and password spraying tool aimed at Microsoft O36
 
 This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-Microsoft makes it possible to identify valid and invalid usernames when the domain is using O365. User enumeration and password spraying can both be done using Microsoft's Autodiscover, ActiveSync, or Azure AD APIs. Microsoft returns false positives for non-O365 domain accounts so this tool has an auto-validate feature to ensure the target domain is using O365.
-
-> NOTE: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray. Autodiscover user enumeration works without any authentication attempts and does not require a lockout reset before password spraying.
-
+> WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray. Autodiscover user enumeration works without any authentication attempts and does not require a lockout reset before password spraying.
+> 
 > NOTE: OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
-
+> 
 > FALLBACK: As a fallback solution, see [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against Microsoft Online. This tool leverages selenium to replicate user clicks and step through the DOM-based authentication form on Microsoft's website. This provides more accurate results on both ends, but requires more time as it does not run asynchronously.
 
 ## Usage
@@ -26,12 +24,12 @@ usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
                     [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
                     [-c COUNT] [-l LOCKOUT]
                     [--validate-type {openid-config,getuserrealm}]
-                    [--enum-type {activesync,autodiscover,onedrive}]
-                    [--spray-type {activesync,autodiscover,msol}]
-                    [--rate RATE] [--safe SAFE] [--paired] [--timeout TIMEOUT]
-                    [--proxy PROXY] [--output OUTPUT] [--debug]
+                    [--enum-type {activesync,onedrive}]
+                    [--spray-type {activesync,autodiscover,msol,adfs}]
+                    [--adfs ADFS] [--rate RATE] [--safe SAFE] [--paired]
+                    [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.3
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3.1
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -49,22 +47,19 @@ optional arguments:
   -P PASSFILE, --passfile PASSFILE
                         File containing list of passwords.
   -c COUNT, --count COUNT
-                        Number of password attempts to run before resetting
-                        lockout timer. Default: 1
+                        Number of password attempts to run before resetting lockout
+                        timer. Default: 1
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy reset time (in minutes). Default: 15
-                        minutes
+                        Lockout policy reset time (in minutes). Default: 15 minutes
   --validate-type {openid-config,getuserrealm}
-                        Specify which spray type to perform. Default:
-                        getuserrealm
+                        Specify which spray type to perform. Default: getuserrealm
   --enum-type {activesync,onedrive}
-                        Specify which spray type to perform. Default:
-                        ActiveSync
-  --spray-type {activesync,autodiscover,msol}
-                        Specify which spray type to perform. Default:
-                        ActiveSync
-  --rate RATE           Number of concurrent connections during enum and
-                        spray. Default: 10
+                        Specify which spray type to perform. Default: ActiveSync
+  --spray-type {activesync,autodiscover,msol,adfs}
+                        Specify which spray type to perform. Default: ActiveSync
+  --adfs ADFS           URL of target ADFS login page for spraying.
+  --rate RATE           Number of concurrent connections during enum and spray.
+                        Default: 10
   --safe SAFE           Terminate scan if `n` locked accounts are observed.
                         Default: 10
   --paired              Password spray pairing usernames and passwords (1:1).
@@ -82,13 +77,14 @@ optional arguments:
 
 ##### Enumeration
 * activesync
-* autodiscover -- No longer working - Removed
 * onedrive
+* autodiscover -- *No longer working - Removed*
 
 ##### Spraying
 * activesync
 * autodiscover
 * msol
+* adfs
 
 ## Acknowledgments
 
