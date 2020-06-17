@@ -102,13 +102,18 @@ optional arguments:
 * [@dafthack](https://github.com/dafthack)
 * Password spray via MSOL
 * [MSOLSpray](https://github.com/dafthack/MSOLSpray)
- * *This was rewritten in Python by byt3bl33d3r*: https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+    * *This was rewritten in Python by byt3bl33d3r*
+    * https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
 
 #### OneDrive Code/References
-* [nyxgeek](https://github.com/nyxgeek/)
+* [nyxgeek](https://github.com/nyxgeek)
 * User enumeration via One Drive
 * [onedrive_user_enum](https://github.com/nyxgeek/onedrive_user_enum)
 * See the [blog post](https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/) discussing this technique.
+
+#### ADFS Code/References
+* [Mr-Un1k0d3r](https://github.com/Mr-Un1k0d3r)
+* https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
 
 #### Other Code References
 * [@byt3bl33d3r](https://github.com/byt3bl33d3r): [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
