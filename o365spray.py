@@ -78,19 +78,35 @@ if __name__ == "__main__":
     # Clean output dir
     args.output = args.output.rstrip('/')
 
-    # Perform domain validation
-    print("[*] Performing O365 validation for: %s\n" % args.domain)
-    validator = Validator(args=args)
-    (valid,adfs) = validator.validate()
-    if not valid or args.validate:
-        (args.enum, args.spray) = (False, False)
 
-    # Handle Federated realms since enumeration is not currently working against it
-    # - spray target AuthUrl provided by Microsoft
-    if adfs:
+    # Perform domain validation
+    #  This should only occur if the user has not excplicitly specified to spray ADFS
+    #  or the user has specified to only validate the domain
+    if not args.adfs or args.validate:
+        print("[*] Performing O365 validation for: %s\n" % args.domain)
+        validator = Validator(args=args)
+        (valid,adfs) = validator.validate()
+        if not valid or args.validate:
+            (args.enum, args.spray) = (False, False)
+
+        # Handle Federated realms since enumeration is not currently working against it
+        # - spray target AuthUrl provided by Microsoft `getuserrealm`
+        if (valid and adfs) and not args.validate:
+            args.enum       = False
+            args.adfs       = adfs
+            args.spray_type = 'adfs'
+
+            # If the user has specified to perform password spraying, prompt the user to ensure
+            # they are aware that we are switching to ADFS
+            if args.spray:
+                print("\n[*]\t\tSwitching to ADFS for password spraying")
+                _ = input("\nPress Enter to continue or Ctrl-C to exit...")
+
+    # Skip domain validation and enfore no enumeration/ADFS spraying when the user provides an ADFS url
+    else:
         args.enum       = False
-        args.adfs       = adfs
         args.spray_type = 'adfs'
+
 
 
     # Perform user enumeration
