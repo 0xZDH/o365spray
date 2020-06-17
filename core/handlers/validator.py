@@ -42,25 +42,23 @@ class Validator:
             )
         )
 
-        xml     = ET.fromstring(rsp.text)
-        nst     = xml.find('NameSpaceType').text
+        xml = ET.fromstring(rsp.text)
+        nst = xml.find('NameSpaceType').text
 
         if nst == "Managed":
             print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
-            return True
+            return (True,None)
 
-        # TODO: For the time being, we will just warn the user of federation and display the ADFS URL
-        #       For the next iteration, add an ADFS password spraying module to allow users to dynamically
-        #       switch to ADFS spraying instead of targeting MS API's
+        # Handle Federated realms differently than Managed - Directly spray the federation servers
         elif nst == "Federated":
-            authurl = xml.find('AuthURL').text
+            authurl = html.unescape(xml.find('AuthURL').text)
             print("[%sWARN%s]\t\tThe following domain is using O365, but is Federated: %s" % (text_colors.yellow, text_colors.reset, self.args.domain))
-            print("\t\tAuthUrl: %s" % html.unescape(authurl))
-            return False
+            print("\t\tAuthUrl: %s" % authurl)
+            return (True,authurl)
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
-            return False
+            return (False,None)
 
 
     """ Validate O365 domain via: OpenID-Configuration """
@@ -79,7 +77,7 @@ class Validator:
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
-            return False
+            return (False,None)
 
 
     """ Perform domain validation against O365 """
@@ -89,4 +87,4 @@ class Validator:
 
         except Exception as e:
             if self.args.debug: print("[DEBUG]\t\t%s" % e)
-            return False
+            return (False,None)
