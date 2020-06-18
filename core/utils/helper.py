@@ -60,7 +60,7 @@ class Helper:
             user = "%s@%s" % (user, domain)
         return user
 
-    def prompt_question(prompt):
+    def prompt_question(self, prompt):
         resp = str(input(prompt) or "Y").lower().strip()
         if resp[0] not in ['y', 'n']:
             return prompt_question(prompt)

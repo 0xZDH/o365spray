@@ -99,7 +99,7 @@ if __name__ == "__main__":
             # if they would like to target ADFS or continue targeting Microsoft API's
             if args.spray and args.spray_type != 'adfs':
                 prompt = "[?]\t\tWould you like to switch to ADFS for password spraying [Y/n] "
-                resp = prompt_question(prompt)
+                resp = helper.prompt_question(prompt)
                 if resp[0] == 'y':
                     args.spray_type = 'adfs'
 
