@@ -126,6 +126,9 @@ class Enumerator:
     # 
     # NOTE: This method is dead based on recent MS updates
     #       I am leaving this code here in case a new method of enumeration is identified via Autodiscover
+    # NOTE: There may be a potential path of enumeration using Autodiscover by identifying responses that show 'Locked'
+    #       based on the AAADSTS code (this appears to happen as a default response code to an invalid authentication attempt),
+    #       but this would require an authentication attempt for each user.
     def _autodiscover(self, user, password):
         try:
             # Add special header for Autodiscover

@@ -4,6 +4,7 @@
 #           https://github.com/Raikia/UhOh365
 #           https://github.com/dafthack/MSOLSpray
 #           '-> https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+#           https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
 
 import re
 import time
@@ -173,7 +174,8 @@ class Sprayer:
                         # Handle AADSTS errors - remove user from future rotations
                         if any(code in response.headers["X-AutoDiscovery-Error"] for code in Config.AADSTS_codes.keys()):
                             # This is where we handle lockout termination
-                            # For now, we will just stop future sprays if a single lockout is hit
+                            # NOTE: It appears that Autodiscover is now showing lockouts no accounts that are valid, but failed authentication
+                            #       so this value may not actually indicate the correct number of locked accounts.
                             if code == "AADSTS50053":
                                 self.lockout += 1  # Keep track of locked accounts seen
 
@@ -184,6 +186,9 @@ class Sprayer:
 
                         else:
                             print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+
+                else:
+                    print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
