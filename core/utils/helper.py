@@ -2,7 +2,7 @@
 
 import sys
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 class Helper:
     """ Helper functions """
@@ -98,6 +98,11 @@ class Helper:
 
                 if arg == 'timeout':
                     BANNER += " seconds"
+
+        # Add timestamp for start of spray
+        space   = ' ' * (15 - len('start'))
+        start_t = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        BANNER += "\n   > start%s:  %s" % (space, start_t)
 
         BANNER += "\n"
         BANNER += "\n>----------------------------------------<\n"
