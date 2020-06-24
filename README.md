@@ -4,11 +4,13 @@ This is a username enumeration and password spraying tool aimed at Microsoft O36
 
 This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-> WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray.
->
-> NOTE: OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
->
-> FALLBACK: As a fallback solution, see [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against Microsoft Online. This tool leverages selenium to replicate user clicks and step through the DOM-based authentication form on Microsoft's website. This tool will require more time as it does not run asynchronously.
+*Update*: The ActiveSync enumeration and password spraying modules have been reimplemented to handle the recent updates from Microsoft that are causing invalid results. The reimplementation appears to be working and stable -- should any issues arise, feel free to open an issue or pull request.
+
+> WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray -- if enumeration is run alone, the user should be aware of the authentication attempts and reset the lockout timer manually.
+
+OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
+
+As a fallback solution to invalid results, check out [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against the Microsoft Online login form. This tool leverages selenium to replicate user clicks and steps through the DOM-based authentication form on Microsoft's website. This tool will require more time as it does not run asynchronously.
 
 ## Usage
 
@@ -84,18 +86,18 @@ optional arguments:
   --debug               Debug output
 ```
 
-### Methods
+### Modules
 
-##### Validation
+#### Validation
 * openid-config
 * getuserrealm
 
-##### Enumeration
+#### Enumeration
 * activesync
 * onedrive
 * autodiscover -- *No longer working - Removed*
 
-##### Spraying
+#### Spraying
 * activesync
 * autodiscover
 * msol
@@ -129,7 +131,8 @@ optional arguments:
 
 #### ADFS Code/References
 * [@Mr-Un1k0d3r](https://github.com/Mr-Un1k0d3r)
-* https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+* Password spray via ADFS
+    * https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
 
 #### Other Code References
 * [@byt3bl33d3r](https://github.com/byt3bl33d3r) --- [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/)
