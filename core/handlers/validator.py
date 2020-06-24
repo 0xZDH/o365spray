@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # This only sends a single request so we can leave it using the requests function and avoid asyncio
+import html
 import requests
 import xml.etree.ElementTree as ET
 from core.utils.colors import text_colors
@@ -44,13 +45,20 @@ class Validator:
         xml = ET.fromstring(rsp.text)
         nst = xml.find('NameSpaceType').text
 
-        if nst in ["Managed", "Federated"]:
+        if nst == "Managed":
             print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
-            return True
+            return (True,None)
+
+        # Handle Federated realms differently than Managed - Directly spray the federation servers
+        elif nst == "Federated":
+            authurl = html.unescape(xml.find('AuthURL').text)
+            print("[%sWARN%s]\t\tThe following domain is using O365, but is Federated: %s" % (text_colors.yellow, text_colors.reset, self.args.domain))
+            print("\t\tAuthUrl: %s" % authurl)
+            return (True,authurl)
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
-            return False
+            return (False,None)
 
 
     """ Validate O365 domain via: OpenID-Configuration """
@@ -63,13 +71,13 @@ class Validator:
         )
         status = rsp.status_code
 
+        # If the domain uses Office 365, let's check the user realm to identify Managed vs. Federated
         if status == 200:
-            print("[%sVALID%s]\t\tThe following domain is using O365: %s" % (text_colors.green, text_colors.reset, self.args.domain))
-            return True
+            return self._getuserrealm()
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
-            return False
+            return (False,None)
 
 
     """ Perform domain validation against O365 """
@@ -79,4 +87,4 @@ class Validator:
 
         except Exception as e:
             if self.args.debug: print("[DEBUG]\t\t%s" % e)
-            return False
+            return (False,None)

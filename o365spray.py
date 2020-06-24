@@ -11,7 +11,7 @@ from core.handlers.validator import *
 from core.handlers.enumerator import *
 
 
-__version__ = '1.2'
+__version__ = '1.3.4'
 
 # Signal handler for Enum routines
 def enum_signal_handler(signal, frame):
@@ -45,8 +45,9 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 15 minutes", default=15.0)
     # Scan specifications
     parser.add_argument("--validate-type",  type=str.lower, default='getuserrealm', choices=('openid-config', 'getuserrealm'), help="Specify which spray type to perform. Default: getuserrealm")
-    parser.add_argument("--enum-type",      type=str.lower, default='autodiscover', choices=('activesync', 'autodiscover', 'onedrive'), help="Specify which spray type to perform. Default: Autodiscover")
-    parser.add_argument("--spray-type",     type=str.lower, default='autodiscover', choices=('activesync', 'autodiscover', 'msol'),     help="Specify which spray type to perform. Default: Autodiscover")
+    parser.add_argument("--enum-type",      type=str.lower, default='activesync', choices=('activesync', 'onedrive'), help="Specify which spray type to perform. Default: ActiveSync")
+    parser.add_argument("--spray-type",     type=str.lower, default='activesync', choices=('activesync', 'autodiscover', 'msol', 'adfs'),     help="Specify which spray type to perform. Default: ActiveSync")
+    parser.add_argument("--adfs",           type=str, help="URL of target ADFS login page for spraying.")
     parser.add_argument("--rate",           type=int, help="Number of concurrent connections during enum and spray. Default: 10", default=10)
     parser.add_argument("--safe",           type=int, help="Terminate scan if `n` locked accounts are observed. Default: 10", default=10)
     parser.add_argument("--paired",         action="store_true", help="Password spray pairing usernames and passwords (1:1).")
@@ -77,12 +78,36 @@ if __name__ == "__main__":
     # Clean output dir
     args.output = args.output.rstrip('/')
 
+
     # Perform domain validation
-    print("[*] Performing O365 validation for: %s\n" % args.domain)
-    validator = Validator(args=args)
-    valid = validator.validate()
-    if not valid or args.validate:
-        (args.enum, args.spray) = (False, False)
+    #  This should only occur if the user has not excplicitly specified to spray ADFS
+    #  or the user has specified to only validate the domain
+    if not args.adfs or args.validate:
+        print("[*] Performing O365 validation for: %s\n" % args.domain)
+        validator = Validator(args=args)
+        (valid,adfs) = validator.validate()
+        if not valid or args.validate:
+            (args.enum, args.spray) = (False, False)
+
+        # Handle Federated realms since enumeration is not currently working against it
+        # - set the ADFS target to the AuthUrl provided by Microsoft `getuserrealm`
+        if (valid and adfs) and not args.validate:
+            args.enum = False
+            args.adfs = adfs
+
+            # If the user has specified to perform password spraying, prompt the user to ask
+            # if they would like to target ADFS or continue targeting Microsoft API's
+            if args.spray and args.spray_type != 'adfs':
+                prompt = "[?]\t\tWould you like to switch to ADFS for password spraying [Y/n] "
+                resp = helper.prompt_question(prompt)
+                if resp[0] == 'y':
+                    args.spray_type = 'adfs'
+
+    # Skip domain validation and enfore no enumeration/ADFS spraying when the user provides an ADFS url
+    else:
+        args.enum       = False
+        args.spray_type = 'adfs'
+
 
 
     # Perform user enumeration

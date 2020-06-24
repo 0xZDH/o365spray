@@ -36,7 +36,7 @@ class Enumerator:
 
         # Enumeration Modules
         self._modules = {
-            'autodiscover': self._autodiscover,
+            # 'autodiscover': self._autodiscover,
             'activesync':   self._activesync,
             'onedrive':     self._onedrive
         }
@@ -80,7 +80,7 @@ class Enumerator:
 
 
     """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
-    # https://bitbucket.org/grimhacker/office365userenum/
+    # Original enumeration via: https://bitbucket.org/grimhacker/office365userenum/
     def _activesync(self, user, password):
         try:
             # Add special header for ActiveSync
@@ -104,19 +104,17 @@ class Enumerator:
                 print("[%sVALID_LOGIN%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
                 self.valid_accts.append(user)
 
-            elif status == 401:
+            # Note: After the new MS updates, it appears that invalid users return a 403 Forbidden while valid users
+            #       appear to respond with 401 Unauthorized with a WWW-Authenticate response header that indicates
+            #       Basic auth negotiation was started
+            elif status == 401 and "WWW-Authenticate" in response.headers.keys():
                 print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
                 self.valid_accts.append(user)
 
-            elif status == 403:
-                print("[%sVALID_LOGIN_MFA%s]\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
-                self.valid_accts.append(user)
-
-            elif status == 404 and ("X-CasErrorCode" in response.headers.keys() and response.headers['X-CasErrorCode'] == "UserNotFound"):
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
-
+            # Note: Since invalid user's are now identified via 403 responses, we can just default all 403/404/etc. to
+            #       as bad users
             else:
-                print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -125,6 +123,12 @@ class Enumerator:
 
     """ Enumerate users on Microsoft using Microsoft Autodiscover """
     # https://github.com/Raikia/UhOh365
+    # 
+    # NOTE: This method is dead based on recent MS updates
+    #       I am leaving this code here in case a new method of enumeration is identified via Autodiscover
+    # NOTE: There may be a potential path of enumeration using Autodiscover by identifying responses that show 'Locked'
+    #       based on the AAADSTS code (this appears to happen as a default response code to an invalid authentication attempt),
+    #       but this would require an authentication attempt for each user.
     def _autodiscover(self, user, password):
         try:
             # Add special header for Autodiscover
@@ -155,10 +159,10 @@ class Enumerator:
                     self.valid_accts.append(user)
 
                 else:
-                    print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                    print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
             else:
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
 
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
@@ -197,7 +201,7 @@ class Enumerator:
                 self.valid_accts.append(user)
 
             elif status == 404:
-                print("[%sINVALID_USER%s]\t\t%s%s" % (text_colors.red, text_colors.reset, user, self.helper.space), end='\r')
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, user, self.helper.space), end='\r')
 
             else:
                 print("[%sUNKNOWN%s]\t\t%s%s" % (text_colors.yellow, text_colors.reset, user, self.helper.space), end='\r')
