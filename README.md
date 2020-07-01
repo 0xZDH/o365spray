@@ -63,13 +63,13 @@ optional arguments:
                         Lockout policy reset time (in minutes). Default: 15 minutes
 
   --validate-type {openid-config,getuserrealm}
-                        Specify which spray type to perform. Default: getuserrealm
+                        Specify which validation module to use. Default: getuserrealm
 
   --enum-type {activesync,onedrive}
-                        Specify which spray type to perform. Default: ActiveSync
+                        Specify which enum module to use. Default: ActiveSync
 
   --spray-type {activesync,autodiscover,msol,adfs}
-                        Specify which spray type to perform. Default: ActiveSync
+                        Specify which spray module to use. Default: ActiveSync
 
   --adfs ADFS           URL of target ADFS login page for spraying.
 
