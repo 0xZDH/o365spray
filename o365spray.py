@@ -112,9 +112,9 @@ if __name__ == "__main__":
                 if resp[0] == 'y':
                     args.spray_type = 'adfs'
 
-    # Skip domain validation and enfore no enumeration/ADFS spraying when the user provides an ADFS url
+    # Skip domain validation and enforce ADFS enumeration/spraying when the user provides an ADFS url
     else:
-        args.enum       = False
+        args.enum_type  = 'onedrive'
         args.spray_type = 'adfs'
 
 
