@@ -2,6 +2,7 @@
 
 # Based on: https://bitbucket.org/grimhacker/office365userenum/
 #           https://github.com/Raikia/UhOh365
+#           https://github.com/nyxgeek/onedrive_user_enum/blob/master/onedrive_enum.py
 
 import time
 import urllib3
@@ -193,10 +194,11 @@ class Enumerator:
             url = "https://{TENANT}-my.sharepoint.com/personal/{USERNAME}_{DOMAIN}_{TLD}/_layouts/15/onedrive.aspx".format(
                 TENANT=tenant, USERNAME=user, DOMAIN=domain, TLD=tld
             )
-            response = self._send_request(requests.head, url)
+            response = self._send_request(requests.get, url)
 
             status = response.status_code
-            if status == 403:
+            # It appears that valid browser User-Agents will return a 302 redirect instead of 401/403 on valid accounts
+            if status == 302 or status == 401 or status == 403:
                 print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, user, self.helper.space))
                 self.valid_accts.append(user)
 

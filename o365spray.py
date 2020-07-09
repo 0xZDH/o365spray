@@ -11,7 +11,7 @@ from core.handlers.validator import *
 from core.handlers.enumerator import *
 
 
-__version__ = '1.3.4'
+__version__ = '1.3.5'
 
 # Signal handler for Enum routines
 def enum_signal_handler(signal, frame):
@@ -89,17 +89,26 @@ if __name__ == "__main__":
         if not valid or args.validate:
             (args.enum, args.spray) = (False, False)
 
-        # Handle Federated realms since enumeration is not currently working against it
+        # Handle Federated realms since standard enumeration is not currently working against it
         # - set the ADFS target to the AuthUrl provided by Microsoft `getuserrealm`
         if (valid and adfs) and not args.validate:
-            args.enum = False
             args.adfs = adfs
+
+            # OneDrive is a valid method for ADFS enumeration - prompt the user to ask
+            # if they would like to switch to OneDrive enumeration if not already enabled
+            if args.enum and args.enum_type != 'onedrive':
+                prompt = "[?]\t\tWould you like to switch to OneDrive for user enumeration [Y/n] "
+                resp   = helper.prompt_question(prompt)
+                if resp[0] == 'y':
+                    args.enum_type = 'onedrive'
+                else:  # Disable as non-OneDrive modules currently give False Positives for ADFS
+                    args.enum = False
 
             # If the user has specified to perform password spraying, prompt the user to ask
             # if they would like to target ADFS or continue targeting Microsoft API's
             if args.spray and args.spray_type != 'adfs':
                 prompt = "[?]\t\tWould you like to switch to ADFS for password spraying [Y/n] "
-                resp = helper.prompt_question(prompt)
+                resp   = helper.prompt_question(prompt)
                 if resp[0] == 'y':
                     args.spray_type = 'adfs'
 

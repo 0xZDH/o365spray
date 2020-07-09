@@ -8,7 +8,7 @@ This tool reimplements a collection of enumeration and spray techniques research
 
 > WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray -- if enumeration is run alone, the user should be aware of the authentication attempts and reset the lockout timer manually.
 
-OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
+OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'. This appears to be a viable solution for user enumeration against federated realms.
 
 As a fallback solution to invalid results, check out [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against the Microsoft Online login form. This tool leverages selenium to replicate user clicks and steps through the DOM-based authentication form on Microsoft's website. This tool will require more time as it does not run asynchronously.
 
@@ -31,7 +31,7 @@ usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
                     [--adfs ADFS] [--rate RATE] [--safe SAFE] [--paired]
                     [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.3.4
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3.5
 
 optional arguments:
   -h, --help            show this help message and exit
