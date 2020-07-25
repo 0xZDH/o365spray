@@ -7,13 +7,13 @@ This tool reimplements a collection of enumeration and spray techniques research
 **Updates**:
 ```
 - The office.com enumeration module has been implemented and set to default for Managed realms.
-- The ActiveSync enumeration and password spraying modules have been reimplemented in an attempt to 
-  handle the recent updates from Microsoft that are causing invalid results. The ActiveSync enumeration
-  module still returns some false positives - this is why the office.com enumeration module has been moved
-  to the default process.
-- When a Federated realm is identified, the user is prompted to switch enumeration to OneDrive (otherwise
-  disabled due to invalid results from different modules) and to switch spraying to ADFS (otherwise sprays
-  against the user selected spray-type).
+- The ActiveSync enumeration and password spraying modules have been reimplemented in an
+  attempt to handle the recent updates from Microsoft that are causing invalid results. The
+  ActiveSync enumeration module still returns some false positives - this is why the office.com
+  enumeration module has been moved to the default process.
+- When a Federated realm is identified, the user is prompted to switch enumeration to OneDrive
+  (otherwise disabled due to invalid results from different modules) and to switch spraying to
+  ADFS (otherwise sprays against the user selected spray-type).
 ```
 
 > WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray -- if enumeration is run alone, the user should be aware of the authentication attempts and reset the lockout timer manually.
