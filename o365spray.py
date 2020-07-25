@@ -11,7 +11,7 @@ from core.handlers.validator import *
 from core.handlers.enumerator import *
 
 
-__version__ = '1.3.5'
+__version__ = '1.3.6'
 
 # Signal handler for Enum routines
 def enum_signal_handler(signal, frame):
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--lockout",  type=float, help="Lockout policy reset time (in minutes). Default: 15 minutes", default=15.0)
     # Scan specifications
     parser.add_argument("--validate-type",  type=str.lower, default='getuserrealm', choices=('openid-config', 'getuserrealm'),              help="Specify which validation module to use. Default: getuserrealm")
-    parser.add_argument("--enum-type",      type=str.lower, default='activesync',   choices=('activesync', 'onedrive'),                     help="Specify which enum module to use. Default: ActiveSync")
+    parser.add_argument("--enum-type",      type=str.lower, default='office',       choices=('office', 'activesync', 'onedrive'),           help="Specify which enum module to use. Default: Office")
     parser.add_argument("--spray-type",     type=str.lower, default='activesync',   choices=('activesync', 'autodiscover', 'msol', 'adfs'), help="Specify which spray module to use. Default: ActiveSync")
     parser.add_argument("--adfs",           type=str, help="URL of target ADFS login page for spraying.")
     parser.add_argument("--rate",           type=int, help="Number of concurrent connections during enum and spray. Default: 10", default=10)
