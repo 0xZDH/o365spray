@@ -360,8 +360,8 @@ if __name__ == "__main__":
                             loop.run_until_complete(spray.run(password))
 
                             # Stop if we hit our locked account limit
-                            # Note: This currently only applies to the MSOL spraying module as
-                            #       Autodiscover is currently disabled
+                            # Note: This currently only applies to the MSOL spraying module as Autodiscover
+                            #       is currently showing invalid lockouts
                             if spray.lockout >= args.safe:
                                 print("[!] Locked account threshold reached. Exiting...")
                                 spray.shutdown()

