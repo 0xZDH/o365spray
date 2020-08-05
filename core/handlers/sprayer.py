@@ -38,7 +38,6 @@ class Sprayer:
         self.executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=self.args.rate
         )
-
         # Spray Modules
         self._modules = {
             'autodiscover': self._autodiscover,
@@ -85,8 +84,32 @@ class Sprayer:
         )
 
 
-    """ Spray users on Microsoft using Microsoft Server ActiveSync """
-    # https://bitbucket.org/grimhacker/office365userenum/
+    """ Asyncronously Send HTTP Requests """
+    async def run(self, password):
+        blocking_tasks = [
+            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.spray_type], user=user, password=password))
+            for user in self.userlist
+        ]
+        if blocking_tasks:
+            await asyncio.wait(blocking_tasks)
+
+
+    """ Asyncronously Send HTTP Requests """
+    async def run_paired(self, passlist):
+        blocking_tasks = [
+            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.spray_type], user=user, password=password))
+            for user, password in zip(self.userlist, passlist)
+        ]
+        if blocking_tasks:
+            await asyncio.wait(blocking_tasks)
+
+
+    # =============================
+    # == -- AcitveSync MODULE -- ==
+    # =============================
+
+    """ Spray users on Microsoft using Microsoft Server ActiveSync
+        https://bitbucket.org/grimhacker/office365userenum/ """
     def _activesync(self, user, password):
         try:
             # Add special header for ActiveSync
@@ -122,8 +145,12 @@ class Sprayer:
             pass
 
 
-    """ Spray users on Microsoft using Microsoft Autodiscover """
-    # https://github.com/Raikia/UhOh365
+    # ===============================
+    # == -- Autodiscover MODULE -- ==
+    # ===============================
+
+    """ Spray users on Microsoft using Microsoft Autodiscover
+        https://github.com/Raikia/UhOh365 """
     def _autodiscover(self, user, password):
         try:
             # Check if we hit our locked account limit, and stop
@@ -195,9 +222,13 @@ class Sprayer:
             pass
 
 
-    """ Spray users on Microsoft using Azure AD """
-    # https://github.com/dafthack/MSOLSpray
-    # https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+    # =======================
+    # == -- MSOL MODULE -- ==
+    # =======================
+
+    """ Spray users on Microsoft using Azure AD
+        https://github.com/dafthack/MSOLSpray
+        https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f """
     def _msol(self, user, password):
         try:
             # Check if we hit our locked account limit, and stop
@@ -258,8 +289,12 @@ class Sprayer:
             pass
 
 
-    """ Spray users via a managed ADFS server """
-    # https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+    # =======================
+    # == -- ADFS MODULE -- ==
+    # =======================
+
+    """ Spray users via a managed ADFS server
+        https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py """
     def _adfs(self, user, password):
         try:
             headers = Config.headers  # Grab external headers from config.py
@@ -292,23 +327,3 @@ class Sprayer:
         except Exception as e:
             if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
             pass
-
-
-    """ Asyncronously Send HTTP Requests """
-    async def run(self, password):
-        blocking_tasks = [
-            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.spray_type], user=user, password=password))
-            for user in self.userlist
-        ]
-        if blocking_tasks:
-            await asyncio.wait(blocking_tasks)
-
-
-    """ Asyncronously Send HTTP Requests """
-    async def run_paired(self, passlist):
-        blocking_tasks = [
-            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.spray_type], user=user, password=password))
-            for user, password in zip(self.userlist, passlist)
-        ]
-        if blocking_tasks:
-            await asyncio.wait(blocking_tasks)

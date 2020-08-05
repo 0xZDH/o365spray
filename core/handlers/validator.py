@@ -33,6 +33,20 @@ class Validator:
         )
 
 
+    """ Perform domain validation against O365 """
+    def validate(self):
+        try:
+            return self._modules[self.args.validate_type]()
+
+        except Exception as e:
+            if self.args.debug: print("[DEBUG]\t\t%s" % e)
+            return (False,None)
+
+
+    # ===============================
+    # == -- GetUserRealm MODULE -- ==
+    # ===============================
+
     """ Validate O365 domain via: GetUserRealm """
     def _getuserrealm(self):
         url = "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1"
@@ -61,6 +75,10 @@ class Validator:
             return (False,None)
 
 
+    # ================================
+    # == -- OpenID-Config MODULE -- ==
+    # ================================
+
     """ Validate O365 domain via: OpenID-Configuration """
     def _openid_config(self):
         url = "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration"
@@ -77,14 +95,4 @@ class Validator:
 
         else:
             print("[%sFAILED%s]\tThe following domain is not using O365: %s" % (text_colors.red, text_colors.reset, self.args.domain))
-            return (False,None)
-
-
-    """ Perform domain validation against O365 """
-    def validate(self):
-        try:
-            return self._modules[self.args.validate_type]()
-
-        except Exception as e:
-            if self.args.debug: print("[DEBUG]\t\t%s" % e)
             return (False,None)

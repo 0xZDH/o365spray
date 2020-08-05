@@ -4,15 +4,27 @@ This is a username enumeration and password spraying tool aimed at Microsoft O36
 
 This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-*Update*: The ActiveSync enumeration and password spraying modules have been reimplemented to handle the recent updates from Microsoft that are causing invalid results. The reimplementation appears to be working and stable -- should any issues arise, feel free to open an issue or pull request.
+**Updates**:
+```
+- The office.com enumeration module has been implemented and set to default for Managed realms.
+- The ActiveSync enumeration and password spraying modules have been reimplemented in an
+  attempt to handle the recent updates from Microsoft that are causing invalid results. The
+  ActiveSync enumeration module still returns some false positives - this is why the office.com
+  enumeration module has been moved to the default process.
+- When a Federated realm is identified, the user is prompted to switch enumeration to OneDrive
+  (otherwise disabled due to invalid results from different modules) and to switch spraying to
+  ADFS (otherwise sprays against the user selected spray-type).
+```
 
 > WARNING: ActiveSync user enumeration is performed by submitting a single authentication attempt per user. If ActiveSync enumeration is run with password spraying, the tool will automatically reset the lockout timer prior to the password spray -- if enumeration is run alone, the user should be aware of the authentication attempts and reset the lockout timer manually.
 
 OneDrive user enumeration relies on the target user(s) to have previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'. This appears to be a viable solution for user enumeration against federated realms.
 
-As a fallback solution to invalid results, check out [msspray](https://github.com/0xZDH/msspray) to perform user enumeration and password spraying against the Microsoft Online login form. This tool leverages selenium to replicate user clicks and steps through the DOM-based authentication form on Microsoft's website. This tool will require more time as it does not run asynchronously.
 
 ## Usage
+
+Validate domain is using O365:<br>
+`python3 o365spray.py --validate --domain test.com`
 
 Perform username enumeration:<br>
 `python3 o365spray.py --enum -U usernames.txt --domain test.com`
@@ -22,22 +34,23 @@ Perform password spray:<br>
 
 
 ```
-usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
+usage: o365spray.py [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                     [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
-                    [-c COUNT] [-l LOCKOUT]
+                    [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
                     [--validate-type {openid-config,getuserrealm}]
-                    [--enum-type {activesync,onedrive}]
+                    [--enum-type {office,activesync,onedrive}]
                     [--spray-type {activesync,autodiscover,msol,adfs}]
-                    [--adfs ADFS] [--rate RATE] [--safe SAFE] [--paired]
-                    [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT] [--debug]
+                    [--adfs ADFS] [--rate RATE] [--safe SAFE]
+                    [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT]
+                    [--version] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.3.5
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3.7
 
 optional arguments:
   -h, --help            show this help message and exit
 
   -d DOMAIN, --domain DOMAIN
-                        Target O365 domain
+                        Target domain
 
   --validate            Perform domain validation only.
   --enum                Perform username enumeration.
@@ -55,34 +68,43 @@ optional arguments:
   -P PASSFILE, --passfile PASSFILE
                         File containing list of passwords.
 
+  --paired PAIRED       File containing list of username:password format.
+
   -c COUNT, --count COUNT
-                        Number of password attempts to run before resetting lockout
-                        timer. Default: 1
+                        Number of password attempts to run before resetting
+                        lockout timer. Default: 1
 
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy reset time (in minutes). Default: 15 minutes
+                        Lockout policy reset time (in minutes). Default: 15
+                        minutes
 
   --validate-type {openid-config,getuserrealm}
-                        Specify which validation module to use. Default: getuserrealm
+                        Specify which validation module to use. Default:
+                        getuserrealm
 
-  --enum-type {activesync,onedrive}
-                        Specify which enum module to use. Default: ActiveSync
+  --enum-type {office,activesync,onedrive}
+                        Specify which enum module to use. Default: Office
 
   --spray-type {activesync,autodiscover,msol,adfs}
                         Specify which spray module to use. Default: ActiveSync
 
-  --adfs ADFS           URL of target ADFS login page for spraying.
+  --adfs ADFS           URL of target ADFS login page for password spraying.
 
-  --rate RATE           Number of concurrent connections during enum and spray.
+  --rate RATE           Number of concurrent connections during enumeration
+                        and spraying. Default: 10
+
+  --safe SAFE           Terminate scan if `N` locked accounts are observed.
                         Default: 10
 
-  --safe SAFE           Terminate scan if `n` locked accounts are observed.
-                        Default: 10
+  --timeout TIMEOUT     Request timeout in seconds. Default: 25
 
-  --paired              Password spray pairing usernames and passwords (1:1).
-  --timeout TIMEOUT     Request timeout. Default: 25
-  --proxy PROXY         Proxy to pass traffic through: [http(s)://ip:port]
-  --output OUTPUT       Output directory. Default: Current directory
+  --proxy PROXY         Proxy to pass traffic through (e.g.
+                        http://127.0.0.1:8080).
+
+  --output OUTPUT       Output directory for results. Default: Current
+                        directory
+
+  --version             Print the tool version.
   --debug               Debug output
 ```
 
@@ -93,6 +115,7 @@ optional arguments:
 * getuserrealm
 
 #### Enumeration
+* office
 * activesync
 * onedrive
 * autodiscover -- *No longer working - Removed*
@@ -104,6 +127,11 @@ optional arguments:
 * adfs
 
 ## Acknowledgments
+
+#### Office.com Code/References
+* [@gremwell](https://github.com/gremwell)
+* User enumeration via Office.com without authentication
+    * [o365enum](https://github.com/gremwell/o365enum)
 
 #### ActiveSync Code/References
 * [@grimhacker](https://bitbucket.org/grimhacker)
