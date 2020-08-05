@@ -66,9 +66,13 @@ class Helper:
             return prompt_question(prompt)
         return resp
 
-    def banner(self, args):
+    def banner(self, args, version):
         BANNER  = "\n            *** O365 Spray ***            \n"
         BANNER += "\n>----------------------------------------<\n"
+
+        # Add version
+        space   = ' ' * (15 - len('version'))
+        BANNER += "\n   > version%s:  %s" % (space, version)
 
         _args = vars(args)
         for arg in _args:

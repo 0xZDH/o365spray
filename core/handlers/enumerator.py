@@ -38,15 +38,13 @@ class Enumerator:
         self.executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=self.args.rate
         )
-
         # Enumeration Modules
         self._modules = {
-            # 'autodiscover': self._autodiscover,
+            # 'autodiscover': self._autodiscover,  # DISABLED
             'activesync':   self._activesync,
             'onedrive':     self._onedrive,
             'office':       self._office
         }
-
         # Build office header/param data
         if args.enum_type == 'office':
             self._pre_office()
@@ -90,8 +88,22 @@ class Enumerator:
         )
 
 
-    """ Enumerate users on Microsoft using Microsoft Server ActiveSync """
-    # Original enumeration via: https://bitbucket.org/grimhacker/office365userenum/
+    """ Asyncronously Send HTTP Requests """
+    async def run(self, userlist, password="Password1"):
+        blocking_tasks = [
+            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.enum_type], user=user, password=password))
+            for user in userlist
+        ]
+        if blocking_tasks:
+            await asyncio.wait(blocking_tasks)
+
+
+    # =============================
+    # == -- ActiveSync MODULE -- ==
+    # =============================
+
+    """ Enumerate users on Microsoft using Microsoft Server ActiveSync
+        Original enumeration via: https://bitbucket.org/grimhacker/office365userenum/ """
     def _activesync(self, user, password):
         try:
             # Add special header for ActiveSync
@@ -132,57 +144,13 @@ class Enumerator:
             pass
 
 
-    """ Enumerate users on Microsoft using Microsoft Autodiscover """
-    # https://github.com/Raikia/UhOh365
-    # 
-    # NOTE: This method is dead based on recent MS updates
-    #       I am leaving this code here in case a new method of enumeration is identified via Autodiscover
-    # NOTE: There may be a potential path of enumeration using Autodiscover by identifying responses that show 'Locked'
-    #       based on the AAADSTS code (this appears to happen as a default response code to an invalid authentication attempt),
-    #       but this would require an authentication attempt for each user.
-    def _autodiscover(self, user, password):
-        try:
-            # Add special header for Autodiscover
-            headers = Config.headers  # Grab external headers from config.py
-            headers["User-Agent"] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
+    # ===========================
+    # == -- OneDrive MODULE -- ==
+    # ===========================
 
-            # Build email if not already built
-            email = self.helper.check_email(user, self.args.domain)
-
-            # Keep track of tested names in case we ctrl-c
-            self.tested_accts.append(email)
-
-            time.sleep(0.250)
-
-            url      = "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1"
-            response = self._send_request(requests.get, url.format(EMAIL=email), headers=headers)
-
-            status = response.status_code
-            body   = response.content
-            # "X-MailboxGuid" in response.headers.keys()  # This appears to not be a required header for valid accounts
-            if status == 200:
-                print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
-                self.valid_accts.append(user)
-
-            elif status == 302:
-                if "outlook.office365.com" not in body:
-                    print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
-                    self.valid_accts.append(user)
-
-                else:
-                    print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
-
-            else:
-                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
-
-        except Exception as e:
-            if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
-            pass
-
-
-    """ Enumerate users on Microsoft using One Drive """
-    # https://github.com/nyxgeek/onedrive_user_enum/blob/master/onedrive_enum.py
-    # https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/
+    """ Enumerate users on Microsoft using One Drive
+        https://github.com/nyxgeek/onedrive_user_enum/blob/master/onedrive_enum.py
+        https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/ """
     def _onedrive(self, user, password):
         try:
             # Remove email format from user if present
@@ -223,11 +191,14 @@ class Enumerator:
             pass
 
 
-    """ Pre-handling of Office.com enumeration """
-    # https://github.com/gremwell/o365enum/blob/master/o365enum.py
-    # 
-    # NOTE: Collect and build the correct header and parameter data to perform user enumeration
-    #       against office.com
+    # =============================
+    # == -- Office.com MODULE -- ==
+    # =============================
+
+    """ Pre-handling of Office.com enumeration
+        https://github.com/gremwell/o365enum/blob/master/o365enum.py
+        Note: Collect and build the correct header and parameter data to perform user enumeration
+              against office.com """
     def _pre_office(self):
         # Request the base domain to collect the `client_id`
         response = self._send_request(requests.get, "https://www.office.com")
@@ -280,9 +251,8 @@ class Enumerator:
             "federationFlags":                 0
         }
 
-
-    """ Enumerate users on Microsoft using Office.com """
-    # https://github.com/gremwell/o365enum/blob/master/o365enum.py
+    """ Enumerate users on Microsoft using Office.com
+        https://github.com/gremwell/o365enum/blob/master/o365enum.py """
     def _office(self, user, password):
         try:
             # Grab prebuild office headers
@@ -320,11 +290,52 @@ class Enumerator:
             pass
 
 
-    """ Asyncronously Send HTTP Requests """
-    async def run(self, userlist, password="Password1"):
-        blocking_tasks = [
-            self.loop.run_in_executor(self.executor, partial(self._modules[self.args.enum_type], user=user, password=password))
-            for user in userlist
-        ]
-        if blocking_tasks:
-            await asyncio.wait(blocking_tasks)
+    # ===========================================
+    # == -- Autodiscover MODULE -- DISABLED -- ==
+    # ===========================================
+
+    """ Enumerate users on Microsoft using Microsoft Autodiscover
+        https://github.com/Raikia/UhOh365
+        Note: This method is dead based on recent MS updates
+              I am leaving this code here in case a new method of enumeration is identified via Autodiscover
+        Note: There may be a potential path of enumeration using Autodiscover by identifying responses that show 'Locked'
+              based on the AAADSTS code (this appears to happen as a default response code to an invalid authentication attempt),
+              but this would require an authentication attempt for each user. """
+    def _autodiscover(self, user, password):
+        try:
+            # Add special header for Autodiscover
+            headers = Config.headers  # Grab external headers from config.py
+            headers["User-Agent"] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
+
+            # Build email if not already built
+            email = self.helper.check_email(user, self.args.domain)
+
+            # Keep track of tested names in case we ctrl-c
+            self.tested_accts.append(email)
+
+            time.sleep(0.250)
+
+            url      = "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1"
+            response = self._send_request(requests.get, url.format(EMAIL=email), headers=headers)
+
+            status = response.status_code
+            body   = response.content
+            # "X-MailboxGuid" in response.headers.keys()  # This appears to not be a required header for valid accounts
+            if status == 200:
+                print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
+                self.valid_accts.append(user)
+
+            elif status == 302:
+                if "outlook.office365.com" not in body:
+                    print("[%sVALID_USER%s]\t\t%s%s" % (text_colors.green, text_colors.reset, email, self.helper.space))
+                    self.valid_accts.append(user)
+
+                else:
+                    print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+
+            else:
+                print("[%sINVALID%s]\t\t%s%s" % (text_colors.red, text_colors.reset, email, self.helper.space), end='\r')
+
+        except Exception as e:
+            if self.args.debug: print("\n[ERROR]\t\t\t%s" % e)
+            pass

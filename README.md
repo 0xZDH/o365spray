@@ -23,6 +23,9 @@ OneDrive user enumeration relies on the target user(s) to have previously logged
 
 ## Usage
 
+Validate domain is using O365:<br>
+`python3 o365spray.py --validate --domain test.com`
+
 Perform username enumeration:<br>
 `python3 o365spray.py --enum -U usernames.txt --domain test.com`
 
@@ -31,22 +34,23 @@ Perform password spray:<br>
 
 
 ```
-usage: o365spray.py [-h] -d DOMAIN [--validate] [--enum] [--spray]
+usage: o365spray.py [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                     [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
-                    [-c COUNT] [-l LOCKOUT]
+                    [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
                     [--validate-type {openid-config,getuserrealm}]
                     [--enum-type {office,activesync,onedrive}]
                     [--spray-type {activesync,autodiscover,msol,adfs}]
-                    [--adfs ADFS] [--rate RATE] [--safe SAFE] [--paired]
-                    [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT] [--debug]
+                    [--adfs ADFS] [--rate RATE] [--safe SAFE]
+                    [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT]
+                    [--version] [--debug]
 
-Microsoft O365 User Enumerator and Password Sprayer -- v1.3.6
+Microsoft O365 User Enumerator and Password Sprayer -- v1.3.7
 
 optional arguments:
   -h, --help            show this help message and exit
 
   -d DOMAIN, --domain DOMAIN
-                        Target O365 domain
+                        Target domain
 
   --validate            Perform domain validation only.
   --enum                Perform username enumeration.
@@ -64,15 +68,19 @@ optional arguments:
   -P PASSFILE, --passfile PASSFILE
                         File containing list of passwords.
 
+  --paired PAIRED       File containing list of username:password format.
+
   -c COUNT, --count COUNT
-                        Number of password attempts to run before resetting lockout
-                        timer. Default: 1
+                        Number of password attempts to run before resetting
+                        lockout timer. Default: 1
 
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy reset time (in minutes). Default: 15 minutes
+                        Lockout policy reset time (in minutes). Default: 15
+                        minutes
 
   --validate-type {openid-config,getuserrealm}
-                        Specify which validation module to use. Default: getuserrealm
+                        Specify which validation module to use. Default:
+                        getuserrealm
 
   --enum-type {office,activesync,onedrive}
                         Specify which enum module to use. Default: Office
@@ -80,18 +88,23 @@ optional arguments:
   --spray-type {activesync,autodiscover,msol,adfs}
                         Specify which spray module to use. Default: ActiveSync
 
-  --adfs ADFS           URL of target ADFS login page for spraying.
+  --adfs ADFS           URL of target ADFS login page for password spraying.
 
-  --rate RATE           Number of concurrent connections during enum and spray.
+  --rate RATE           Number of concurrent connections during enumeration
+                        and spraying. Default: 10
+
+  --safe SAFE           Terminate scan if `N` locked accounts are observed.
                         Default: 10
 
-  --safe SAFE           Terminate scan if `n` locked accounts are observed.
-                        Default: 10
+  --timeout TIMEOUT     Request timeout in seconds. Default: 25
 
-  --paired              Password spray pairing usernames and passwords (1:1).
-  --timeout TIMEOUT     Request timeout. Default: 25
-  --proxy PROXY         Proxy to pass traffic through: [http(s)://ip:port]
-  --output OUTPUT       Output directory. Default: Current directory
+  --proxy PROXY         Proxy to pass traffic through (e.g.
+                        http://127.0.0.1:8080).
+
+  --output OUTPUT       Output directory for results. Default: Current
+                        directory
+
+  --version             Print the tool version.
   --debug               Debug output
 ```
 
