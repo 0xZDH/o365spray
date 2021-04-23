@@ -75,6 +75,13 @@ class Enumerator:
 
     """ Template for HTTP Request """
     def _send_request(self, request, url, auth=None, json=None, data=None, allow_redirects=False, headers=Config.headers):
+        if self.args.sleep > 0:
+            sleep = self.args.sleep
+            if self.args.jitter > 0:
+                sleep = sleep + int(sleep * float(random.randint(1, self.args.jitter) / 100.0))
+            if self.args.debug: print(f"\n[DEBUG]\t\t\tSleeping for {sleep} seconds before sending request...")
+            time.sleep(sleep)
+
         return request(  # Send HTTP request
             url,
             auth=auth,

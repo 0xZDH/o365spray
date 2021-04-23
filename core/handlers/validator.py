@@ -2,6 +2,8 @@
 
 # This only sends a single request so we can leave it using the requests function and avoid asyncio
 import html
+import random
+import time
 import requests
 import xml.etree.ElementTree as ET
 from core.utils.colors import text_colors
@@ -24,6 +26,13 @@ class Validator:
 
 
     def _send_request(self, url):
+        if self.args.sleep > 0:
+            sleep = self.args.sleep
+            if self.args.jitter > 0:
+                sleep = sleep + int(sleep * float(random.randint(1, self.args.jitter) / 100.0))
+            if self.args.debug: print(f"\n[DEBUG]\tSleeping for {sleep} seconds before sending request...")
+            time.sleep(sleep)
+
         return requests.get(  # Send HTTP request to validate domain
             url,
             headers=Config.headers,

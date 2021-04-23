@@ -144,6 +144,22 @@ if __name__ == "__main__":
         default=10
     )
 
+    parser.add_argument(
+        '-s',
+        "--sleep",
+        type=int,
+        help="Throttle subsequent attempts every # seconds, can be randomized by passing the value 'random' (between 1sec and 20 mins) - default is 0",
+        default=0
+    )
+
+    parser.add_argument(
+        '-j',
+        "--jitter",
+        type=int,
+        help="Jitter among subsequent tries. Jitter extends sleep period by percanted given (0-100). Default: no jitter.",
+        default=0
+    )
+
     # HTTP configurations
     parser.add_argument(
         "--timeout",
