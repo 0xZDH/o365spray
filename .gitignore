@@ -1,15 +1,12 @@
-# Ignore all compiled Python code
-*.pyc
-# Ignore all text files
+*.egg-info
+*.py[co]
 *.txt
-# Ignore all OS X .DS_Store files
 **/.DS_Store
-# Ignore all directories with compiled Python data
 **/__pycache__
-# Ignore unit test scripts
 **/test
-# Ignore results directories
+**/dist
+.vscode/
 enum/
 spray/
-# Negate requirements text file to include on commits
+output/
 !requirements.txt
