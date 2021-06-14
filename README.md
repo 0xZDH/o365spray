@@ -96,6 +96,8 @@ optional arguments:
 
 ## Modules
 
+o365spray has been packaged to allow for use within automation scenarios. If domain validation, user enumeration, or password spraying is a part of your proposed attack/recon automation, see the below modules and import usage exmaples.
+
 ### Validation
 * getuserrealm
 * openid-config -- *Currently Disabled*
@@ -155,6 +157,10 @@ loop.run_until_complete()
 loop.close()
 list_of_valid_creds = s.VALID_CREDENTIALS
 ```
+
+## Omnispray
+
+The o365spray framework has been ported to a new tool: [Omnispray](https://github.com/0xZDH/Omnispray). This tool is meant to modularize the original enumeration and spraying framework to allow for generic targeting, not just O365. Omnispray includes template modules for enumeration and spraying that can be modified and leveraged for any target.
 
 ## Acknowledgments
 

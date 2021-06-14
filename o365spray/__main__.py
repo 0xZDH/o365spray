@@ -366,9 +366,6 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
         args: namespace containing command line arguments
         output_dir: name of output directory to write results to
 
-    Returns:
-        initialized Enumerator instance
-
     Raises:
         KeyboardInterrupt: generic catch so that our signal handler
           can do its job

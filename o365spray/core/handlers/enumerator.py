@@ -79,7 +79,7 @@ class Enumerator(BaseHandler):
               is enabled
         """
         self._modules = {
-            "autodiscover": self._autodiscover,
+            "autodiscover": None,  # self._autodiscover,  # DISABLED
             "activesync": self._activesync,
             "onedrive": self._onedrive,
             "office": self._office,
@@ -584,11 +584,17 @@ class Enumerator(BaseHandler):
         if module not in self._modules.keys():
             raise ValueError(f"Invalid user enumeration module name: '{module}'")
 
+        # Handle NotImplementedError exception handling here to avoid async
+        # weirdness or relying on return_when of the asyncio.wait() method
+        # since we want to pass through generic exceptions on run
+        module_f = self._modules[module]
+        if module_f == None:
+            raise NotImplementedError("This module is not currently implemented.")
+
         # Build office module header/param data
         if module == "office":
             self._pre_office()
 
-        module_f = self._modules[module]
         blocking_tasks = [
             self.loop.run_in_executor(
                 self.executor,

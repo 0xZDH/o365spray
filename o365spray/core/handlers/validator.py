@@ -113,7 +113,7 @@ class Validator(BaseHandler):
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError("This method is not currently longer implemented.")
+        raise NotImplementedError("This module is not currently implemented.")
         url = "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration".format(
             DOMAIN=domain
         )
@@ -161,6 +161,8 @@ class Validator(BaseHandler):
 
         try:
             return self._modules[module](domain)
+        except NotImplementedError as e:  # Catch disabled module(s)
+            raise e
         except Exception as e:
             logging.debug(e)
             return (False, None)
