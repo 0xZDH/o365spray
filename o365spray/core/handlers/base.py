@@ -55,7 +55,7 @@ class BaseHandler(object):
             throttle = sleep
             if jitter > 0:
                 throttle = sleep + int(sleep * float(randint(1, jitter) / 100.0))
-            logging.debug(f"Sleeping for {sleep} seconds before sending request.")
+            logging.debug(f"Sleeping for {throttle} seconds before sending request.")
             time.sleep(throttle)
 
         return requests.request(
