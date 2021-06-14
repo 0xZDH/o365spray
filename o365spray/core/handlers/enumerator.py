@@ -51,6 +51,8 @@ class Enumerator(BaseHandler):
         proxy: Union[str, Dict[str, str]] = None,
         workers: int = 5,
         writer: bool = True,
+        sleep: int = 0,
+        jitter: int = 0,
         *args,
         **kwargs,
     ):
@@ -73,6 +75,8 @@ class Enumerator(BaseHandler):
             proxy: http request proxy
             workers: thread pool worker rate
             writer: toggle writing to output files
+            sleep: throttle http requests
+            jitter: randomize throttle
 
         Raises:
             ValueError: if no output directory provided when output writing
@@ -98,6 +102,8 @@ class Enumerator(BaseHandler):
         self.domain = domain
         self.timeout = timeout
         self.proxies = proxy
+        self.sleep = sleep
+        self.jitter = jitter
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
 
         # Initialize writers
@@ -188,6 +194,8 @@ class Enumerator(BaseHandler):
                 headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
             )
 
             status = response.status_code
@@ -272,6 +280,8 @@ class Enumerator(BaseHandler):
                 url,
                 proxies=self.proxies,
                 timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
             )
 
             # It appears that valid browser User-Agents will return a 302 redirect
@@ -313,6 +323,8 @@ class Enumerator(BaseHandler):
             "https://www.office.com",
             proxies=self.proxies,
             timeout=self.timeout,
+            sleep=self.sleep,
+            jitter=self.jitter,
         )
         client_id = re.findall(b'"appId":"([^"]*)"', response.content)
 
@@ -324,6 +336,8 @@ class Enumerator(BaseHandler):
             proxies=self.proxies,
             timeout=self.timeout,
             allow_redirects=True,
+            sleep=self.sleep,
+            jitter=self.jitter,
         )
 
         hpgid = re.findall(b'hpgid":([0-9]+),', response.content)
@@ -411,6 +425,8 @@ class Enumerator(BaseHandler):
                 headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
             )
 
             status = response.status_code
@@ -501,6 +517,8 @@ class Enumerator(BaseHandler):
                 headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
             )
             status = response.status_code
             body = response.content

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+import time
+import logging
 import requests
+from random import randint
 from typing import Dict, Any, Union
 
 from o365spray.core import Defaults  # type: ignore
@@ -19,6 +22,8 @@ class BaseHandler(object):
         timeout: int = 25,
         verify: bool = False,
         allow_redirects: bool = False,
+        sleep: int = 0,
+        jitter: int = 0,
     ) -> requests.Response:
         """Template for HTTP requests.
 
@@ -33,6 +38,8 @@ class BaseHandler(object):
             timeout: request timeout time
             verify: validadte HTTPS certificates
             allow_redirects: boolean to determine to follow redirects
+            sleep: throttle requests
+            jitter: randomize throttle
 
         Returns:
             response from http request
@@ -42,6 +49,14 @@ class BaseHandler(object):
         """
         if method.lower() not in Defaults.HTTP_METHODS:
             raise ValueError(f"Invalid HTTP request method: {method}")
+
+        # Sleep/Jitter to throttle subsequent request attempts
+        if sleep > 0:
+            throttle = sleep
+            if jitter > 0:
+                throttle = sleep + int(sleep * float(randint(1, jitter) / 100.0))
+            logging.debug(f"Sleeping for {sleep} seconds before sending request.")
+            time.sleep(throttle)
 
         return requests.request(
             method,

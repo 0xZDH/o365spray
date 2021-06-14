@@ -7,6 +7,7 @@ import signal
 import logging
 import asyncio
 import argparse
+from random import randint
 from pathlib import Path
 
 from o365spray import __version__
@@ -112,6 +113,25 @@ def parse_args() -> argparse.Namespace:
 
     # General scan specifications
     parser.add_argument(
+        "--sleep",
+        type=int,
+        default=0,
+        choices=range(-1, 121),
+        metavar="[-1, 0-120]",
+        help=(
+            "Throttle HTTP requests every `N` seconds. This can be randomized by "
+            "passing the value `-1` (between 1 sec and 2 mins). Default: 0"
+        ),
+    )
+    parser.add_argument(
+        "--jitter",
+        type=int,
+        default=0,
+        choices=range(0, 101),
+        metavar="[0-100]",
+        help="Jitter extends --sleep period by percentage given (0-100). Default: 0",
+    )
+    parser.add_argument(
         "--rate",
         type=int,
         default=10,
@@ -198,6 +218,10 @@ def parse_args() -> argparse.Namespace:
             "otherwise, --paired is required."
         )
 
+    # Handle sleep randomization
+    if args.sleep == -1:
+        args.sleep = randint(0, 120)
+
     return args
 
 
@@ -210,7 +234,12 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
 
     # Note: For now, this will default to the 'getuserrealm' module as that
     #       is the only implemented module
-    v = Validator(timeout=args.timeout, proxy=args.proxy)
+    v = Validator(
+        timeout=args.timeout,
+        proxy=args.proxy,
+        sleep=args.sleep,
+        jitter=args.jitter,
+    )
     (valid, adfs) = v.validate(args.domain)
 
     # If the domain is invalid, notify the user, disable enum and spray
@@ -318,6 +347,8 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> Enumerator:
         proxy=args.proxy,
         workers=args.rate,
         writer=True,
+        sleep=args.sleep,
+        jitter=args.jitter,
     )
 
     def enum_signal_handler(signal, frame):
@@ -429,6 +460,8 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
         lock_threshold=args.safe,
         adfs_url=args.adfs_url,
         writer=True,
+        sleep=args.sleep,
+        jitter=args.jitter,
     )
 
     def spray_signal_handler(signal, frame):

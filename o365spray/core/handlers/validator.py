@@ -20,6 +20,8 @@ class Validator(BaseHandler):
         module: str = "getuserrealm",
         timeout: int = 25,
         proxy: Union[str, Dict[str, str]] = None,
+        sleep: int = 0,
+        jitter: int = 0,
         *args,
         **kwargs,
     ):
@@ -36,6 +38,8 @@ class Validator(BaseHandler):
             module: name of validator module to run
             proxy: http request proxy
             timeout: http request timeout
+            sleep: throttle http requests
+            jitter: randomize throttle
         """
         self._modules = {
             "getuserrealm": self._getuserrealm,
@@ -51,6 +55,8 @@ class Validator(BaseHandler):
         self.module = module
         self.proxies = proxy
         self.timeout = timeout
+        self.sleep = sleep
+        self.jitter = jitter
 
     def get_modules(self):
         """Return the list of module names."""
@@ -81,6 +87,8 @@ class Validator(BaseHandler):
             url,
             proxies=self.proxies,
             timeout=self.timeout,
+            sleep=self.sleep,
+            jitter=self.jitter,
         )
 
         # Parse the XML response and find the NameSpaceType value in the
@@ -118,7 +126,12 @@ class Validator(BaseHandler):
             DOMAIN=domain
         )
         rsp = self._send_request(
-            method="get", url=url, timeout=self.timeout, proxies=self.proxies
+            "get",
+            url,
+            proxies=self.proxies,
+            timeout=self.timeout,
+            sleep=self.sleep,
+            jitter=self.jitter,
         )
         sts = rsp.status_code
         if sts == 200:

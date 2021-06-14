@@ -75,6 +75,13 @@ optional arguments:
   --adfs-url ADFS_URL   AuthURL of the target domain's ADFS login page for password
                         spraying.
 
+  --sleep [-1, 0-120]   Throttle HTTP requests every `N` seconds. This can be
+                        randomized by passing the value `-1` (between 1 sec and 2
+                        mins). Default: 0
+
+  --jitter [0-100]      Jitter extends --sleep period by percentage given (0-100).
+                        Default: 0
+
   --rate RATE           Number of concurrent connections (attempts) during enumeration
                         and spraying. Default: 10
 

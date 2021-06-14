@@ -50,6 +50,8 @@ class Sprayer(BaseHandler):
         lock_threshold: int = 5,
         adfs_url: str = None,
         writer: bool = True,
+        sleep: int = 0,
+        jitter: int = 0,
         *args,
         **kwargs,
     ):
@@ -75,6 +77,8 @@ class Sprayer(BaseHandler):
             lock_threshold: locked account threashold
             adfs_url: ADFS AuthURL
             writer: toggle writing to output files
+            sleep: throttle http requests
+            jitter: randomize throttle
 
         Raises:
             ValueError: if no output directory provided when output writing
@@ -103,6 +107,8 @@ class Sprayer(BaseHandler):
         self.proxies = proxy
         self.locked_limit = lock_threshold
         self.adfs_url = adfs_url
+        self.sleep = sleep
+        self.jitter = jitter
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
 
         # Global locked account counter
@@ -229,7 +235,16 @@ class Sprayer(BaseHandler):
 
             auth = HTTPBasicAuth(email, password)
             url = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
-            response = self._send_request("options", url, auth=auth, headers=headers)
+            response = self._send_request(
+                "options",
+                url,
+                auth=auth,
+                headers=headers,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
             status = response.status_code
 
             # Note: 403 responses no longer indicate that an authentication attempt
@@ -292,7 +307,15 @@ class Sprayer(BaseHandler):
 
             auth = HTTPBasicAuth(email, password)
             url = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
-            response = self._send_request("get", url, auth=auth)
+            response = self._send_request(
+                "get",
+                url,
+                auth=auth,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
             status = response.status_code
 
             if status == 200:
@@ -402,7 +425,16 @@ class Sprayer(BaseHandler):
             }
 
             url = "https://login.microsoft.com/common/oauth2/token"
-            response = self._send_request("post", url, data=data, headers=headers)
+            response = self._send_request(
+                "post",
+                url,
+                data=data,
+                headers=headers,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
             status = response.status_code
 
             if status == 200:
@@ -473,7 +505,16 @@ class Sprayer(BaseHandler):
                 email,
                 password,
             )
-            response = self._send_request("post", url, data=data, headers=headers)
+            response = self._send_request(
+                "post",
+                url,
+                data=data,
+                headers=headers,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
             status = response.status_code
 
             if status == 302:
