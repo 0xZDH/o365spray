@@ -220,7 +220,7 @@ def parse_args() -> argparse.Namespace:
 
     # Handle sleep randomization
     if args.sleep == -1:
-        args.sleep = randint(0, 120)
+        args.sleep = randint(1, 120)
 
     return args
 
