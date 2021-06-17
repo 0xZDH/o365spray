@@ -586,9 +586,10 @@ def main():
     # Perform user enumeration
     if args.enum:
         enum = enumerate(args, output_directory)
+    else:
+        enum = None
 
     if args.spray:
-        enum = None if not enum else enum
         spray(args, output_directory, enum)
 
     elapsed = time.time() - start
