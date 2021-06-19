@@ -256,7 +256,7 @@ class Sprayer(BaseHandler):
                     self.valid_writer.write(tested)
                 self.VALID_CREDENTIALS.append(tested)
                 logging.info(
-                    f"[{text_colors.green}VALID{text_colors.reset} {email}:{password}"
+                    f"[{text_colors.green}VALID{text_colors.reset}] {email}:{password}"
                 )
                 # Remove valid user from being sprayed again
                 self.userlist.remove(user)
@@ -602,7 +602,7 @@ class Sprayer(BaseHandler):
         else:
             # Assume the password is not an object like a dict or instance
             # and that a single string/int/value was passed
-            creds = zip(self.userlist, cycle(password))
+            creds = zip(self.userlist, cycle([password]))
 
         module_f = self._modules[module]
         blocking_tasks = [
