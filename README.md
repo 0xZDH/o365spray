@@ -21,13 +21,13 @@ Perform password spraying against a given domain:<br>
 usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                  [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
                  [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
-                 [--enum-module {office,activesync,onedrive}]
+                 [--enum-module {office,activesync,onedrive,oauth2}]
                  [--spray-module {activesync,autodiscover,msol,adfs}]
                  [--adfs-url ADFS_URL] [--rate RATE] [--safe SAFE]
                  [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT]
                  [-v] [--debug]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v2.0.0
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v2.0.1
 
 optional arguments:
 
@@ -65,7 +65,7 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy's reset time (in minutes). Default: 15 minutes
 
-  --enum-module {office,activesync,onedrive}
+  --enum-module {office,activesync,onedrive,oauth2}
                         Specify which enumeration module to run. Default: office
 
   --spray-module {activesync,autodiscover,msol,adfs}
@@ -121,6 +121,7 @@ valid, adfs_url = v.validate('domain.com')
 * activesync
 * onedrive
   * This module relies on the target user(s) having previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
+* oauth2
 * autodiscover -- *Currently Disabled*
 
 The enumerator can be imported and used via:
@@ -180,5 +181,6 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | MSOLSpray: Python reimplementation | [Gist](https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f) |
 | [nyxgeek](https://github.com/nyxgeek) | onedrive_user_enum: OneDrive user enumeration | [onedrive_user_enum](https://github.com/nyxgeek/onedrive_user_enum) / [blog post](https://www.trustedsec.com/blog/achieving-passive-user-enumeration-with-onedrive/) |
 | [Mr-Un1k0d3r](https://github.com/Mr-Un1k0d3r) | adfs-spray: ADFS password spraying | [adfs-spray](https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py) |
+| [Nestori Syynimaa](https://github.com/NestoriSyynimaa) | AADInternals: oAuth2 user enumeration | [AADInternals](https://github.com/Gerenios/AADInternals) |
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | SprayingToolkit: Code references | [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/) |
 | [sensepost](https://github.com/sensepost) | ruler: Code references | [Ruler](https://github.com/sensepost/ruler/) |

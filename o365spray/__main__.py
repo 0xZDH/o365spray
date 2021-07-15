@@ -95,7 +95,7 @@ def parse_args() -> argparse.Namespace:
         "--enum-module",
         type=str.lower,
         default="office",
-        choices=("office", "activesync", "onedrive"),
+        choices=("office", "activesync", "onedrive", "oauth2"),
         help="Specify which enumeration module to run. Default: office",
     )
     parser.add_argument(
@@ -282,15 +282,17 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
         # OneDrive is currently the only valid method for ADFS enumeration -
         # prompt the user to ask if they would like to switch if not already
         # set
-        if args.enum and args.enum_module != "onedrive":
+        if args.enum and (
+            args.enum_module != "onedrive" and args.enum_module != "oauth2"
+        ):
             logging.info("\n")  # Blank line
             prompt = (
-                "[ ? ]\tSwitch to the OneDrive module for user enumeration against a "
+                "[ ? ]\tSwitch to the oAuth2 module for user enumeration against a "
                 "Federated Realm [Y/n] "
             )
             resp = HELPER.prompt_question(prompt)
             if resp[0] == "y":
-                args.enum_module = "onedrive"
+                args.enum_module = "oauth2"
             else:
                 # Disable enumeration as all other modules currently return False
                 # Positives for ADFS

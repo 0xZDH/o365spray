@@ -16,9 +16,9 @@ import random
 import logging
 import urllib3
 import asyncio
-import requests
 import concurrent.futures
 import concurrent.futures.thread
+from uuid import uuid4
 from typing import List, Dict, Union
 from functools import partial
 from requests.auth import HTTPBasicAuth
@@ -87,6 +87,7 @@ class Enumerator(BaseHandler):
             "activesync": self._activesync,
             "onedrive": self._onedrive,
             "office": self._office,
+            "oauth2": self._oauth2,
         }
 
         if writer and not output_dir:
@@ -549,6 +550,105 @@ class Enumerator(BaseHandler):
                     f"{email}{' '*10}",
                     end="\r",
                 )
+        except Exception as e:
+            logging.debug(e)
+            pass
+
+    # =========================
+    # == -- oAuth2 MODULE -- ==
+    # =========================
+
+    def _oauth2(self, domain: str, user: str, password: str = "Password1"):
+        """Enumerate users via Microsoft's oAuth2 endpoint
+        https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L112
+
+        Arguments:
+            <required>
+            domain: domain to enumerate against
+            user: username for enumeration request
+            <optional>
+            password: password for enumeration request
+
+        Raises:
+            Exception: generic handler so we can successfully fail without
+              crashing the run
+        """
+        try:
+            # Grab prebuilt office headers
+            headers = Defaults.HTTP_HEADERS
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+            # Build email if not already built
+            email = self.HELPER.check_email(user, domain)
+
+            # Write the tested user
+            tested = f"{user} -> {email}" if user != email else email
+            if self.writer:
+                self.tested_writer.write(tested)
+
+            time.sleep(0.250)
+
+            randomGuid = uuid4()
+            data = {
+                "resource": randomGuid,
+                "client_id": randomGuid,
+                "grant_type": "password",
+                "username": email,
+                "password": password,
+                "scope": "openid",
+            }
+
+            url = "https://login.microsoftonline.com/common/oauth2/token"
+            response = self._send_request(
+                "post",
+                url,
+                data=data,
+                headers=headers,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
+
+            status = response.status_code
+            body = response.json()
+            if "error_codes" in body:
+                error_codes = [f"AADSTS{code}" for code in body["error_codes"]]
+            else:
+                error_codes = None
+
+            # Default to valid if 200 or 302
+            if status == 200 or status == 302:
+                if self.writer:
+                    self.valid_writer.write(email)
+                self.VALID_ACCOUNTS.append(email)
+                logging.info(f"[{text_colors.green}VALID{text_colors.reset}] {email}")
+
+            elif error_codes:
+                # User not found error is an invalid user
+                if "AADSTS50034" in error_codes:
+                    print(
+                        f"[{text_colors.red}INVALID{text_colors.reset}] "
+                        f"{email}{' '*10}",
+                        end="\r",
+                    )
+                # Otherwise, valid user
+                else:
+                    if self.writer:
+                        self.valid_writer.write(email)
+                    self.VALID_ACCOUNTS.append(email)
+                    logging.info(
+                        f"[{text_colors.green}VALID{text_colors.reset}] {email}"
+                    )
+
+            # Unknown response -> invalid user
+            else:
+                print(
+                    f"[{text_colors.red}INVALID{text_colors.reset}] "
+                    f"{email}{' '*10}",
+                    end="\r",
+                )
+
         except Exception as e:
             logging.debug(e)
             pass
