@@ -421,7 +421,7 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
         userlist = enum.VALID_ACCOUNTS
         # Sleep before spraying when enumeration that uses authentication
         # was used
-        if args.enum_module in ["activesync"]:
+        if args.enum_module in ["activesync", "oauth2"]:
             logging.info(
                 "User enumeration using authentication was run. "
                 "Resetting lockout before password spraying."
