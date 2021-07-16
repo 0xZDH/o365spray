@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v2.0.1 (15/07/2021)
+- Add oAuth2 user enumeration module based on [AADInternals](https://github.com/Gerenios/AADInternals)
+
 ## v2.0.0 (12/06/2021)
 - Convert tool to package for PyPi deployment
 - Add LICENSE
