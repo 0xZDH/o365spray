@@ -6,6 +6,8 @@ o365spray a username enumeration and password spraying tool aimed at Microsoft O
 
 > WARNING: The ActiveSync module for user enumeration is performed by submitting a single authentication attempt per user. If this module is run in conjunction with password spraying in a single execution, o365spray will automatically reset the account lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
 
+> If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
+
 ## Usage
 
 Validate a domain is using O365:<br>
@@ -184,3 +186,11 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 | [Nestori Syynimaa](https://github.com/NestoriSyynimaa) | AADInternals: oAuth2 user enumeration | [AADInternals](https://github.com/Gerenios/AADInternals) |
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | SprayingToolkit: Code references | [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/) |
 | [sensepost](https://github.com/sensepost) | ruler: Code references | [Ruler](https://github.com/sensepost/ruler/) |
+
+## Using Previous Versions
+
+o365spray was recently rewritten (v2) and could have some hidden bugs remaining. If issues are encountered, try checking out the commit prior to the code rewrite (`v1.3.7`):
+
+```
+git checkout e235abdcebad61dbd2cde80974aca21ddb188704
+```
