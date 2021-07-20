@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v2.0.2 (20/07/2021)
+- Add O365 reporting API password spraying module based on [Daniel Chronlund's blog post](https://danielchronlund.com/2020/03/17/azure-ad-password-spray-attacks-with-powershell-and-how-to-defend-your-tenant/) and [the ADFSpray tool](https://github.com/xFreed0m/ADFSpray).
+
 ## v2.0.1 (15/07/2021)
 - Add oAuth2 user enumeration module based on [AADInternals](https://github.com/Gerenios/AADInternals)
 

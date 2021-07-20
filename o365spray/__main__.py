@@ -102,7 +102,7 @@ def parse_args() -> argparse.Namespace:
         "--spray-module",
         type=str.lower,
         default="activesync",
-        choices=("activesync", "autodiscover", "msol", "adfs"),
+        choices=("activesync", "autodiscover", "reporting", "msol", "adfs"),
         help="Specify which password spraying module to run. Default: activesync",
     )
     parser.add_argument(
