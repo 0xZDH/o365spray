@@ -301,7 +301,7 @@ class Sprayer(BaseHandler):
                 raise ValueError("Locked account limit reached.")
 
             # Build email if not already built
-            email = self.helper.check_email(user, domain)
+            email = self.HELPER.check_email(user, domain)
 
             # Write the tested user
             tested = f"{email}:{password}"
@@ -405,7 +405,7 @@ class Sprayer(BaseHandler):
                 raise ValueError("Locked account limit reached.")
 
             # Build email if not already built
-            email = self.helper.check_email(user, domain)
+            email = self.HELPER.check_email(user, domain)
 
             # Write the tested user
             tested = f"{email}:{password}"
@@ -416,7 +416,7 @@ class Sprayer(BaseHandler):
 
             # Grab external headers from config.py
             headers = Defaults.HTTP_HEADERS
-            headers["Accept"] = ("application/json",)
+            headers["Accept"] = "application/json"
             headers["Content-Type"] = "application/x-www-form-urlencoded"
             data = {
                 "resource": "https://graph.windows.net",
@@ -563,7 +563,7 @@ class Sprayer(BaseHandler):
         """
         try:
             # Build email if not already built
-            email = self.helper.check_email(user, domain)
+            email = self.HELPER.check_email(user, domain)
 
             # Write the tested user
             tested = f"{email}:{password}"

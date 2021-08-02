@@ -517,6 +517,11 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                         spray.shutdown()
                         break
 
+                    # Stop if there are no more users to spray
+                    if not spray.userlist:
+                        logging.debug("End of password spraying user list reached.")
+                        break
+
                 # https://stackoverflow.com/a/654002
                 # https://docs.python.org/3/tutorial/controlflow.html#break-and-continue-statements-and-else-clauses-on-loops
                 # Only executed if the inner loop did NOT break
