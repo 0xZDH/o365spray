@@ -5,6 +5,7 @@ Based on: https://bitbucket.org/grimhacker/office365userenum/
           https://github.com/Raikia/UhOh365
           https://github.com/nyxgeek/onedrive_user_enum/blob/master/onedrive_enum.py
           https://github.com/gremwell/o365enum/blob/master/o365enum.py
+          https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L112
 """
 
 # TODO: Test and validate each active module

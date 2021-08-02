@@ -102,7 +102,7 @@ def parse_args() -> argparse.Namespace:
         "--spray-module",
         type=str.lower,
         default="activesync",
-        choices=("activesync", "autodiscover", "msol", "adfs"),
+        choices=("activesync", "autodiscover", "reporting", "msol", "adfs"),
         help="Specify which password spraying module to run. Default: activesync",
     )
     parser.add_argument(
@@ -515,6 +515,11 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                     if spray.lockout >= args.safe:
                         logging.error("Locked account threshold reached. Exiting...")
                         spray.shutdown()
+                        break
+
+                    # Stop if there are no more users to spray
+                    if not spray.userlist:
+                        logging.debug("End of password spraying user list reached.")
                         break
 
                 # https://stackoverflow.com/a/654002
