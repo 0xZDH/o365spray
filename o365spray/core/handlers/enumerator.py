@@ -435,6 +435,21 @@ class Enumerator(BaseHandler):
             body = response.json()
 
             if status == 200:
+                # This enumeration is only valid if the user has DesktopSSO
+                # enabled
+                # https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L93
+                is_desktop_sso = body["EstsProperties"]["DesktopSsoEnabled"]
+                if not is_desktop_sso:
+                    logging.info(f"Desktop SSO disabled. Shutting down...")
+                    return self.shutdown()
+
+                # Check if the requests are being throttled and shutdown
+                # if so
+                is_request_throttled = int(body["ThrottleStatus"])
+                if is_request_throttled == 1:
+                    logging.info(f"Requests are being throttled. Shutting down...")
+                    return self.shutdown()
+
                 if_exists_result = int(body["IfExistsResult"])
 
                 # It appears that both 0 and 6 response codes indicate a valid user
