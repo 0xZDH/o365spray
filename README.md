@@ -29,7 +29,7 @@ usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                  [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT]
                  [-v] [--debug]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v2.0.2
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v2.0.3
 
 optional arguments:
 
