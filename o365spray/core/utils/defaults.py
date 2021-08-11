@@ -60,6 +60,8 @@ class Defaults:
             "SEC_CHAL",
             "Response indicates conditional access (MFA: DUO or other)",
         ],
+        "AADSTS500011": ["INVALID_RESOURCE", "Invalid resource name"],
+        "AADSTS700016": ["INVALID_APPID", "Invalid application client ID"],
     }
 
     # List of substrings that can be found when BasicAuth is blocked
