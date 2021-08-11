@@ -121,11 +121,12 @@ valid, adfs_url = v.validate('domain.com')
 
 ### Enumeration
 * office
-* activesync
-* onedrive
-  * This module relies on the target user(s) having previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
 * oauth2
+* onedrive
+* activesync -- *Currently Disabled*
 * autodiscover -- *Currently Disabled*
+
+> The onedrive module relies on the target user(s) having previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
 
 The enumerator can be imported and used via:
 ```python

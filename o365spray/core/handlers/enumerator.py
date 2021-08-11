@@ -8,8 +8,6 @@ Based on: https://bitbucket.org/grimhacker/office365userenum/
           https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L112
 """
 
-# TODO: Test and validate each active module
-
 import re
 import time
 import string
@@ -85,7 +83,7 @@ class Enumerator(BaseHandler):
         """
         self._modules = {
             "autodiscover": None,  # self._autodiscover,  # DISABLED
-            "activesync": self._activesync,
+            "activesync": None,  # self._activesync,  # DISABLED
             "onedrive": self._onedrive,
             "office": self._office,
             "oauth2": self._oauth2,
@@ -168,9 +166,9 @@ class Enumerator(BaseHandler):
             password: password for enumeration request
 
         Raises:
-            Exception: generic handler so we can successfully fail without
-              crashing the run
+            NotImplementedError
         """
+        raise NotImplementedError("This method is not currently implemented.")
         try:
             # Grab external headers from defaults.py and add special header
             # for ActiveSync

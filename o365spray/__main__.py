@@ -95,7 +95,7 @@ def parse_args() -> argparse.Namespace:
         "--enum-module",
         type=str.lower,
         default="office",
-        choices=("office", "activesync", "onedrive", "oauth2"),
+        choices=("office", "onedrive", "oauth2"),
         help="Specify which enumeration module to run. Default: office",
     )
     parser.add_argument(
