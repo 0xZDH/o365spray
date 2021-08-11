@@ -4,7 +4,7 @@
 
 o365spray a username enumeration and password spraying tool aimed at Microsoft Office 365 (O365). This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-> WARNING: The ActiveSync and oAuth2 modules for user enumeration are performed by submitting a single authentication attempt per user. If either module is run in conjunction with password spraying in a single execution, o365spray will automatically reset the account lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
+> WARNING: The oAuth2 module for user enumeration is performed by submitting a single authentication attempt per user. If the module is run in conjunction with password spraying in a single execution, o365spray will automatically reset the lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
 
 > If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
 
@@ -23,8 +23,8 @@ Perform password spraying against a given domain:<br>
 usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                  [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
                  [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
-                 [--enum-module {office,activesync,onedrive,oauth2}]
-                 [--spray-module {activesync,autodiscover,reporting,msol,adfs}]
+                 [--enum-module {office,onedrive,oauth2}]
+                 [--spray-module {oauth2,activesync,autodiscover,reporting,adfs}]
                  [--adfs-url ADFS_URL] [--rate RATE] [--safe SAFE]
                  [--timeout TIMEOUT] [--proxy PROXY] [--output OUTPUT]
                  [-v] [--debug]
@@ -67,13 +67,13 @@ optional arguments:
   -l LOCKOUT, --lockout LOCKOUT
                         Lockout policy's reset time (in minutes). Default: 15 minutes
 
-  --enum-module {office,activesync,onedrive,oauth2}
+  --enum-module {office,onedrive,oauth2}
                         Specify which enumeration module to run.
                         Default: office
 
-  --spray-module {activesync,autodiscover,reporting,msol,adfs}
+  --spray-module {oauth2,activesync,autodiscover,reporting,adfs}
                         Specify which password spraying module to run.
-                        Default: activesync
+                        Default: oauth2
 
   --adfs-url ADFS_URL   AuthURL of the target domain's ADFS login page for password
                         spraying.
@@ -147,10 +147,10 @@ list_of_valid_users = e.VALID_ACCOUNTS
 ```
 
 ### Spraying
+* oauth2
 * activesync
 * autodiscover
 * reporting
-* msol
 * adfs
 
 The sprayer can be imported and used via:

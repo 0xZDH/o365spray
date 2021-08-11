@@ -101,9 +101,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--spray-module",
         type=str.lower,
-        default="activesync",
-        choices=("activesync", "autodiscover", "reporting", "msol", "adfs"),
-        help="Specify which password spraying module to run. Default: activesync",
+        default="oauth2",
+        choices=("oauth2", "activesync", "autodiscover", "reporting", "adfs"),
+        help="Specify which password spraying module to run. Default: oauth2",
     )
     parser.add_argument(
         "--adfs-url",
@@ -140,7 +140,7 @@ def parse_args() -> argparse.Namespace:
             "spraying. Default: 10"
         ),
     )
-    # Note: This is currently only applicable to the `msol` spray module
+    # Note: This is currently only applicable to the `oauth2` spray module
     parser.add_argument(
         "--safe",
         type=int,
@@ -302,7 +302,9 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
         # If the user has specified to perform password spraying - prompt
         # the user to ask if they would like to target ADFS or continue
         # targeting Microsoft API's
-        if args.spray and args.spray_module != "adfs":
+        if args.spray and (
+            args.spray_module != "adfs" and args.spray_module != "oauth2"
+        ):
             logging.info("\n")  # Blank line
             prompt = "[ ? ]\tSwitch to the ADFS module for password spraying [Y/n] "
             resp = HELPER.prompt_question(prompt)
@@ -510,7 +512,7 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                         spray.tested_writer.flush()
 
                     # Stop if we hit our locked account limit
-                    # Note: This currently only applies to the MSOL spraying module as
+                    # Note: This currently only applies to the oauth2 spraying module as
                     #       Autodiscover is currently showing invalid lockouts
                     if spray.lockout >= args.safe:
                         logging.error("Locked account threshold reached. Exiting...")

