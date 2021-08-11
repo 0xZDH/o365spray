@@ -302,6 +302,9 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
         # If the user has specified to perform password spraying - prompt
         # the user to ask if they would like to target ADFS or continue
         # targeting Microsoft API's
+        # Note: The oAuth2 module will work for federated realms ONLY when
+        #       the target has enabled password synchronization - otherwise
+        #       authentication will always fail
         if args.spray and (
             args.spray_module != "adfs" and args.spray_module != "oauth2"
         ):

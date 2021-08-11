@@ -153,6 +153,8 @@ list_of_valid_users = e.VALID_ACCOUNTS
 * reporting
 * adfs
 
+> The oAuth2 module can be used for federated spraying, but it should be noted that this will work ONLY when the target has enabled password synchronization - otherwise authentication will always fail. The default mechanic is to default to the 'adfs' module when federation is identified.
+
 The sprayer can be imported and used via:
 ```python
 from o365spray.core import Sprayer
