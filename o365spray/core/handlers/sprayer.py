@@ -531,9 +531,8 @@ class Sprayer(BaseHandler):
                 fr"\1{user}\2",
                 self.adfs_url,
             )
-            data = "UserName=%s&Password=%s&AuthMethod=FormsAuthentication" % (
-                email,
-                password,
+            data = (
+                f"UserName={email}&Password={password}&AuthMethod=FormsAuthentication"
             )
             response = self._send_request(
                 "post",

@@ -269,12 +269,7 @@ class Enumerator(BaseHandler):
             # Replace any `.` with `_` for use in the URL
             fmt_user = user.replace(".", "_")
 
-            url = "https://{TENANT}-my.sharepoint.com/personal/{USERNAME}_{DOMAIN}_{TLD}/_layouts/15/onedrive.aspx".format(
-                TENANT=tenant,
-                USERNAME=fmt_user,
-                DOMAIN=domain,
-                TLD=tld,
-            )
+            url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}_{tld}/_layouts/15/onedrive.aspx"
             response = self._send_request(
                 "get",
                 url,
@@ -524,9 +519,7 @@ class Enumerator(BaseHandler):
             if self.writer:
                 self.tested_writer.write(email)
             time.sleep(0.250)
-            url = "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1".format(
-                EMAIL=email
-            )
+            url = f"https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{email}?Protocol=Autodiscoverv1"
             response = self._send_request(
                 "get",
                 url,
