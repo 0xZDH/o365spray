@@ -438,10 +438,11 @@ class Enumerator(BaseHandler):
                 # This enumeration is only valid if the user has DesktopSSO
                 # enabled
                 # https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L93
-                is_desktop_sso = body["EstsProperties"]["DesktopSsoEnabled"]
-                if not is_desktop_sso:
-                    logging.info(f"Desktop SSO disabled. Shutting down...")
-                    return self.shutdown()
+                if "DesktopSsoEnabled" in body["EstsProperties"]:
+                    is_desktop_sso = body["EstsProperties"]["DesktopSsoEnabled"]
+                    if not is_desktop_sso:
+                        logging.info(f"Desktop SSO disabled. Shutting down...")
+                        return self.shutdown()
 
                 # Check if the requests are being throttled and shutdown
                 # if so
