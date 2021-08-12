@@ -385,7 +385,9 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> Enumerator:
             )
         )
 
-        enum.shutdown()
+        # Gracefully shutdown if it triggered internally
+        if not enum.exit:
+            enum.shutdown()
         logging.info("Valid Accounts: %d" % len(enum.VALID_ACCOUNTS))
 
         loop.run_until_complete(asyncio.sleep(0.250))
@@ -509,6 +511,10 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                 for password in password_chunk:
                     loop.run_until_complete(spray.run(password))
 
+                    # Catch exit handler from within spray class
+                    if spray.exit:
+                        break
+
                     # Flush the open files after each rotation
                     if spray.writer:
                         spray.valid_writer.flush()
@@ -539,7 +545,9 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                 # Only executed if the inner loop DID break
                 break
 
-        spray.shutdown()
+        # Gracefully shutdown if it triggered internally
+        if not spray.exit:
+            spray.shutdown()
         logging.info("Valid Credentials: %d" % (len(spray.VALID_CREDENTIALS)))
 
         loop.run_until_complete(asyncio.sleep(0.250))

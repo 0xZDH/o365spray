@@ -106,6 +106,9 @@ class Enumerator(BaseHandler):
         self.jitter = jitter
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
 
+        # Internal exit handler
+        self.exit = False
+
         # Initialize writers
         self.writer = writer
         if self.writer:
@@ -435,6 +438,7 @@ class Enumerator(BaseHandler):
                     is_desktop_sso = body["EstsProperties"]["DesktopSsoEnabled"]
                     if not is_desktop_sso:
                         logging.info(f"Desktop SSO disabled. Shutting down...")
+                        self.exit = True
                         return self.shutdown()
 
                 # Check if the requests are being throttled and shutdown
@@ -442,6 +446,7 @@ class Enumerator(BaseHandler):
                 is_request_throttled = int(body["ThrottleStatus"])
                 if is_request_throttled == 1:
                     logging.info(f"Requests are being throttled. Shutting down...")
+                    self.exit = True
                     return self.shutdown()
 
                 if_exists_result = int(body["IfExistsResult"])

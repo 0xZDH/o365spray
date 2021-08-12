@@ -115,6 +115,9 @@ class Sprayer(BaseHandler):
         self.jitter = jitter
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
 
+        # Internal exit handler
+        self.exit = False
+
         # Global locked account counter
         self.lockout = 0
 
@@ -379,6 +382,7 @@ class Sprayer(BaseHandler):
                     logging.info(
                         "Tenant not provisioned for this type of authentication. Shutting down..."
                     )
+                    self.exit = True
                     return self.shutdown()
 
                 # Handle Microsoft AADSTS errors
