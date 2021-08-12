@@ -77,9 +77,7 @@ class Validator(BaseHandler):
         """
         (valid, adfs_url) = (False, None)  # Defaults
 
-        url = "https://login.microsoftonline.com/getuserrealm.srf?login=user@{DOMAIN}&xml=1".format(
-            DOMAIN=domain
-        )
+        url = f"https://login.microsoftonline.com/getuserrealm.srf?login=user@{domain}&xml=1"
 
         # Send request
         rsp = self._send_request(
@@ -122,9 +120,7 @@ class Validator(BaseHandler):
             NotImplementedError
         """
         raise NotImplementedError("This module is not currently implemented.")
-        url = "https://login.microsoftonline.com/{DOMAIN}/.well-known/openid-configuration".format(
-            DOMAIN=domain
-        )
+        url = f"https://login.microsoftonline.com/{domain}/.well-known/openid-configuration"
         rsp = self._send_request(
             "get",
             url,

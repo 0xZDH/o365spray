@@ -8,8 +8,6 @@ Based on: https://bitbucket.org/grimhacker/office365userenum/
           https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L112
 """
 
-# TODO: Test and validate each active module
-
 import re
 import time
 import string
@@ -85,7 +83,7 @@ class Enumerator(BaseHandler):
         """
         self._modules = {
             "autodiscover": None,  # self._autodiscover,  # DISABLED
-            "activesync": self._activesync,
+            "activesync": None,  # self._activesync,  # DISABLED
             "onedrive": self._onedrive,
             "office": self._office,
             "oauth2": self._oauth2,
@@ -107,6 +105,9 @@ class Enumerator(BaseHandler):
         self.sleep = sleep
         self.jitter = jitter
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
+
+        # Internal exit handler
+        self.exit = False
 
         # Initialize writers
         self.writer = writer
@@ -168,9 +169,9 @@ class Enumerator(BaseHandler):
             password: password for enumeration request
 
         Raises:
-            Exception: generic handler so we can successfully fail without
-              crashing the run
+            NotImplementedError
         """
+        raise NotImplementedError("This method is not currently implemented.")
         try:
             # Grab external headers from defaults.py and add special header
             # for ActiveSync
@@ -262,21 +263,27 @@ class Enumerator(BaseHandler):
 
             time.sleep(0.250)
 
+            # TODO: Continue testing to find the best method
+            #       of constructing this data from the provided
+            #       domain
             # Collect the pieces to build the One Drive URL
-            domain_array = domain.split(".")
+            domain_mod = re.sub("^https?://", "", domain)
+            domain_mod = domain_mod.split("/")[0]
+            domain_array = domain_mod.split(".")
 
-            domain = domain_array[0]  # Collect the domain
-            tenant = domain  # Use domain as tenant
-            tld = domain_array[-1]  # Grab the TLD
+            # Assume the domain/subdomain is the tenant
+            # i.e. tenant.onmicrosoft.com
+            #      tenant.com
+            tenant = domain_array[0]
+
+            # Replace the `.` with `_` in the domain
+            # and keep the TLD
+            domain = "_".join(domain_array)
+
             # Replace any `.` with `_` for use in the URL
             fmt_user = user.replace(".", "_")
 
-            url = "https://{TENANT}-my.sharepoint.com/personal/{USERNAME}_{DOMAIN}_{TLD}/_layouts/15/onedrive.aspx".format(
-                TENANT=tenant,
-                USERNAME=fmt_user,
-                DOMAIN=domain,
-                TLD=tld,
-            )
+            url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}/_layouts/15/onedrive.aspx"
             response = self._send_request(
                 "get",
                 url,
@@ -435,6 +442,24 @@ class Enumerator(BaseHandler):
             body = response.json()
 
             if status == 200:
+                # This enumeration is only valid if the user has DesktopSSO
+                # enabled
+                # https://github.com/Gerenios/AADInternals/blob/master/KillChain_utils.ps1#L93
+                if "DesktopSsoEnabled" in body["EstsProperties"]:
+                    is_desktop_sso = body["EstsProperties"]["DesktopSsoEnabled"]
+                    if not is_desktop_sso:
+                        logging.info(f"Desktop SSO disabled. Shutting down...")
+                        self.exit = True
+                        return self.shutdown()
+
+                # Check if the requests are being throttled and shutdown
+                # if so
+                is_request_throttled = int(body["ThrottleStatus"])
+                if is_request_throttled == 1:
+                    logging.info(f"Requests are being throttled. Shutting down...")
+                    self.exit = True
+                    return self.shutdown()
+
                 if_exists_result = int(body["IfExistsResult"])
 
                 # It appears that both 0 and 6 response codes indicate a valid user
@@ -494,7 +519,6 @@ class Enumerator(BaseHandler):
               (this appears to happen as a default response code to an invalid
               authentication attempt), but this would require an authentication attempt
               for each user.
-        TODO: Test this
         https://github.com/Raikia/UhOh365
 
         Raises:
@@ -502,7 +526,7 @@ class Enumerator(BaseHandler):
         """
         raise NotImplementedError("This method is not currently implemented.")
         try:
-            headers = Config.headers
+            headers = Defaults.HTTP_HEADERS
             headers[
                 "User-Agent"
             ] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
@@ -510,9 +534,7 @@ class Enumerator(BaseHandler):
             if self.writer:
                 self.tested_writer.write(email)
             time.sleep(0.250)
-            url = "https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{EMAIL}?Protocol=Autodiscoverv1".format(
-                EMAIL=email
-            )
+            url = f"https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{email}?Protocol=Autodiscoverv1"
             response = self._send_request(
                 "get",
                 url,
@@ -523,7 +545,7 @@ class Enumerator(BaseHandler):
                 jitter=self.jitter,
             )
             status = response.status_code
-            body = response.content
+            body = response.text
             # "X-MailboxGuid" in response.headers.keys()
             # This appears to not be a required header for valid accounts
             if status == 200:
