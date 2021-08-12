@@ -519,7 +519,6 @@ class Enumerator(BaseHandler):
               (this appears to happen as a default response code to an invalid
               authentication attempt), but this would require an authentication attempt
               for each user.
-        TODO: Test this
         https://github.com/Raikia/UhOh365
 
         Raises:
@@ -527,7 +526,7 @@ class Enumerator(BaseHandler):
         """
         raise NotImplementedError("This method is not currently implemented.")
         try:
-            headers = Config.headers
+            headers = Defaults.HTTP_HEADERS
             headers[
                 "User-Agent"
             ] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"
@@ -546,7 +545,7 @@ class Enumerator(BaseHandler):
                 jitter=self.jitter,
             )
             status = response.status_code
-            body = response.content
+            body = response.text
             # "X-MailboxGuid" in response.headers.keys()
             # This appears to not be a required header for valid accounts
             if status == 200:
