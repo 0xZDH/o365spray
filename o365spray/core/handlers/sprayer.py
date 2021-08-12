@@ -176,11 +176,14 @@ class Sprayer(BaseHandler):
             password: password used during auth
             response: http reponse string to search
         """
-        code = next(
-            (c in response for c in Defaults.AADSTS_CODES.keys()),
-            False,
-        )
-        if code:
+        code = None
+        for c in Defaults.AADSTS_CODES.keys():
+            if c in response:
+                code = c
+                break
+
+        # Account for invalid credentials error code
+        if code and code != "AADSTS50126":
             # This is where we handle lockout termination
             # Note: It appears that Autodiscover is now showing lockouts
             #       on accounts that are valid that failed authentication
@@ -192,7 +195,9 @@ class Sprayer(BaseHandler):
 
             # These error codes occur via oAuth2 only after a valid
             # authentication has been processed
-            if code in ["AADSTS500011", "AADSTS700016"]:
+            # Also account for expired passwords which only trigger
+            # after valid authentication
+            if code in ["AADSTS500011", "AADSTS700016", "AADSTS50055"]:
                 tested = f"{email}:{password}"
                 if self.writer:
                     self.valid_writer.write(tested)
