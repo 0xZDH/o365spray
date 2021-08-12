@@ -263,16 +263,27 @@ class Enumerator(BaseHandler):
 
             time.sleep(0.250)
 
+            # TODO: Continue testing to find the best method
+            #       of constructing this data from the provided
+            #       domain
             # Collect the pieces to build the One Drive URL
-            domain_array = domain.split(".")
+            domain_mod = re.sub("^https?://", "", domain)
+            domain_mod = domain_mod.split("/")[0]
+            domain_array = domain_mod.split(".")
 
-            domain = domain_array[0]  # Collect the domain
-            tenant = domain  # Use domain as tenant
-            tld = domain_array[-1]  # Grab the TLD
+            # Assume the domain/subdomain is the tenant
+            # i.e. tenant.onmicrosoft.com
+            #      tenant.com
+            tenant = domain_array[0]
+
+            # Replace the `.` with `_` in the domain
+            # and keep the TLD
+            domain = "_".join(domain_array)
+
             # Replace any `.` with `_` for use in the URL
             fmt_user = user.replace(".", "_")
 
-            url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}_{tld}/_layouts/15/onedrive.aspx"
+            url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}/_layouts/15/onedrive.aspx"
             response = self._send_request(
                 "get",
                 url,
