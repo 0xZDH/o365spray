@@ -11,17 +11,16 @@ Based on: https://bitbucket.org/grimhacker/office365userenum/
         https://github.com/Gerenios/AADInternals
 """
 
-import re
 import time
 import logging
 import urllib3
 import asyncio
 import concurrent.futures
 import concurrent.futures.thread
-from uuid import uuid4
 from typing import List, Dict, Union
 from functools import partial
 from itertools import cycle
+from urllib.parse import quote
 from requests.auth import HTTPBasicAuth
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -525,15 +524,15 @@ class Sprayer(BaseHandler):
 
             # Fix the ADFS URL for each user since the AuthUrl was pulled during
             # validation using a bogus user
-            # TODO: Stress test this shitty regex...
-            url = re.sub(
-                r"(username=).+(&?)",
-                fr"\1{user}\2",
-                self.adfs_url,
-            )
-            data = (
-                f"UserName={email}&Password={password}&AuthMethod=FormsAuthentication"
-            )
+            url, url_params = self.adfs_url.split("?", 1)
+            url_params = url_params.split("&")
+            for i in range(len(url_params)):
+                if "username=" in url_params[i]:
+                    url_params[i] = f"username={email}"
+            url_params = "&".join(url_params)
+            url = f"{url}?{url_params}"
+
+            data = f"UserName={quote(email)}&Password={quote(password)}&AuthMethod=FormsAuthentication"
             response = self._send_request(
                 "post",
                 url,
