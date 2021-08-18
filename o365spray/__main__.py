@@ -438,9 +438,11 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
 
     # Handle username:password files
     elif args.paired:
-        paired_list = HELPER.get_list_from_file(args.paired)
-        userlist = [user.split(":")[0] for user in paired_list]
-        passlist = [password.split(":")[1] for password in paired_list]
+        paired_dict = HELPER.get_paired_dict_from_file(args.paired)
+        paired_max_pass = HELPER.get_max_dict_elem(paired_dict)
+        # Default this to None as we will pass a custom userlist
+        # on each spray rotation
+        userlist = [None]
 
     else:
         # Support both username(s) and a username file being provided
@@ -494,10 +496,58 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
         if args.paired:
             logging.info("Password spraying using paired usernames:passwords.")
 
-            loop.run_until_complete(spray.run(passlist))
-            # Note: Since we are pairing usernames and passwords, we can ignore the
-            #       lockout reset wait call as we should only be running a single
-            #       cycle
+            # Track the current password index
+            count = 0
+
+            # Loop over our paired data set until we have reached the end of
+            # the longest password list
+            while count < paired_max_pass:
+                count += 1
+                userlist, passlist = [], []
+
+                # Loop over the users in our data set and create a new userlist
+                # and passlist each time
+                for username, passwords in paired_dict.items():
+                    if len(passwords) >= count:
+                        userlist.append(username)
+                        passlist.append(passwords[count - 1])
+
+                logging.info(f"Password spraying {len(userlist)} paired accounts.")
+
+                loop.run_until_complete(
+                    spray.run(
+                        password=passlist,
+                        userlist=userlist,
+                    )
+                )
+
+                # Catch exit handler from within spray class
+                if spray.exit:
+                    break
+
+                # Flush the open files after each rotation
+                if spray.writer:
+                    spray.valid_writer.flush()
+                    spray.tested_writer.flush()
+
+                # Stop if we hit our locked account limit
+                # Note: This currently only applies to the oauth2 spraying module as
+                #       Autodiscover is currently showing invalid lockouts
+                if spray.lockout >= args.safe:
+                    logging.error("Locked account threshold reached. Exiting...")
+                    spray.shutdown()
+                    break
+
+                # Stop if there are no more users to spray
+                if not spray.userlist:
+                    logging.debug("End of password spraying user list reached.")
+                    break
+
+                # Check if we have reached the end of our paired data set
+                if count < paired_max_pass:
+                    HELPER.lockout_reset_wait(args.lockout)
+                else:
+                    break
 
         else:
             for password_chunk in HELPER.get_chunks_from_list(passlist, args.count):

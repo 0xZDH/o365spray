@@ -66,6 +66,48 @@ class Helper:
             list_ = [line.strip() for line in f if line.strip() not in [None, ""]]
         return list_
 
+    def get_max_dict_elem(
+        self,
+        dict_: Dict[str, List[str]],
+    ) -> int:
+        """Identify the largest list of values in a given
+        dictionary.
+
+        Arguments:
+            dict_: dictionary to iterate over
+
+        Returns:
+            length of largest list of values
+        """
+        max_ = max(dict_, key=lambda k: len(dict_[k]))
+        return len(dict_[max_])
+
+    def get_paired_dict_from_file(
+        self,
+        file_: str,
+    ) -> List[Any]:
+        """Read the paired username:password combinations from a
+        file into an organized dict object.
+
+        Arguments:
+            file_: file to read into a list
+
+        Returns:
+            dict of {username: [passwords]}
+        """
+        with open(file_, "r") as f:
+            list_ = [line.strip() for line in f if line.strip() not in [None, ""]]
+        dict_ = {}
+        for line in list_:
+            try:
+                (username, password) = line.split(":", 1)
+                if username not in dict_.keys():
+                    dict_[username] = []
+                dict_[username].append(password)
+            except:
+                pass
+        return dict_
+
     def check_last_chunk(
         self,
         sublist: List[Any],
