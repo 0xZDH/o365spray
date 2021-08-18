@@ -535,7 +535,6 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                 #       Autodiscover is currently showing invalid lockouts
                 if spray.lockout >= args.safe:
                     logging.error("Locked account threshold reached. Exiting...")
-                    spray.shutdown()
                     break
 
                 # Since we are maintaining the list of users to test here and not
@@ -593,7 +592,6 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                     #       Autodiscover is currently showing invalid lockouts
                     if spray.lockout >= args.safe:
                         logging.error("Locked account threshold reached. Exiting...")
-                        spray.shutdown()
                         break
 
                     # Stop if there are no more users to spray
