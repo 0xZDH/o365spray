@@ -538,6 +538,24 @@ def spray(args: argparse.Namespace, output_dir: str, enum: Enumerator):
                     spray.shutdown()
                     break
 
+                # Since we are maintaining the list of users to test here and not
+                # in the spray class, we need to handle found valid creds here
+                for valid_creds in spray.VALID_CREDENTIALS:
+                    valid_email, _ = valid_creds.split(":", 1)
+                    valid_user = valid_email.split("@", 1)[0]
+
+                    # If the email/user exists in the paired dict still, attempt
+                    # to remove it from further iterations
+                    if any(
+                        uname in paired_dict.keys()
+                        for uname in [valid_email, valid_user]
+                    ):
+                        paired_dict.pop(valid_email, None)
+                        paired_dict.pop(valid_user, None)
+                        # If we found new creds and updated our spraying dict, let's
+                        # update our counter
+                        paired_max_pass = HELPER.get_max_dict_elem(paired_dict)
+
                 # Stop if there are no more users to spray
                 if not spray.userlist:
                     logging.debug("End of password spraying user list reached.")

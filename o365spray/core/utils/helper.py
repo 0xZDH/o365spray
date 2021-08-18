@@ -79,6 +79,9 @@ class Helper:
         Returns:
             length of largest list of values
         """
+        # Account for an empty dict_
+        if not dict_:
+            return 0
         max_ = max(dict_, key=lambda k: len(dict_[k]))
         return len(dict_[max_])
 
