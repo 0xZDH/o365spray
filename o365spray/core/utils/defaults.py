@@ -64,6 +64,16 @@ class Defaults:
         "AADSTS700016": ["INVALID_APPID", "Invalid application client ID"],
     }
 
+    # List of valid AADSTS codes to check against
+    VALID_AADSTS_CODES = [
+        "AADSTS500011",  # INVALID_RESOURCE
+        "AADSTS700016",  # INVALID_APPID
+        "AADSTS50055",  # EXPIRED_PASS
+        "AADSTS50079",  # VALID_MFA
+        "AADSTS50076",  # VALID_MFA
+        "AADSTS50158",  # SEC_CHAL
+    ]
+
     # List of substrings that can be found when BasicAuth is blocked
     BASICAUTH_ERRORS = [
         "Basic Auth Blocked",

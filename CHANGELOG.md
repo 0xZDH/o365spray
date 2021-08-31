@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## v2.0.4 (18/08/2021)
-- Update how paired lists are handled during password spraying to account for users with more than one password so lockout thresholds are respected
+## v2.0.4
+- Update list of valid AADSTS codes checked against during password spraying (30/08/2021)
+- Update how paired lists are handled during password spraying to account for users with more than one password so lockout thresholds are respected (18/08/2021)
 
 ## v2.0.3 (12/08/2021)
 - Clean up and optimize enum and spray modules

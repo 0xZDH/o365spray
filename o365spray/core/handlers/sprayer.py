@@ -197,7 +197,7 @@ class Sprayer(BaseHandler):
             # authentication has been processed
             # Also account for expired passwords which only trigger
             # after valid authentication
-            if code in ["AADSTS500011", "AADSTS700016", "AADSTS50055"]:
+            if code in Defaults.VALID_AADSTS_CODES:
                 tested = f"{email}:{password}"
                 if self.writer:
                     self.valid_writer.write(tested)
