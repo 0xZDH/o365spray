@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v2.0.4 (30/08/2021)
+- Update list of valid AADSTS codes checked against during password spraying
+
 ## v2.0.3 (12/08/2021)
 - Clean up and optimize enum and spray modules
 - Disable modules that no longer function as expected
