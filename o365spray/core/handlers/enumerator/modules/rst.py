@@ -18,12 +18,14 @@ class EnumerateModule_rst(EnumeratorBase):
         super(EnumerateModule_rst, self).__init__(*args, **kwargs)
 
     def _enumerate(self, domain: str, user: str, password: str = "Password1"):
-        """Spray users via the Office 365 RST SOAP API
+        """Enumerate users via the Office 365 RST SOAP API
 
         Arguments:
-            domain: domain to spray
-            user: username for authentication
-            password: password for authentication
+            <required>
+            domain: domain to enumerate against
+            user: username for enumeration request
+            <optional>
+            password: password for enumeration request
 
         Raises:
             Exception: generic handler so we can successfully fail without
