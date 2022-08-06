@@ -4,6 +4,7 @@ import time
 import logging
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.sprayer.modules.base import SprayerBase
@@ -61,7 +62,17 @@ class SprayModule_oauth2(SprayerBase):
                 "scope": "openid",
             }
 
-            url = "https://login.microsoftonline.com/common/oauth2/token"
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/common/oauth2/token"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://login.microsoftonline.com/common/oauth2/token"
+
             response = self._send_request(
                 "post",
                 url,

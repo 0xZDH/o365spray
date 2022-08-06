@@ -5,6 +5,7 @@ import logging
 from requests.auth import HTTPBasicAuth  # type: ignore
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.sprayer.modules.base import SprayerBase
@@ -45,12 +46,26 @@ class SprayModule_autodiscover(SprayerBase):
 
             time.sleep(0.250)
 
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/autodiscover/autodiscover.xml"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
+
             auth = HTTPBasicAuth(email, password)
-            url = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.xml"
             response = self._send_request(
                 "get",
                 url,
                 auth=auth,
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,

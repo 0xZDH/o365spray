@@ -5,6 +5,7 @@ import logging
 from bs4 import BeautifulSoup  # type: ignore
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
@@ -42,10 +43,21 @@ class EnumerateModule_rst(EnumeratorBase):
 
             time.sleep(0.250)
 
+            # Update content type for SOAP XML
             headers = Defaults.HTTP_HEADERS
             headers["Content-Type"] = "application/soap+xml"
 
-            url = "https://login.microsoftonline.com/rst2.srf"
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/rst2.srf"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://login.microsoftonline.com/rst2.srf"
+
             data = f"""
 <?xml version="1.0" encoding="UTF-8"?>
 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wst="http://schemas.xmlsoap.org/ws/2005/02/trust">
@@ -81,11 +93,11 @@ class EnumerateModule_rst(EnumeratorBase):
                 "post",
                 url,
                 data=data.strip(),
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,
                 jitter=self.jitter,
-                headers=headers,
             )
             xml = BeautifulSoup(response.content, "xml")
 

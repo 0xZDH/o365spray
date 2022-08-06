@@ -3,7 +3,11 @@
 import re
 import time
 import logging
-from o365spray.core.utils import text_colors
+from o365spray.core.utils import (
+    Defaults,
+    Helper,
+    text_colors,
+)
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
@@ -57,10 +61,24 @@ class EnumerateModule_onedrive(EnumeratorBase):
             # Replace any `.` with `_` for use in the URL
             fmt_user = user.replace(".", "_")
 
-            url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}/_layouts/15/onedrive.aspx"
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/personal/{fmt_user}_{domain}/_layouts/15/onedrive.aspx"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = f"https://{tenant}-my.sharepoint.com/personal/{fmt_user}_{domain}/_layouts/15/onedrive.aspx"
+
             response = self._send_request(
                 "get",
                 url,
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,

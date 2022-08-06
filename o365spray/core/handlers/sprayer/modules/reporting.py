@@ -3,7 +3,11 @@
 import time
 import logging
 from requests.auth import HTTPBasicAuth  # type: ignore
-from o365spray.core.utils import text_colors
+from o365spray.core.utils import (
+    Defaults,
+    Helper,
+    text_colors,
+)
 from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
@@ -37,12 +41,26 @@ class SprayModule_reporting(SprayerBase):
 
             time.sleep(0.250)
 
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/ecp/reportingwebservice/reporting.svc"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://reports.office365.com/ecp/reportingwebservice/reporting.svc"
+
             auth = HTTPBasicAuth(email, password)
-            url = "https://reports.office365.com/ecp/reportingwebservice/reporting.svc"
             response = self._send_request(
                 "get",
                 url,
                 auth=auth,
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,

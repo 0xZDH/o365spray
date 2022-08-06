@@ -5,6 +5,7 @@ import logging
 from requests.auth import HTTPBasicAuth  # type: ignore
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.sprayer.modules.base import SprayerBase
@@ -45,8 +46,18 @@ class SprayModule_activesync(SprayerBase):
 
             time.sleep(0.250)
 
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/Microsoft-Server-ActiveSync"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
+
             auth = HTTPBasicAuth(email, password)
-            url = "https://outlook.office365.com/Microsoft-Server-ActiveSync"
             response = self._send_request(
                 "options",
                 url,

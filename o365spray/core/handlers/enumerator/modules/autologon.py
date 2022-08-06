@@ -7,7 +7,11 @@ from datetime import (
     datetime,
     timedelta,
 )
-from o365spray.core.utils import text_colors
+from o365spray.core.utils import (
+    Defaults,
+    Helper,
+    text_colors,
+)
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
@@ -48,7 +52,20 @@ class EnumerateModule_autologon(EnumeratorBase):
             created = created.strftime("%Y-%m-%dT%H:%M:%S.001Z")
             expires = expires.strftime("%Y-%m-%dT%H:%M:%S.001Z")
 
-            url = f"https://autologon.microsoftazuread-sso.com/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = f"https://autologon.microsoftazuread-sso.com/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
+
             data = f"""
 <?xml version='1.0' encoding='UTF-8'?>
 <s:Envelope xmlns:s='http://www.w3.org/2003/05/soap-envelope' xmlns:wsse='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd' xmlns:saml='urn:oasis:names:tc:SAML:1.0:assertion' xmlns:wsp='http://schemas.xmlsoap.org/ws/2004/09/policy' xmlns:wsu='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' xmlns:wsa='http://www.w3.org/2005/08/addressing' xmlns:wssc='http://schemas.xmlsoap.org/ws/2005/02/sc' xmlns:wst='http://schemas.xmlsoap.org/ws/2005/02/trust' xmlns:ic='http://schemas.xmlsoap.org/ws/2005/05/identity'>
@@ -85,6 +102,7 @@ class EnumerateModule_autologon(EnumeratorBase):
                 "post",
                 url,
                 data=data.strip(),
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,

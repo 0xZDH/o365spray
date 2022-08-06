@@ -2,6 +2,10 @@
 
 import sys
 import time
+import socket
+import struct
+import string
+import random
 import argparse
 from typing import (
     Any,
@@ -19,6 +23,60 @@ class Helper:
     """Helper functions"""
 
     space = " " * 20
+
+    def _forwarded_for(self) -> str:
+        """Generate a random X-My-X-Forwarded-For IP address
+
+        Returns:
+            randomized X-My-X-Forwarded-For
+        """
+        # Start range at 1.0.0.0
+        i = struct.pack(">I", random.randint(0x1000000, 0xFFFFFFFF))
+        return socket.inet_ntoa(i)
+
+    def _amzn_trace_id(self) -> str:
+        """Generate a random X-Amzn-Trace-Id
+        https://aws.amazon.com/premiumsupport/knowledge-center/trace-elb-x-amzn-trace-id/
+        e.g. X-Amzn-Trace-Id: Root=1-67891233-abcdef012345678912345678
+
+        Returns:
+            randomized X-Amzn-Trace-Id
+        """
+        b = "Root=1"
+        f = "".join(random.choice("abcdef0123456789") for _ in range(8))
+        s = "".join(random.choice("abcdef0123456789") for _ in range(24))
+        return f"{b}-{f}-{s}"
+
+    def _amzn_apigateway_api_id(self) -> str:
+        """Generate a random X-Amzn-Apigateway-Api-Id
+        e.g. x-amzn-apigateway-api-id=beags1mnid
+
+        Returns:
+            randomized X-Amzn-Apigateway-Api-Id
+        """
+        c = string.digits + string.ascii_lowercase
+        return "".join(random.choice(c) for _ in range(10))
+
+    @classmethod
+    def fireprox_headers(cls, headers: Dict[str, str]) -> Dict[str, str]:
+        """Update the provided HTTP headers for FireProx masking
+        https://github.com/ustayready/fireprox/issues/32
+
+        Arguments:
+            headers: dict of http headers
+
+        Returns:
+            updated http headers
+        """
+        headers["X-My-X-Forwarded-For"] = cls._forwarded_for(cls)
+        headers["X-My-X-Amzn-Trace-Id"] = cls._amzn_trace_id(cls)
+        headers["x-amzn-apigateway-api-id"] = cls._amzn_apigateway_api_id(cls)
+
+        # I don't think we need to worry about these headers
+        # headers["X-Forwarded-Port"] = 443
+        # headers["X-Forwarded-Proto"] = "https"
+
+        return headers
 
     @classmethod
     def write_data(

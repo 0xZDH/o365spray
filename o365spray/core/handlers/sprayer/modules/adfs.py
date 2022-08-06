@@ -53,6 +53,8 @@ class SprayModule_adfs(SprayerBase):
             url_params = "&".join(url_params)
             url = f"{url}?{url_params}"
 
+            # TODO: Look into how to properly implement FireProx proxy URL here...
+
             data = f"UserName={quote(email)}&Password={quote(password)}&AuthMethod=FormsAuthentication"
             response = self._send_request(
                 "post",

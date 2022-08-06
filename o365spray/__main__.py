@@ -158,6 +158,11 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help="HTTP/S proxy to pass traffic through (e.g. http://127.0.0.1:8080).",
     )
+    parser.add_argument(
+        "--proxy-url",
+        type=str,
+        help="FireProx API URL.",
+    )
 
     # Misc configurations
     parser.add_argument(

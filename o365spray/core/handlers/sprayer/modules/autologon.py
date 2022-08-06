@@ -8,7 +8,11 @@ from datetime import (
     datetime,
     timedelta,
 )
-from o365spray.core.utils import text_colors
+from o365spray.core.utils import (
+    Defaults,
+    Helper,
+    text_colors,
+)
 from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
@@ -42,26 +46,25 @@ class SprayModule_autologon(SprayerBase):
 
             time.sleep(0.250)
 
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = f"https://autologon.microsoftazuread-sso.com/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
+
             created = datetime.utcnow()
             expires = created + timedelta(minutes=10)
             created = created.strftime("%Y-%m-%dT%H:%M:%S.001Z")
             expires = expires.strftime("%Y-%m-%dT%H:%M:%S.001Z")
 
-            # TODO: Test this against a proper ADFS environment
-            # # Allow for ADFS spraying by extracting the ADFS domain
-            # # Note: This assumed the provided ADFS URL follows the pattern
-            # #       of using the `/adfs/ls` path
-            # if self.adfs_url:
-            #     re_str = "^(https?://)?(.*)/adfs/ls.*"
-            #     url_domain = re.match(re_str, self.adfs_url).group(2)
-            #     # If no protocol, manually add it
-            #     if not re.match("^https?://.*", url_domain):
-            #         url_domain = f"https://{url_domain}"
-            # else:
-            #     # Public target for managed realms
-            #     url_domain = "https://autologon.microsoftazuread-sso.com"
-
-            url = f"https://autologon.microsoftazuread-sso.com/{domain}/winauth/trust/2005/usernamemixed?client-request-id={uuid4()}"
             data = f"""
 <?xml version='1.0' encoding='UTF-8'?>
 <s:Envelope xmlns:s='http://www.w3.org/2003/05/soap-envelope' xmlns:wsse='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd' xmlns:saml='urn:oasis:names:tc:SAML:1.0:assertion' xmlns:wsp='http://schemas.xmlsoap.org/ws/2004/09/policy' xmlns:wsu='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' xmlns:wsa='http://www.w3.org/2005/08/addressing' xmlns:wssc='http://schemas.xmlsoap.org/ws/2005/02/sc' xmlns:wst='http://schemas.xmlsoap.org/ws/2005/02/trust' xmlns:ic='http://schemas.xmlsoap.org/ws/2005/05/identity'>
@@ -98,6 +101,7 @@ class SprayModule_autologon(SprayerBase):
                 "post",
                 url,
                 data=data.strip(),
+                headers=headers,
                 proxies=self.proxies,
                 timeout=self.timeout,
                 sleep=self.sleep,

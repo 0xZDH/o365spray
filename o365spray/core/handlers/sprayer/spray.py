@@ -97,6 +97,7 @@ def spray(args: argparse.Namespace, output_dir: str, enum: object):
         writer=True,
         sleep=args.sleep,
         jitter=args.jitter,
+        proxy_url=args.proxy_url,
     )
 
     def spray_signal_handler(signal, frame):

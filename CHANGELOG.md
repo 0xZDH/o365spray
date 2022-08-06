@@ -7,6 +7,7 @@
 - Add rst module for enumeration and spraying based on [Go365](https://github.com/optiv/Go365)
 - Update list of valid AADSTS codes checked against during password spraying
 - Fix execution bugs when running on Windows
+- Add support for FireProx proxy URL handling
 
 ## v2.0.4 (30/08/2021)
 - Update list of valid AADSTS codes checked against during password spraying

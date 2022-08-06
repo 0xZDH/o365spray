@@ -4,6 +4,7 @@ import time
 import logging
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
@@ -34,9 +35,6 @@ class EnumerateModule_office(EnumeratorBase):
               crashing the run
         """
         try:
-            # Grab default headers
-            headers = Defaults.HTTP_HEADERS
-
             # Build email if not already built
             email = self.HELPER.check_email(user, domain)
 
@@ -57,7 +55,20 @@ class EnumerateModule_office(EnumeratorBase):
                 "username": email,
             }
 
-            url = "https://login.microsoftonline.com/common/GetCredentialType?mkt=en-US"
+            # Grab default headers
+            headers = Defaults.HTTP_HEADERS
+
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/common/GetCredentialType?mkt=en-US"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://login.microsoftonline.com/common/GetCredentialType?mkt=en-US"
+
             response = self._send_request(
                 "post",
                 url,

@@ -4,6 +4,7 @@ import time
 import logging
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
@@ -35,6 +36,7 @@ class EnumerateModule_autodiscover(EnumeratorBase):
               crashing the run
         """
         try:
+            # Add custom User-Agent to appear from outlook
             headers = Defaults.HTTP_HEADERS
             headers["User-Agent"] = "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.12026; Pro)"  # fmt: skip
 
@@ -48,7 +50,17 @@ class EnumerateModule_autodiscover(EnumeratorBase):
 
             time.sleep(0.250)
 
-            url = f"https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{email}?Protocol=Autodiscoverv1"
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/autodiscover/autodiscover.json/v1.0/{email}?Protocol=Autodiscoverv1"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = f"https://outlook.office365.com/autodiscover/autodiscover.json/v1.0/{email}?Protocol=Autodiscoverv1"
+
             response = self._send_request(
                 "get",
                 url,

@@ -39,6 +39,7 @@ class EnumeratorBase(BaseHandler):
         writer: bool = True,
         sleep: int = 0,
         jitter: int = 0,
+        proxy_url: str = None,
         *args,
         **kwargs,
     ):
@@ -62,6 +63,7 @@ class EnumeratorBase(BaseHandler):
             writer: toggle writing to output files
             sleep: throttle http requests
             jitter: randomize throttle
+            proxy_url: fireprox api url
 
         Raises:
             ValueError: if no output directory provided when output writing
@@ -81,6 +83,7 @@ class EnumeratorBase(BaseHandler):
         self.proxies = proxy
         self.sleep = sleep
         self.jitter = jitter
+        self.proxy_url = proxy_url
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
 
         # Internal exit handler

@@ -5,6 +5,7 @@ import logging
 from uuid import uuid4
 from o365spray.core.utils import (
     Defaults,
+    Helper,
     text_colors,
 )
 from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
@@ -32,7 +33,7 @@ class EnumerateModule_oauth2(EnumeratorBase):
               crashing the run
         """
         try:
-            # Grab prebuilt office headers
+            # Update content type
             headers = Defaults.HTTP_HEADERS
             headers["Content-Type"] = "application/x-www-form-urlencoded"
 
@@ -56,7 +57,17 @@ class EnumerateModule_oauth2(EnumeratorBase):
                 "scope": "openid",
             }
 
-            url = "https://login.microsoftonline.com/common/oauth2/token"
+            # Handle FireProx API URL
+            if self.proxy_url:
+                proxy_url = self.proxy_url.rstrip("/")
+                url = f"{proxy_url}/common/oauth2/token"
+
+                # Update headers
+                headers = Helper.fireprox_headers(headers)
+
+            else:
+                url = "https://login.microsoftonline.com/common/oauth2/token"
+
             response = self._send_request(
                 "post",
                 url,
