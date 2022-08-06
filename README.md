@@ -165,7 +165,7 @@ git checkout e235abdcebad61dbd2cde80974aca21ddb188704
 git checkout a585432f269a8f527d61f064822bb08880c887ef
 ```
 
-## FireProx Base URls
+## FireProx Base URLs
 
 Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
 
