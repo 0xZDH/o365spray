@@ -2,7 +2,6 @@
 
 import time
 import logging
-from uuid import uuid4
 from o365spray.core.utils import (
     Defaults,
     Helper,
@@ -47,10 +46,11 @@ class EnumerateModule_oauth2(EnumeratorBase):
 
             time.sleep(0.250)
 
-            randomGuid = uuid4()
+            # Use a valid resource and client_id
+            # APP: Azure Active Directory PowerShell
             data = {
-                "resource": randomGuid,
-                "client_id": randomGuid,
+                "resource": "https://graph.windows.net",
+                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
                 "grant_type": "password",
                 "username": email,
                 "password": password,
