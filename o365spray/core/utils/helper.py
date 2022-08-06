@@ -3,8 +3,16 @@
 import sys
 import time
 import argparse
-from typing import Union, Dict, Any, List
-from datetime import timedelta, datetime
+from typing import (
+    Any,
+    List,
+    Dict,
+    Union,
+)
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 
 class Helper:
@@ -12,13 +20,14 @@ class Helper:
 
     space = " " * 20
 
+    @classmethod
     def write_data(
-        self,
+        cls,
         creds: Union[List[str], Dict[str, str]],
         file_: str,
         append: bool = True,
     ):
-        """Write a given list of data to a specified file.
+        """Write a given list of cred data to a specified file.
 
         Arguments:
             creds: data to write (if a dict, format key:value)
@@ -33,8 +42,9 @@ class Helper:
                 for account in creds:
                     f.write(f"{account}\n")
 
+    @classmethod
     def get_chunks_from_list(
-        self,
+        cls,
         list_: List[Any],
         n: int,
     ) -> List[Any]:
@@ -50,8 +60,9 @@ class Helper:
         for i in range(0, len(list_), n):
             yield list_[i : i + n]
 
+    @classmethod
     def get_list_from_file(
-        self,
+        cls,
         file_: str,
     ) -> List[Any]:
         """Read a file's lines into a list.
@@ -66,8 +77,56 @@ class Helper:
             list_ = [line.strip() for line in f if line.strip() not in [None, ""]]
         return list_
 
+    @classmethod
+    def get_max_dict_elem(
+        cls,
+        dict_: Dict[str, List[str]],
+    ) -> int:
+        """Identify the largest list of values in a given
+        dictionary.
+
+        Arguments:
+            dict_: dictionary to iterate over
+
+        Returns:
+            length of largest list of values
+        """
+        # Account for an empty dict_
+        if not dict_:
+            return 0
+        max_ = max(dict_, key=lambda k: len(dict_[k]))
+        return len(dict_[max_])
+
+    @classmethod
+    def get_paired_dict_from_file(
+        cls,
+        file_: str,
+    ) -> List[Any]:
+        """Read the paired username:password combinations from a
+        file into an organized dict object.
+
+        Arguments:
+            file_: file to read into a list
+
+        Returns:
+            dict of {username: [passwords]}
+        """
+        with open(file_, "r") as f:
+            list_ = [line.strip() for line in f if line.strip() not in [None, ""]]
+        dict_ = {}
+        for line in list_:
+            try:
+                (username, password) = line.split(":", 1)
+                if username not in dict_.keys():
+                    dict_[username] = []
+                dict_[username].append(password)
+            except:
+                pass
+        return dict_
+
+    @classmethod
     def check_last_chunk(
-        self,
+        cls,
         sublist: List[Any],
         full_list: List[Any],
     ) -> bool:
@@ -85,9 +144,10 @@ class Helper:
             return True
         return False
 
-    def lockout_reset_wait(self, lockout: Union[int, float]):
+    @classmethod
+    def lockout_reset_wait(cls, lockout: Union[int, float]):
         """Print a lockout timer to the screen.
-        From: https://github.com/byt3bl33d3r/SprayingToolkit/blob/master/core/utils/time.py
+        Reference: https://github.com/byt3bl33d3r/SprayingToolkit/blob/master/core/utils/time.py
 
         Arguments:
             lockout: lockout time in minutes
@@ -100,7 +160,8 @@ class Helper:
             time.sleep(1)
         sys.stdout.write("\n\n")
 
-    def check_email(self, user: str, domain: str) -> str:
+    @classmethod
+    def check_email(cls, user: str, domain: str) -> str:
         """Check if the given username is an email. If not, convert
         to an email address with the given doamin.
 
@@ -118,7 +179,8 @@ class Helper:
             user = "%s@%s" % (user, domain)
         return user
 
-    def prompt_question(self, prompt: str) -> str:
+    @classmethod
+    def prompt_question(cls, prompt: str) -> str:
         """Prompt a user with a given question.
 
         Arguments:
@@ -132,7 +194,8 @@ class Helper:
             return prompt_question(prompt)  # type: ignore
         return resp
 
-    def banner(self, args: argparse.Namespace, version: str):
+    @classmethod
+    def banner(cls, args: argparse.Namespace, version: str):
         """Build a tool banner based on provided command line args.
 
         Arguments:

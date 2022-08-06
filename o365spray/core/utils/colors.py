@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 
+import sys
+from colorama import (  # type: ignore
+    init,
+    Fore,
+)
+
+
+# Init colorama to switch between Windows and Linux
+if sys.platform == "win32":
+    init(convert=True)
+
 
 class text_colors:
-    """Colorized output during run"""
+    """Color codes for colorized terminal output"""
 
-    red = "\033[91m"
-    green = "\033[92m"
-    yellow = "\033[93m"
-    reset = "\033[0m"
+    HEADER = Fore.MAGENTA
+    OKBLUE = Fore.BLUE
+    OKCYAN = Fore.CYAN
+    OKGREEN = Fore.GREEN
+    WARNING = Fore.YELLOW
+    FAIL = Fore.RED
+    ENDC = Fore.RESET

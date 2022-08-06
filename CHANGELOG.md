@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v3.0.0 (06/08/2022)
+- Update how paired lists are handled during password spraying to account for users with more than one password so lockout thresholds are respected
+- Update how modules are called and handled to allow for more modular handling
+- Add autologon module for enumeration and spraying based on [AADInternals](https://github.com/Gerenios/AADInternals)
+- Add rst module for enumeration and spraying based on [Go365](https://github.com/optiv/Go365)
+- Update list of valid AADSTS codes checked against during password spraying
+- Fix execution bugs when running on Windows
+
 ## v2.0.4 (30/08/2021)
 - Update list of valid AADSTS codes checked against during password spraying
 
