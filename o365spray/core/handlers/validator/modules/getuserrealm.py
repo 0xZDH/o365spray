@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 from typing import Tuple
 from o365spray.core.utils import (
     Defaults,
-    Helper,
 )
 from o365spray.core.handlers.validator.modules.base import ValidatorBase
 
@@ -29,18 +28,8 @@ class ValidateModule_getuserrealm(ValidatorBase):
         (valid, adfs_url) = (False, None)  # Defaults
         headers = Defaults.HTTP_HEADERS
 
-        # Handle FireProx API URL
-        if self.proxy_url:
-            proxy_url = self.proxy_url.rstrip("/")
-            url = f"{proxy_url}/getuserrealm.srf?login=user@{domain}&xml=1"
-
-            # Update headers
-            headers = Helper.fireprox_headers(headers)
-
-        else:
-            url = f"https://login.microsoftonline.com/getuserrealm.srf?login=user@{domain}&xml=1"
-
         # Send request
+        url = f"https://login.microsoftonline.com/getuserrealm.srf?login=user@{domain}&xml=1"
         rsp = self._send_request(
             "get",
             url,

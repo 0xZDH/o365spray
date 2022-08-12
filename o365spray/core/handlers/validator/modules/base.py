@@ -25,7 +25,6 @@ class ValidatorBase(BaseHandler):
         proxy: Union[str, Dict[str, str]] = None,
         sleep: int = 0,
         jitter: int = 0,
-        proxy_url: str = None,
         *args,
         **kwargs,
     ):
@@ -43,7 +42,6 @@ class ValidatorBase(BaseHandler):
             timeout: http request timeout
             sleep: throttle http requests
             jitter: randomize throttle
-            proxy_url: fireprox api url
         """
         # If proxy server provided, build HTTP proxies object for
         # requests lib
@@ -55,7 +53,6 @@ class ValidatorBase(BaseHandler):
         self.timeout = timeout
         self.sleep = sleep
         self.jitter = jitter
-        self.proxy_url = proxy_url
 
     def validate(
         self,
