@@ -8,6 +8,20 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
 
 > If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
 
+# Table of Contents
+
+- [Usage](#usage)
+- [Modules](#modules)
+  - [Validation](#validation)
+  - [Enumeration](#enumeration)
+  - [Spraying](#spraying)
+- [FireProx URLs](#fireprox-base-urls)
+  - [Validation](#validation-1)
+  - [Enumeration](#enumeration-1)
+  - [Spraying](#spraying-1)
+- [Acknowledgments](#acknowledgments)
+- [Previous Versions](#using-previous-versions)
+
 ## Usage
 
 Validate a domain is using O365:<br>
@@ -132,6 +146,45 @@ optional arguments:
 
 > The oAuth2 module can be used for federated spraying, but it should be noted that this will ONLY work when the target tenant has enabled password synchronization - otherwise authentication will always fail. The default mechanic is to default to the 'adfs' module when federation is identified.
 
+## FireProx Base URLs
+
+Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
+
+To use FireProx with o365spray, create a proxy URL for the given o365spray module based on the based URL tables below. The proxy URL can then be passed in via `--proxy-url`.
+
+> NOTE: Make sure to use the correct `--enum-module` or `--spray-module` flag with the base URL used to create the FireProx URL.
+
+### Validation
+
+| Module       | Base URL |
+| ---          | ---      |
+| getuserrealm | `https://login.microsoftonline.com/` |
+
+### Enumeration
+
+> The 'tenant' value in the OneDrive URL is the domain name value that is provided via the `--domain` flag.
+
+| Module       | Base URL |
+| ---          | ---      |
+| autodiscover | `https://outlook.office365.com/` |
+| autologon    | `https://autologon.microsoftazuread-sso.com/` |
+| oauth2       | `https://login.microsoftonline.com/` |
+| office       | `https://login.microsoftonline.com/` |
+| rst          | `https://login.microsoftonline.com/` |
+| onedrive     | `https://<tenant>-my.sharepoint.com/personal` |
+
+### Spraying
+
+| Module       | Base URL |
+| ---          | ---      |
+| activesync   | `https://outlook.office365.com/` |
+| adfs         | Currently not implemented |
+| autodiscover | `https://autodiscover-s.outlook.com/` |
+| autologon    | `https://autologon.microsoftazuread-sso.com/` |
+| oauth2       | `https://login.microsoftonline.com/` |
+| reporting    | `https://reports.office365.com/` |
+| rst          | `https://login.microsoftonline.com/` |
+
 ## Omnispray
 
 The o365spray framework has been ported to a new tool: [Omnispray](https://github.com/0xZDH/Omnispray). This tool is meant to modularize the original enumeration and spraying framework to allow for generic targeting, not just O365. Omnispray includes template modules for enumeration and spraying that can be modified and leveraged for any target.
@@ -164,42 +217,3 @@ git checkout e235abdcebad61dbd2cde80974aca21ddb188704
 # v2.0.4
 git checkout a585432f269a8f527d61f064822bb08880c887ef
 ```
-
-## FireProx Base URLs
-
-Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
-
-To use FireProx with o365spray, create a proxy URL for the given o365spray module based on the based URL tables below. The proxy URL can then be passed in via `--proxy-url`.
-
-> NOTE: Make sure to use the correct `--enum-module` or `--spray-module` flag with the base URL used to create the FireProx URL.
-
-### Validate
-
-| Module       | Base URL |
-| ---          | ---      |
-| getuserrealm | `https://login.microsoftonline.com/` |
-
-### Enumerate
-
-> The 'tenant' value in the OneDrive URL is the domain name value that is provided via the `--domain` flag.
-
-| Module       | Base URL |
-| ---          | ---      |
-| autodiscover | `https://outlook.office365.com/` |
-| autologon    | `https://autologon.microsoftazuread-sso.com/` |
-| oauth2       | `https://login.microsoftonline.com/` |
-| office       | `https://login.microsoftonline.com/` |
-| rst          | `https://login.microsoftonline.com/` |
-| onedrive     | `https://<tenant>-my.sharepoint.com/personal` |
-
-### Spray
-
-| Module       | Base URL |
-| ---          | ---      |
-| activesync   | `https://outlook.office365.com/` |
-| adfs         | Currently not implemented |
-| autodiscover | `https://autodiscover-s.outlook.com/` |
-| autologon    | `https://autologon.microsoftazuread-sso.com/` |
-| oauth2       | `https://login.microsoftonline.com/` |
-| reporting    | `https://reports.office365.com/` |
-| rst          | `https://login.microsoftonline.com/` |
