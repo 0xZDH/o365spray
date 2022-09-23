@@ -2,11 +2,13 @@
 
 import time
 import logging
-import requests
+import urllib3  # type: ignore
+import requests  # type: ignore
 from random import randint
 from typing import Dict, Any, Union
+from o365spray.core.utils import Defaults
 
-from o365spray.core import Defaults  # type: ignore
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class BaseHandler(object):

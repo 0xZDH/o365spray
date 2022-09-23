@@ -1,1 +1,4 @@
+beautifulsoup4>=4.11.1
+colorama>=0.4.5
+lxml>=4.9.1
 requests>=2.22.0
