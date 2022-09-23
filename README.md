@@ -150,15 +150,9 @@ optional arguments:
 
 Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
 
-To use FireProx with o365spray, create a proxy URL for the given o365spray module based on the based URL tables below. The proxy URL can then be passed in via `--proxy-url`.
+To use FireProx with o365spray, create a proxy URL for the given o365spray module based on the base URL tables below. The proxy URL can then be passed in via `--proxy-url`.
 
 > NOTE: Make sure to use the correct `--enum-module` or `--spray-module` flag with the base URL used to create the FireProx URL.
-
-### Validation
-
-| Module       | Base URL |
-| ---          | ---      |
-| getuserrealm | `https://login.microsoftonline.com/` |
 
 ### Enumeration
 
