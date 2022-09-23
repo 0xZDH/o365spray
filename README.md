@@ -16,7 +16,6 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
   - [Enumeration](#enumeration)
   - [Spraying](#spraying)
 - [FireProx URLs](#fireprox-base-urls)
-  - [Validation](#validation-1)
   - [Enumeration](#enumeration-1)
   - [Spraying](#spraying-1)
 - [Acknowledgments](#acknowledgments)
