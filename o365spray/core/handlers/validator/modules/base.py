@@ -7,7 +7,8 @@ from typing import (
     Tuple,
     Union,
 )
-from o365spray.core.handlers.base import BaseHandler  # type: ignore
+from o365spray.core.handlers.base import BaseHandler
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -43,6 +44,8 @@ class ValidatorBase(BaseHandler):
             sleep: throttle http requests
             jitter: randomize throttle
         """
+        super().__init__(*args, **kwargs)
+
         # If proxy server provided, build HTTP proxies object for
         # requests lib
         if isinstance(proxy, str):

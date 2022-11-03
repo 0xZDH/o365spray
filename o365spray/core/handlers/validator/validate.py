@@ -37,6 +37,7 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
         proxy=args.proxy,
         sleep=args.sleep,
         jitter=args.jitter,
+        useragents=args.useragents,
     )
     (valid, adfs) = v.validate(args.domain)
 

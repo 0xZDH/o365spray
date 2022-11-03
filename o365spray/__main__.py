@@ -148,6 +148,11 @@ def parse_args() -> argparse.Namespace:
 
     # HTTP configurations
     parser.add_argument(
+        "--useragents",
+        type=str,
+        help="File containing list of user agents for randomization.",
+    )
+    parser.add_argument(
         "--timeout",
         type=int,
         default=25,
@@ -217,6 +222,14 @@ def parse_args() -> argparse.Namespace:
             "(-u/--username or -U/--userfile) and (-p/--password or -P/--passfile) -> "
             "otherwise, --paired is required."
         )
+
+    # Validate user agent file and load data set
+    if args.useragents:
+        if not Path(args.useragents).is_file():
+            parser.error("invalid user agent file provided")
+
+        else:
+            args.useragents = Helper.get_list_from_file(args.useragents)
 
     # Handle sleep randomization
     if args.sleep == -1:
