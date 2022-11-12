@@ -19,6 +19,7 @@ from o365spray.core.utils import (
     ThreadWriter,
 )
 
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -69,6 +70,8 @@ class EnumeratorBase(BaseHandler):
             ValueError: if no output directory provided when output writing
               is enabled
         """
+        super().__init__(*args, **kwargs)
+
         if writer and not output_dir:
             raise ValueError("Missing 1 required argument: 'output_dir'")
 

@@ -7,6 +7,7 @@ import struct
 import string
 import random
 import argparse
+from random import sample
 from typing import (
     Any,
     List,
@@ -99,6 +100,14 @@ class Helper:
             with open(file_, mode) as f:
                 for account in creds:
                     f.write(f"{account}\n")
+
+    @classmethod
+    def get_random_element_from_list(cls, l: List[Any]) -> Any:
+        """Select a random element from a given list
+
+        :returns: random element from list
+        """
+        return sample(l, 1)[0]
 
     @classmethod
     def get_chunks_from_list(
@@ -274,26 +283,33 @@ class Helper:
                 # Handle conditions to not show certain data
                 # 1) Don't show `rate` if both enum and spray are disabled or
                 #    the user specified validation only
-                if ((not args.enum and not args.spray) or args.validate) and (
-                    arg == "rate"
+                if arg == "rate" and (
+                    (not args.enum and not args.spray) or args.validate
                 ):
                     continue
                 # 2) Don't show `enum_module` if enum is disabled
-                if not args.enum and arg == "enum_module":
+                if arg == "enum_module" and not args.enum:
                     continue
                 # 3) Don't show the following if spray is disabled:
                 #    spray_module, count, lockout, safe
-                if not args.spray and (
+                if (
                     arg == "spray_module"
                     or arg == "count"
                     or arg == "lockout"
                     or arg == "safe"
-                ):
+                ) and not args.spray:
                     continue
 
+                value = _args[arg]
                 space = " " * (15 - len(arg))
 
-                BANNER += "\n   > %s%s:  %s" % (arg, space, str(_args[arg]))
+                # Handle conditions to show custom values
+                # 1) If a user agents file is provided, show 'random' instead
+                #    of full list of agents - include number of random agents
+                if arg == "useragents" and args.useragents:
+                    value = f"random ({len(_args[arg])})"
+
+                BANNER += "\n   > %s%s:  %s" % (arg, space, str(value))
 
                 # Add data meanings
                 if arg == "count":

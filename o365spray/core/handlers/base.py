@@ -5,13 +5,42 @@ import logging
 import urllib3  # type: ignore
 import requests  # type: ignore
 from random import randint
-from typing import Dict, Any, Union
-from o365spray.core.utils import Defaults
+from typing import (
+    Any,
+    Dict,
+    List,
+    Union,
+)
+from o365spray.core.utils import (
+    Defaults,
+    Helper,
+)
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class BaseHandler(object):
+    """Module Base"""
+
+    def __init__(
+        self,
+        useragents: List[str] = None,
+        *args,
+        **kwargs,
+    ):
+        """Initialize a module base handler.
+
+        Note:
+            This is to allow all modules to provide user agent
+            lists for randomization easily.
+
+        Arguments:
+            <optional>
+            useragents: list of user agents
+        """
+        self.useragents = useragents
+
     def _send_request(
         self,
         method: str,
@@ -59,6 +88,11 @@ class BaseHandler(object):
                 throttle = sleep + int(sleep * float(randint(1, jitter) / 100.0))
             logging.debug(f"Sleeping for {throttle} seconds before sending request.")
             time.sleep(throttle)
+
+        # Retrieve random user agent and overwrite
+        # the existing value
+        if self.useragents:
+            headers["User-Agent"] = Helper.get_random_element_from_list(self.useragents)
 
         return requests.request(
             method,

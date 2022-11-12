@@ -18,6 +18,7 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
 - [FireProx URLs](#fireprox-base-urls)
   - [Enumeration](#enumeration-1)
   - [Spraying](#spraying-1)
+- [User Agent Randomization](#user-agent-randomization)
 - [Acknowledgments](#acknowledgments)
 - [Previous Versions](#using-previous-versions)
 
@@ -38,10 +39,11 @@ usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                  [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
                  [--validate-module] [--enum-module] [--spray-module]
                  [--adfs-url ADFS_URL] [--rate RATE] [--safe SAFE]
-                 [--timeout TIMEOUT] [--proxy PROXY] [--proxy-url PROXY_URL]
+                 [--useragents USERAGENTS] [--timeout TIMEOUT]
+                 [--proxy PROXY] [--proxy-url PROXY_URL]
                  [--output OUTPUT] [-v] [--debug]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.0
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.1
 
 optional arguments:
 
@@ -103,6 +105,9 @@ optional arguments:
 
   --safe SAFE           Terminate password spraying run if `N` locked accounts are
                         observed. Default: 10
+
+  --useragents USERAGENTS
+                        File containing list of user agents for randomization.
 
   --timeout TIMEOUT     HTTP request timeout in seconds. Default: 25
 
@@ -178,6 +183,14 @@ To use FireProx with o365spray, create a proxy URL for the given o365spray modul
 | reporting    | `https://reports.office365.com/` |
 | rst          | `https://login.microsoftonline.com/` |
 
+## User Agent Randomization
+
+User-Agent randomization is now supported and can be accomplished by providing a User-Agent file to the `--useragents` flag. o365spray includes an example file with 4,800+ agents via [resc/user-agents.txt](resc/user-agents.txt).
+
+The agents in the example data set were collected from the following:
+- https://github.com/sqlmapproject/sqlmap/blob/master/data/txt/user-agents.txt
+- https://www.useragentstring.com/pages/useragentstring.php?name=<browser>
+
 ## Omnispray
 
 The o365spray framework has been ported to a new tool: [Omnispray](https://github.com/0xZDH/Omnispray). This tool is meant to modularize the original enumeration and spraying framework to allow for generic targeting, not just O365. Omnispray includes template modules for enumeration and spraying that can be modified and leveraged for any target.
@@ -201,7 +214,7 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 
 ## Using Previous Versions
 
-o365spray has recently been rewritten and could have some hidden/unknown bugs. If issues are encountered, try checking out the commit prior to the code rewrites:
+If issues are encountered, try checking out previous versions prior to code rewrites:
 
 ```bash
 # v1.3.7

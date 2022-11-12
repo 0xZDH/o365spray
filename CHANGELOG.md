@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v3.0.1 (03/11/2022)
+- Add support for User-Agent randomization handling
+
 ## v3.0.0 (06/08/2022)
 - Update how paired lists are handled during password spraying to account for users with more than one password so lockout thresholds are respected
 - Update how modules are called and handled to allow for more modular handling

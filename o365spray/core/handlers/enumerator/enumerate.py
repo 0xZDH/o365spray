@@ -63,6 +63,7 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> object:
         sleep=args.sleep,
         jitter=args.jitter,
         proxy_url=args.proxy_url,
+        useragents=args.useragents,
     )
 
     def enum_signal_handler(signal, frame):

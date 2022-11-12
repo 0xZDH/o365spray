@@ -98,6 +98,7 @@ def spray(args: argparse.Namespace, output_dir: str, enum: object):
         sleep=args.sleep,
         jitter=args.jitter,
         proxy_url=args.proxy_url,
+        useragents=args.useragents,
     )
 
     def spray_signal_handler(signal, frame):

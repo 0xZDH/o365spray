@@ -166,3 +166,4 @@ enum/
 spray/
 output/
 !requirements.txt
+!user-agents.txt
