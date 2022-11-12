@@ -47,10 +47,9 @@ class EnumerateModule_oauth2(EnumeratorBase):
             time.sleep(0.250)
 
             # Use a valid resource and client_id
-            # APP: Azure Active Directory PowerShell
             data = {
-                "resource": "https://graph.windows.net",
-                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
+                "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
+                "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,

@@ -52,10 +52,9 @@ class SprayModule_oauth2(SprayerBase):
 
             # Resource and client_id must be valid for authentication
             # to complete
-            # APP: Azure Active Directory PowerShell
             data = {
-                "resource": "https://graph.windows.net",
-                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
+                "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
+                "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,

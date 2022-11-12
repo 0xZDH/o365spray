@@ -49,6 +49,29 @@ class Defaults:
         "Upgrade-Insecure-Requests": "1",
     }
 
+    # Valid resources and client IDs for OAuth authentication and enumeration
+    RESOURCES = [
+        "graph.windows.net",
+        "graph.microsoft.com",
+    ]
+
+    # https://github.com/secureworks/TokenMan#foci-application-client-id-map
+    CLIENT_IDS = [
+        "a40d7d7d-59aa-447e-a655-679a4107e548",  # Accounts Control UI
+        "f44b1140-bc5e-48c6-8dc0-5cf5a53c0e34",  # Microsoft Edge
+        "e9c51622-460d-4d3d-952d-966a5b1da34c",  # Microsoft Edge (1)
+        "ecd6b820-32c2-49b6-98a6-444530e5a77a",  # Microsoft Edge AAD BrokerPlugin
+        "9ba1a5c7-f17a-4de9-a1f1-6178c8d51223",  # Microsoft Intune Company Portal
+        "c0d2a505-13b8-4ae0-aa9e-cddd5eab0b12",  # Microsoft Power BI
+        "22098786-6e16-43cc-a27d-191a01a1e3b5",  # Microsoft To-Do client
+        "eb539595-3fe1-474e-9c1d-feb3625d1be5",  # Microsoft Tunnel
+        "57336123-6e14-4acc-8dcf-287b6088aa28",  # Microsoft Whiteboard Client
+        "ab9b8c07-8f02-4f72-87fa-80105867a763",  # OneDrive SyncEngine
+        "4e291c71-d680-4d0e-9640-0a3358e31177",  # PowerApps
+        "872cd9fa-d31f-45e0-9eab-6e460a02d1f1",  # Visual Studio
+        "26a7ee05-5602-4d76-a7ba-eae8b7b67941",  # Windows Search
+    ]
+
     # https://docs.microsoft.com/en-us/azure/active-directory/develop/reference-aadsts-error-codes
     # fmt: off
     AADSTS_CODES = {

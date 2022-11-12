@@ -43,7 +43,7 @@ usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
                  [--proxy PROXY] [--proxy-url PROXY_URL]
                  [--output OUTPUT] [-v] [--debug]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.1
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.2
 
 optional arguments:
 
