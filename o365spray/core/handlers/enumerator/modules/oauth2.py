@@ -46,14 +46,15 @@ class EnumerateModule_oauth2(EnumeratorBase):
 
             time.sleep(0.250)
 
-            # Use a valid resource and client_id
+            # Use a valid scope, resource, and client_id
+            scope = Helper.get_random_sublist_from_list(Defaults.SCOPES)
             data = {
                 "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
                 "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,
-                "scope": "openid",
+                "scope": " ".join(scope),
             }
 
             # Handle FireProx API URL

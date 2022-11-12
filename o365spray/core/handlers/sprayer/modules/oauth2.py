@@ -50,15 +50,16 @@ class SprayModule_oauth2(SprayerBase):
 
             time.sleep(0.250)
 
-            # Resource and client_id must be valid for authentication
+            # Scope, resource, client_id must be valid for authentication
             # to complete
+            scope = Helper.get_random_sublist_from_list(Defaults.SCOPES)
             data = {
                 "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
                 "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,
-                "scope": "openid",
+                "scope": " ".join(scope),
             }
 
             # Handle FireProx API URL

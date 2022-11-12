@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## v3.0.2 (12/11/2022)
-- Add resource and client_id randomization for the `oauth2` enumeration and spraying modules
+- Add scope, resource, and client_id randomization for the `oauth2` enumeration and spraying modules
 
 ## v3.0.1 (03/11/2022)
 - Add support for User-Agent randomization handling

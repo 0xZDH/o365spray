@@ -49,7 +49,14 @@ class Defaults:
         "Upgrade-Insecure-Requests": "1",
     }
 
-    # Valid resources and client IDs for OAuth authentication and enumeration
+    # Valid scopes, resources, and client IDs for OAuth authentication and enumeration
+    SCOPES = [
+        ".default",
+        "openid",
+        "profile",
+        "offline_access",
+    ]
+
     RESOURCES = [
         "graph.windows.net",
         "graph.microsoft.com",

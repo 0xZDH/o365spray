@@ -7,7 +7,10 @@ import struct
 import string
 import random
 import argparse
-from random import sample
+from random import (
+    randint,
+    sample,
+)
 from typing import (
     Any,
     List,
@@ -108,6 +111,14 @@ class Helper:
         :returns: random element from list
         """
         return sample(l, 1)[0]
+
+    @classmethod
+    def get_random_sublist_from_list(cls, l: List[Any]) -> Any:
+        """Select a random set from a given list
+
+        :returns: random element from list
+        """
+        return sample(l, randint(1, len(l)))
 
     @classmethod
     def get_chunks_from_list(
