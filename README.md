@@ -34,14 +34,7 @@ Perform password spraying against a given domain:<br>
 `o365spray --spray -U usernames.txt -P passwords.txt --count 2 --lockout 5 --domain test.com`
 
 ```
-usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
-                 [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
-                 [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
-                 [--validate-module] [--enum-module] [--spray-module]
-                 [--adfs-url ADFS_URL] [--rate RATE] [--safe SAFE]
-                 [--useragents USERAGENTS] [--timeout TIMEOUT]
-                 [--proxy PROXY] [--proxy-url PROXY_URL]
-                 [--output OUTPUT] [-v] [--debug]
+usage: o365spray [flags]
 
 o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.2
 
