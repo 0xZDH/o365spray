@@ -181,7 +181,7 @@ To use FireProx with o365spray, create a proxy URL for the given o365spray modul
 | oauth2       | `https://login.microsoftonline.com/` |
 | office       | `https://login.microsoftonline.com/` |
 | rst          | `https://login.microsoftonline.com/` |
-| onedrive     | `https://<tenant>-my.sharepoint.com/personal` |
+| onedrive     | `https://<tenant>-my.sharepoint.com/` |
 
 ### Spraying
 
