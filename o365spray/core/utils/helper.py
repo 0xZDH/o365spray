@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 
+import argparse
+import random
+import socket
+import string
+import struct
 import sys
 import time
-import socket
-import struct
-import string
-import random
-import argparse
+from datetime import (
+    datetime,
+    timedelta,
+)
 from random import (
     randint,
     sample,
 )
 from typing import (
     Any,
-    List,
     Dict,
+    List,
     Union,
-)
-from datetime import (
-    datetime,
-    timedelta,
 )
 
 
@@ -108,15 +108,23 @@ class Helper:
     def get_random_element_from_list(cls, l: List[Any]) -> Any:
         """Select a random element from a given list
 
-        :returns: random element from list
+        Arguments:
+            l: list of objects
+
+        Returns:
+            random element from list
         """
         return sample(l, 1)[0]
 
     @classmethod
-    def get_random_sublist_from_list(cls, l: List[Any]) -> Any:
+    def get_random_sublist_from_list(cls, l: List[Any]) -> List[Any]:
         """Select a random set from a given list
 
-        :returns: random element from list
+        Arguments:
+            l: list of objects
+
+        Returns:
+            random sublist of elements from list
         """
         return sample(l, randint(1, len(l)))
 

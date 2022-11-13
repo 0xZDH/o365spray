@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import logging
 import argparse
 import importlib
+import logging
+
 from o365spray.core.utils import (
     Helper,
     text_colors,

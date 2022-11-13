@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import time
 import logging
+import time
+
+from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
 class EnumerateModule_oauth2(EnumeratorBase):

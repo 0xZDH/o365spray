@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 
+import logging
 import re
 import time
-import logging
-from uuid import uuid4
 from datetime import (
     datetime,
     timedelta,
 )
+from uuid import uuid4
+
+from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
 class SprayModule_autologon(SprayerBase):

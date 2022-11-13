@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-import time
+import json
 import logging
+import time
+
+from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
 class SprayModule_oauth2(SprayerBase):
@@ -94,6 +96,16 @@ class SprayModule_oauth2(SprayerBase):
                 )
                 # Remove valid user from being sprayed again
                 self.userlist.remove(user)
+
+                # If a token was returned, attempt to write the token
+                # to disk for future use
+                try:
+                    token_file = f"{self.output_dir}{email}.token.json"
+                    with open(token_file, "w") as f:
+                        json.dump(response.json(), f)
+
+                except:
+                    pass
 
             else:
                 # Handle Microsoft AADSTS errors

@@ -3,8 +3,9 @@
 import html
 import xml.etree.ElementTree as ET
 from typing import Tuple
-from o365spray.core.utils import Defaults
+
 from o365spray.core.handlers.validator.modules.base import ValidatorBase
+from o365spray.core.utils import Defaults
 
 
 class ValidateModule_getuserrealm(ValidatorBase):

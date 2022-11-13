@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
-import signal
-import logging
-import asyncio
 import argparse
+import asyncio
 import importlib
+import logging
+import signal
+import sys
 from pathlib import Path
+
 from o365spray.core.utils import (
     Defaults,
     Helper,

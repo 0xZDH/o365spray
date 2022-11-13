@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+import logging
 import re
 import time
-import logging
+
+from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
 class EnumerateModule_onedrive(EnumeratorBase):

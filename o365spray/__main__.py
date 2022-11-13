@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
+import argparse
+import logging
 import os
 import sys
 import time
-import logging
-import argparse
 from random import randint
 from pathlib import Path
+
 from o365spray import __version__
-from o365spray.core.handlers.validator import validate
 from o365spray.core.handlers.enumerator import enumerate
 from o365spray.core.handlers.sprayer import spray
+from o365spray.core.handlers.validator import validate
 from o365spray.core.utils import Helper
 from o365spray.core.utils import init_logger
 

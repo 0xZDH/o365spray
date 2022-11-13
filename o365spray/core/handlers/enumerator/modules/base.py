@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
-import logging
-import urllib3  # type: ignore
 import asyncio
 import concurrent.futures
 import concurrent.futures.thread
+import logging
+import urllib3  # type: ignore
+from functools import partial
 from typing import (
-    List,
     Dict,
+    List,
     Union,
 )
-from functools import partial
+
 from o365spray.core.handlers.base import BaseHandler
 from o365spray.core.utils import (
     Defaults,

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from o365spray.core.utils.colors import text_colors
 from o365spray.core.utils.defaults import (
     Defaults,

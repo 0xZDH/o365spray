@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import sys
 import asyncio
+import sys
 from datetime import datetime
+
 
 # Get the current time in YYMMDDHHMM format to append
 # to file names to keep each run distinct

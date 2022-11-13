@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import time
 import logging
-import urllib3  # type: ignore
+import time
 import requests  # type: ignore
+import urllib3  # type: ignore
 from random import randint
 from typing import (
     Any,
@@ -11,6 +11,7 @@ from typing import (
     List,
     Union,
 )
+
 from o365spray.core.utils import (
     Defaults,
     Helper,
