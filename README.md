@@ -38,20 +38,22 @@ usage: o365spray [flags]
 
 o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.2
 
-optional arguments:
-
+options:
   -h, --help            show this help message and exit
 
+Target:
   -d DOMAIN, --domain DOMAIN
                         Target domain for validation, user enumeration, and/or
                         password spraying.
 
+Actions:
   --validate            Run domain validation only.
 
   --enum                Run username enumeration.
 
   --spray               Run password spraying.
 
+Credentials:
   -u USERNAME, --username USERNAME
                         Username(s) delimited using commas.
 
@@ -67,38 +69,49 @@ optional arguments:
   --paired PAIRED       File containing list of credentials in username:password
                         format.
 
+Password Spraying Configuration:
   -c COUNT, --count COUNT
                         Number of password attempts to run per user before resetting
-                        the lockout account timer. Default: 1
+                        the lockout account timer.
+                        Default: 1
 
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy's reset time (in minutes). Default: 15 minutes
+                        Lockout policy's reset time (in minutes).
+                        Default: 15 minutes
 
-  --validate-module     Specify which valiadtion module to run.
+Module Configuration:
+  --validate-module VALIDATE_MODULE
+                        Specify which valiadtion module to run.
                         Default: getuserrealm
 
-  --enum-module         Specify which enumeration module to run.
-                        Default: oauth2
+  --enum-module ENUM_MODULE
+                        Specify which enumeration module to run.
+                        Default: office
 
-  --spray-module        Specify which password spraying module to run.
+  --spray-module SPRAY_MODULE
+                        Specify which password spraying module to run.
                         Default: oauth2
 
   --adfs-url ADFS_URL   AuthURL of the target domain's ADFS login page for password
                         spraying.
 
-  --sleep [-1, 0-120]   Throttle HTTP requests every `N` seconds. This can be
-                        randomized by passing the value `-1` (between 1 sec and 2
-                        mins). Default: 0
+Scan Configuration:
+  --sleep [-1, 0-120]   Throttle HTTP requests every `N` seconds. This can be randomized
+                        by passing the value `-1` (between 1 sec and 2 mins).
+                        Default: 0
 
   --jitter [0-100]      Jitter extends --sleep period by percentage given (0-100).
                         Default: 0
 
-  --rate RATE           Number of concurrent connections (attempts) during enumeration
-                        and spraying. Default: 10
+  --rate RATE           Number of concurrent connections (attempts) during
+                        enumeration and spraying.
+                        Default: 10
 
-  --safe SAFE           Terminate password spraying run if `N` locked accounts are
-                        observed. Default: 10
+  --safe SAFE           Terminate password spraying run if `N` locked accounts
+                        are observed.
+                        Default: 10
 
+HTTP Configuration:
   --useragents USERAGENTS
                         File containing list of user agents for randomization.
 
@@ -110,9 +123,11 @@ optional arguments:
   --proxy-url PROXY_URL
                         FireProx API URL.
 
+Output Configuration:
   --output OUTPUT       Output directory for results and test case files.
                         Default: current directory
 
+Debug:
   -v, --version         Print the tool version.
 
   --debug               Enable debug output.

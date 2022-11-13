@@ -23,7 +23,8 @@ def parse_args() -> argparse.Namespace:
         )
     )
 
-    parser.add_argument(
+    target_args = parser.add_argument_group(title="Target")
+    target_args.add_argument(
         "-d",
         "--domain",
         type=str,
@@ -34,37 +35,40 @@ def parse_args() -> argparse.Namespace:
     )
 
     # Type of action(s) to run
-    parser.add_argument(
+    action_args = parser.add_argument_group(title="Actions")
+    action_args.add_argument(
         "--validate", action="store_true", help="Run domain validation only."
     )
-    parser.add_argument(  # Can be used with --spray
+    action_args.add_argument(  # Can be used with --spray
         "--enum", action="store_true", help="Run username enumeration."
     )
-    parser.add_argument(  # Can be used with --enum
+    action_args.add_argument(  # Can be used with --enum
         "--spray", action="store_true", help="Run password spraying."
     )
 
     # Username(s)/Password(s) for enum/spray
-    parser.add_argument(
+    credential_args = parser.add_argument_group(title="Credentials")
+    credential_args.add_argument(
         "-u", "--username", type=str, help="Username(s) delimited using commas."
     )
-    parser.add_argument(
+    credential_args.add_argument(
         "-p", "--password", type=str, help="Password(s) delimited using commas."
     )
-    parser.add_argument(
+    credential_args.add_argument(
         "-U", "--userfile", type=str, help="File containing list of usernames."
     )
-    parser.add_argument(
+    credential_args.add_argument(
         "-P", "--passfile", type=str, help="File containing list of passwords."
     )
-    parser.add_argument(
+    credential_args.add_argument(
         "--paired",
         type=str,
         help="File containing list of credentials in username:password format.",
     )
 
     # Password spraying lockout policy
-    parser.add_argument(
+    spraying_args = parser.add_argument_group(title="Password Spraying Configuration")
+    spraying_args.add_argument(
         "-c",
         "--count",
         type=int,
@@ -74,7 +78,7 @@ def parse_args() -> argparse.Namespace:
             "lockout account timer. Default: 1"
         ),
     )
-    parser.add_argument(
+    spraying_args.add_argument(
         "-l",
         "--lockout",
         type=float,
@@ -83,32 +87,34 @@ def parse_args() -> argparse.Namespace:
     )
 
     # Validate/Spray/Enum action specifications
-    parser.add_argument(
+    module_args = parser.add_argument_group(title="Module Configuration")
+    module_args.add_argument(
         "--validate-module",
         type=str.lower,
         default="getuserrealm",
         help="Specify which valiadtion module to run. Default: getuserrealm",
     )
-    parser.add_argument(
+    module_args.add_argument(
         "--enum-module",
         type=str.lower,
         default="oauth2",
         help="Specify which enumeration module to run. Default: office",
     )
-    parser.add_argument(
+    module_args.add_argument(
         "--spray-module",
         type=str.lower,
         default="oauth2",
         help="Specify which password spraying module to run. Default: oauth2",
     )
-    parser.add_argument(
+    module_args.add_argument(
         "--adfs-url",
         type=str,
         help="AuthURL of the target domain's ADFS login page for password spraying.",
     )
 
     # General scan specifications
-    parser.add_argument(
+    scan_args = parser.add_argument_group(title="Scan Configuration")
+    scan_args.add_argument(
         "--sleep",
         type=int,
         default=0,
@@ -119,7 +125,7 @@ def parse_args() -> argparse.Namespace:
             "passing the value `-1` (between 1 sec and 2 mins). Default: 0"
         ),
     )
-    parser.add_argument(
+    scan_args.add_argument(
         "--jitter",
         type=int,
         default=0,
@@ -127,7 +133,7 @@ def parse_args() -> argparse.Namespace:
         metavar="[0-100]",
         help="Jitter extends --sleep period by percentage given (0-100). Default: 0",
     )
-    parser.add_argument(
+    scan_args.add_argument(
         "--rate",
         type=int,
         default=10,
@@ -136,7 +142,7 @@ def parse_args() -> argparse.Namespace:
             "spraying. Default: 10"
         ),
     )
-    parser.add_argument(
+    scan_args.add_argument(
         "--safe",
         type=int,
         default=10,
@@ -147,30 +153,32 @@ def parse_args() -> argparse.Namespace:
     )
 
     # HTTP configurations
-    parser.add_argument(
+    http_args = parser.add_argument_group(title="HTTP Configuration")
+    http_args.add_argument(
         "--useragents",
         type=str,
         help="File containing list of user agents for randomization.",
     )
-    parser.add_argument(
+    http_args.add_argument(
         "--timeout",
         type=int,
         default=25,
         help="HTTP request timeout in seconds. Default: 25",
     )
-    parser.add_argument(
+    http_args.add_argument(
         "--proxy",
         type=str,
         help="HTTP/S proxy to pass traffic through (e.g. http://127.0.0.1:8080).",
     )
-    parser.add_argument(
+    http_args.add_argument(
         "--proxy-url",
         type=str,
         help="FireProx API URL.",
     )
 
     # Misc configurations
-    parser.add_argument(
+    output_args = parser.add_argument_group(title="Output Configuration")
+    output_args.add_argument(
         "--output",
         type=str,
         help=(
@@ -178,10 +186,12 @@ def parse_args() -> argparse.Namespace:
             "Default: current directory"
         ),
     )
-    parser.add_argument(
+
+    debug_args = parser.add_argument_group(title="Debug")
+    debug_args.add_argument(
         "-v", "--version", action="store_true", help="Print the tool version."
     )
-    parser.add_argument("--debug", action="store_true", help="Enable debug output.")
+    debug_args.add_argument("--debug", action="store_true", help="Enable debug output.")
     args = parser.parse_args()
 
     # If no flags provided, print the tool help and exit
