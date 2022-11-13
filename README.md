@@ -1,12 +1,10 @@
 # o365spray
 
-> For educational, authorized and/or research purposes only.
-
 o365spray ia a username enumeration and password spraying tool aimed at Microsoft Office 365 (O365). This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
 
-> WARNING: The Autologon, oAuth2, and RST user enumeration modules work by submitting a single authentication attempt per user. If the modules are run in conjunction with password spraying in a single execution, o365spray will automatically reset the lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
+> For educational, authorized and/or research purposes only.
 
-> If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
+> WARNING: The Autologon, oAuth2, and RST user enumeration modules work by submitting a single authentication attempt per user. If the modules are run in conjunction with password spraying in a single execution, o365spray will automatically reset the lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
 
 # Table of Contents
 
@@ -20,9 +18,15 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
   - [Spraying](#spraying-1)
 - [User Agent Randomization](#user-agent-randomization)
 - [Acknowledgments](#acknowledgments)
+- [Bugs](#bugs)
 - [Previous Versions](#using-previous-versions)
 
 ## Usage
+
+<h2 align="center">
+  <img src="static/o365spray_validate.png" alt="o365spray" width="75%">
+  <br>
+</h2>
 
 Validate a domain is using O365:<br>
 `o365spray --validate --domain test.com`
@@ -219,6 +223,10 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 | [Optiv](https://github.com/optiv) (Several Authors) | Go365: RST user enumeration and password spraying module | [Go365](https://github.com/optiv/Go365) |
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | SprayingToolkit: Code references | [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/) |
 | [sensepost](https://github.com/sensepost) | ruler: Code references | [Ruler](https://github.com/sensepost/ruler/) |
+
+## Bugs
+
+If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
 
 ## Using Previous Versions
 

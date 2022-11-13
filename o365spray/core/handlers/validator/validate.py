@@ -57,8 +57,8 @@ def validate(args: argparse.Namespace) -> argparse.Namespace:
         logging.info(
             f"[{text_colors.WARNING}WARNING{text_colors.ENDC}] "
             f"The following domain appears to be using O365, but is Federated: {args.domain}"
-            f"\n\t[!] --> ADFS AuthURL: {adfs}"
         )
+        logging.info(f"ADFS AuthURL:\n{adfs}")
 
     else:
         logging.info(
