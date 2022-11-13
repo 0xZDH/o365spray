@@ -24,7 +24,7 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
 ## Usage
 
 <h2 align="center">
-  <img src="static/o365spray_validate.png" alt="o365spray" width="75%">
+  <img src="static/o365spray_validate.png" alt="o365spray" width="90%">
   <br>
 </h2>
 
