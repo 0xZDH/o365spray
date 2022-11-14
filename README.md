@@ -1,12 +1,10 @@
 # o365spray
 
+o365spray is a username enumeration and password spraying tool aimed at Microsoft Office 365 (O365). This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
+
 > For educational, authorized and/or research purposes only.
 
-o365spray ia a username enumeration and password spraying tool aimed at Microsoft Office 365 (O365). This tool reimplements a collection of enumeration and spray techniques researched and identified by those mentioned in [Acknowledgments](#Acknowledgments).
-
 > WARNING: The Autologon, oAuth2, and RST user enumeration modules work by submitting a single authentication attempt per user. If the modules are run in conjunction with password spraying in a single execution, o365spray will automatically reset the lockout timer prior to performing the password spray -- if enumeration is run alone, the user should be aware of how many and when each authentication attempt was made and manually reset the lockout timer before performing any password spraying.
-
-> If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
 
 # Table of Contents
 
@@ -20,9 +18,15 @@ o365spray ia a username enumeration and password spraying tool aimed at Microsof
   - [Spraying](#spraying-1)
 - [User Agent Randomization](#user-agent-randomization)
 - [Acknowledgments](#acknowledgments)
+- [Bugs](#bugs)
 - [Previous Versions](#using-previous-versions)
 
 ## Usage
+
+<h2 align="center">
+  <img src="static/o365spray_validate.png" alt="o365spray" width="90%">
+  <br>
+</h2>
 
 Validate a domain is using O365:<br>
 `o365spray --validate --domain test.com`
@@ -34,31 +38,26 @@ Perform password spraying against a given domain:<br>
 `o365spray --spray -U usernames.txt -P passwords.txt --count 2 --lockout 5 --domain test.com`
 
 ```
-usage: o365spray [-h] [-d DOMAIN] [--validate] [--enum] [--spray]
-                 [-u USERNAME] [-p PASSWORD] [-U USERFILE] [-P PASSFILE]
-                 [--paired PAIRED] [-c COUNT] [-l LOCKOUT]
-                 [--validate-module] [--enum-module] [--spray-module]
-                 [--adfs-url ADFS_URL] [--rate RATE] [--safe SAFE]
-                 [--useragents USERAGENTS] [--timeout TIMEOUT]
-                 [--proxy PROXY] [--proxy-url PROXY_URL]
-                 [--output OUTPUT] [-v] [--debug]
+usage: o365spray [flags]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.1
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.2
 
-optional arguments:
-
+options:
   -h, --help            show this help message and exit
 
+Target:
   -d DOMAIN, --domain DOMAIN
                         Target domain for validation, user enumeration, and/or
                         password spraying.
 
+Actions:
   --validate            Run domain validation only.
 
   --enum                Run username enumeration.
 
   --spray               Run password spraying.
 
+Credentials:
   -u USERNAME, --username USERNAME
                         Username(s) delimited using commas.
 
@@ -74,38 +73,49 @@ optional arguments:
   --paired PAIRED       File containing list of credentials in username:password
                         format.
 
+Password Spraying Configuration:
   -c COUNT, --count COUNT
                         Number of password attempts to run per user before resetting
-                        the lockout account timer. Default: 1
+                        the lockout account timer.
+                        Default: 1
 
   -l LOCKOUT, --lockout LOCKOUT
-                        Lockout policy's reset time (in minutes). Default: 15 minutes
+                        Lockout policy's reset time (in minutes).
+                        Default: 15 minutes
 
-  --validate-module     Specify which valiadtion module to run.
+Module Configuration:
+  --validate-module VALIDATE_MODULE
+                        Specify which valiadtion module to run.
                         Default: getuserrealm
 
-  --enum-module         Specify which enumeration module to run.
-                        Default: oauth2
+  --enum-module ENUM_MODULE
+                        Specify which enumeration module to run.
+                        Default: office
 
-  --spray-module        Specify which password spraying module to run.
+  --spray-module SPRAY_MODULE
+                        Specify which password spraying module to run.
                         Default: oauth2
 
   --adfs-url ADFS_URL   AuthURL of the target domain's ADFS login page for password
                         spraying.
 
-  --sleep [-1, 0-120]   Throttle HTTP requests every `N` seconds. This can be
-                        randomized by passing the value `-1` (between 1 sec and 2
-                        mins). Default: 0
+Scan Configuration:
+  --sleep [-1, 0-120]   Throttle HTTP requests every `N` seconds. This can be randomized
+                        by passing the value `-1` (between 1 sec and 2 mins).
+                        Default: 0
 
   --jitter [0-100]      Jitter extends --sleep period by percentage given (0-100).
                         Default: 0
 
-  --rate RATE           Number of concurrent connections (attempts) during enumeration
-                        and spraying. Default: 10
+  --rate RATE           Number of concurrent connections (attempts) during
+                        enumeration and spraying.
+                        Default: 10
 
-  --safe SAFE           Terminate password spraying run if `N` locked accounts are
-                        observed. Default: 10
+  --safe SAFE           Terminate password spraying run if `N` locked accounts
+                        are observed.
+                        Default: 10
 
+HTTP Configuration:
   --useragents USERAGENTS
                         File containing list of user agents for randomization.
 
@@ -117,9 +127,11 @@ optional arguments:
   --proxy-url PROXY_URL
                         FireProx API URL.
 
+Output Configuration:
   --output OUTPUT       Output directory for results and test case files.
                         Default: current directory
 
+Debug:
   -v, --version         Print the tool version.
 
   --debug               Enable debug output.
@@ -169,7 +181,7 @@ To use FireProx with o365spray, create a proxy URL for the given o365spray modul
 | oauth2       | `https://login.microsoftonline.com/` |
 | office       | `https://login.microsoftonline.com/` |
 | rst          | `https://login.microsoftonline.com/` |
-| onedrive     | `https://<tenant>-my.sharepoint.com/personal` |
+| onedrive     | `https://<tenant>-my.sharepoint.com/` |
 
 ### Spraying
 
@@ -211,6 +223,10 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 | [Optiv](https://github.com/optiv) (Several Authors) | Go365: RST user enumeration and password spraying module | [Go365](https://github.com/optiv/Go365) |
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | SprayingToolkit: Code references | [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/) |
 | [sensepost](https://github.com/sensepost) | ruler: Code references | [Ruler](https://github.com/sensepost/ruler/) |
+
+## Bugs
+
+If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
 
 ## Using Previous Versions
 

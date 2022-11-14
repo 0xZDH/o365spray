@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import time
 import logging
+import time
+
+from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
 class EnumerateModule_oauth2(EnumeratorBase):
@@ -46,15 +47,15 @@ class EnumerateModule_oauth2(EnumeratorBase):
 
             time.sleep(0.250)
 
-            # Use a valid resource and client_id
-            # APP: Azure Active Directory PowerShell
+            # Use a valid scope, resource, and client_id
+            scope = Helper.get_random_sublist_from_list(Defaults.SCOPES)
             data = {
-                "resource": "https://graph.windows.net",
-                "client_id": "1b730954-1685-4b74-9bfd-dac224a7b894",
+                "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
+                "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
                 "grant_type": "password",
                 "username": email,
                 "password": password,
-                "scope": "openid",
+                "scope": " ".join(scope),
             }
 
             # Handle FireProx API URL

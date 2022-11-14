@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import time
 import logging
+import time
 from urllib.parse import quote
+
+from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 from o365spray.core.utils import (
     Defaults,
     text_colors,
 )
-from o365spray.core.handlers.sprayer.modules.base import SprayerBase
 
 
 class SprayModule_adfs(SprayerBase):

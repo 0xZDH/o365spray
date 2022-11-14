@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 
-import time
 import logging
-from uuid import uuid4
+import time
 from datetime import (
     datetime,
     timedelta,
 )
+from uuid import uuid4
+
+from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 from o365spray.core.utils import (
     Defaults,
     Helper,
     text_colors,
 )
-from o365spray.core.handlers.enumerator.modules.base import EnumeratorBase
 
 
 class EnumerateModule_autologon(EnumeratorBase):

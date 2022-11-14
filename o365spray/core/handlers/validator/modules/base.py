@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import urllib3  # type: ignore
 import logging
+import urllib3  # type: ignore
 from typing import (
     Dict,
     Tuple,
     Union,
 )
+
 from o365spray.core.handlers.base import BaseHandler
 
 
