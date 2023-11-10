@@ -248,6 +248,14 @@ def parse_args() -> argparse.Namespace:
     if args.sleep == -1:
         args.sleep = randint(1, 120)
 
+    if (args.enum or args.spray) and args.userfile:
+        if not Path(args.userfile).is_file():
+            parser.error("invalid username file provided")
+
+    if args.spray and args.passfile:
+        if not Path(args.passfile).is_file():
+            parser.error("invalid password file provided")
+
     return args
 
 
