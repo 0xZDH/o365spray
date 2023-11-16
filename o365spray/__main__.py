@@ -146,6 +146,14 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     scan_args.add_argument(
+        "--conlimit",
+        type=int,
+        default=10000,
+        help=(
+            "Concurrency limit to control memory usage. Default: 10000"
+        ),
+    )
+    scan_args.add_argument(
         "--safe",
         type=int,
         default=10,

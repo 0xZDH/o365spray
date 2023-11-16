@@ -38,6 +38,7 @@ class EnumeratorBase(BaseHandler):
         timeout: int = 25,
         proxy: Union[str, Dict[str, str]] = None,
         workers: int = 5,
+        conlimit: int = 10000,
         writer: bool = True,
         sleep: int = 0,
         jitter: int = 0,
@@ -89,6 +90,7 @@ class EnumeratorBase(BaseHandler):
         self.jitter = jitter
         self.proxy_url = proxy_url
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
+        self.conlimit = conlimit
 
         # Internal exit handler
         self.exit = False
@@ -133,6 +135,17 @@ class EnumeratorBase(BaseHandler):
             self.valid_writer.close()
             self.tested_writer.close()
 
+    def _consume_threads(self, threads: list, max_n: int):
+        while len(threads) > max_n:
+            done, _ = concurrent.futures.wait(
+                threads,
+                return_when=concurrent.futures.FIRST_COMPLETED
+            )
+
+            for t in done:
+                t.result()
+                del threads[t]
+
     async def run(
         self,
         userlist: List[str],
@@ -156,21 +169,16 @@ class EnumeratorBase(BaseHandler):
         if not domain:
             raise ValueError(f"Invalid domain for user enumeration: '{domain}'")
 
-        blocking_tasks = [
-            self.loop.run_in_executor(
-                self.executor,
-                partial(
-                    self._enumerate,
-                    domain=domain,
-                    user=user,
-                    password=password,
-                ),
+        threads = {}
+        for user in userlist:
+            future = self.executor.submit(
+                self._enumerate, domain=domain, user=user, password=password
             )
-            for user in userlist
-        ]
 
-        if blocking_tasks:
-            await asyncio.wait(blocking_tasks)
+            threads[future] = 1
+            self._consume_threads(threads, self.conlimit)
+
+        self._consume_threads(threads, 0)
 
     def _enumerate(self, domain: str, user: str, password: str = "Password1"):
         """Parent implementation of module child method"""
