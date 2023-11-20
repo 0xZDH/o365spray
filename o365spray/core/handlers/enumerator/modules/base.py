@@ -38,7 +38,7 @@ class EnumeratorBase(BaseHandler):
         timeout: int = 25,
         proxy: Union[str, Dict[str, str]] = None,
         workers: int = 5,
-        conlimit: int = 10000,
+        poolsize: int = 10000,
         writer: bool = True,
         sleep: int = 0,
         jitter: int = 0,
@@ -90,7 +90,7 @@ class EnumeratorBase(BaseHandler):
         self.jitter = jitter
         self.proxy_url = proxy_url
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
-        self.conlimit = conlimit
+        self.poolsize = poolsize
 
         # Internal exit handler
         self.exit = False
@@ -135,16 +135,34 @@ class EnumeratorBase(BaseHandler):
             self.valid_writer.close()
             self.tested_writer.close()
 
-    def _consume_threads(self, threads: list, max_n: int):
-        while len(threads) > max_n:
+    def _consume_futures(self, futures: dict, max_n: int):
+        """Keep the number of concurrent futures below a specified limit.
+
+        This method is primarily used to control memory usage by forcing
+        the program to wait for some futures to finish when the number
+        of concurrent futures is above max_n.
+
+        In our case, these futures represent concurrent jobs
+        in the ThreadPoolExecutor.
+
+        Arguments:
+            <required>
+            futures: list of futures to consume from
+            max_n: maximum number of concurrent futures
+
+        References:
+            - https://github.com/0xZDH/o365spray/issues/21
+            - https://stackoverflow.com/a/67527682
+        """
+        while len(futures) > max_n:
             done, _ = concurrent.futures.wait(
-                threads,
+                futures,
                 return_when=concurrent.futures.FIRST_COMPLETED
             )
 
-            for t in done:
-                t.result()
-                del threads[t]
+            for future in done:
+                future.result()
+                del futures[future]
 
     async def run(
         self,
@@ -169,16 +187,16 @@ class EnumeratorBase(BaseHandler):
         if not domain:
             raise ValueError(f"Invalid domain for user enumeration: '{domain}'")
 
-        threads = {}
+        futures = {}
         for user in userlist:
             future = self.executor.submit(
                 self._enumerate, domain=domain, user=user, password=password
             )
 
-            threads[future] = 1
-            self._consume_threads(threads, self.conlimit)
+            futures[future] = 1
+            self._consume_futures(futures, self.poolsize)
 
-        self._consume_threads(threads, 0)
+        self._consume_futures(futures, 0)
 
     def _enumerate(self, domain: str, user: str, password: str = "Password1"):
         """Parent implementation of module child method"""
