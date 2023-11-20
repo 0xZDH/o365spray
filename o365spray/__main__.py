@@ -146,11 +146,11 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     scan_args.add_argument(
-        "--conlimit",
+        "--poolsize",
         type=int,
         default=10000,
         help=(
-            "Concurrency limit to control memory usage. Default: 10000"
+            "Maximum size of the ThreadPoolExecutor. Default: 10000"
         ),
     )
     scan_args.add_argument(
