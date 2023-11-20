@@ -60,6 +60,7 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> object:
         timeout=args.timeout,
         proxy=args.proxy,
         workers=args.rate,
+        poolsize=args.poolsize,
         writer=True,
         sleep=args.sleep,
         jitter=args.jitter,
