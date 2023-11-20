@@ -38,6 +38,7 @@ class EnumeratorBase(BaseHandler):
         timeout: int = 25,
         proxy: Union[str, Dict[str, str]] = None,
         workers: int = 5,
+        poolsize: int = 10000,
         writer: bool = True,
         sleep: int = 0,
         jitter: int = 0,
@@ -89,6 +90,7 @@ class EnumeratorBase(BaseHandler):
         self.jitter = jitter
         self.proxy_url = proxy_url
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
+        self.poolsize = poolsize
 
         # Internal exit handler
         self.exit = False
@@ -133,6 +135,35 @@ class EnumeratorBase(BaseHandler):
             self.valid_writer.close()
             self.tested_writer.close()
 
+    def _consume_futures(self, futures: dict, max_n: int):
+        """Keep the number of concurrent futures below a specified limit.
+
+        This method is primarily used to control memory usage by forcing
+        the program to wait for some futures to finish when the number
+        of concurrent futures is above max_n.
+
+        In our case, these futures represent concurrent jobs
+        in the ThreadPoolExecutor.
+
+        Arguments:
+            <required>
+            futures: list of futures to consume from
+            max_n: maximum number of concurrent futures
+
+        References:
+            - https://github.com/0xZDH/o365spray/issues/21
+            - https://stackoverflow.com/a/67527682
+        """
+        while len(futures) > max_n:
+            done, _ = concurrent.futures.wait(
+                futures,
+                return_when=concurrent.futures.FIRST_COMPLETED
+            )
+
+            for future in done:
+                future.result()
+                del futures[future]
+
     async def run(
         self,
         userlist: List[str],
@@ -156,21 +187,16 @@ class EnumeratorBase(BaseHandler):
         if not domain:
             raise ValueError(f"Invalid domain for user enumeration: '{domain}'")
 
-        blocking_tasks = [
-            self.loop.run_in_executor(
-                self.executor,
-                partial(
-                    self._enumerate,
-                    domain=domain,
-                    user=user,
-                    password=password,
-                ),
+        futures = {}
+        for user in userlist:
+            future = self.executor.submit(
+                self._enumerate, domain=domain, user=user, password=password
             )
-            for user in userlist
-        ]
 
-        if blocking_tasks:
-            await asyncio.wait(blocking_tasks)
+            futures[future] = 1
+            self._consume_futures(futures, self.poolsize)
+
+        self._consume_futures(futures, 0)
 
     def _enumerate(self, domain: str, user: str, password: str = "Password1"):
         """Parent implementation of module child method"""

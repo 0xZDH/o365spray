@@ -146,6 +146,14 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     scan_args.add_argument(
+        "--poolsize",
+        type=int,
+        default=10000,
+        help=(
+            "Maximum size of the ThreadPoolExecutor. Default: 10000"
+        ),
+    )
+    scan_args.add_argument(
         "--safe",
         type=int,
         default=10,
