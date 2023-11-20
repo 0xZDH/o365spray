@@ -1,10 +1,10 @@
 # CHANGELOG
 
 ## v3.0.4 (11/19/2023)
-- Update how enumeration performs concurrent requests by limiting the number of blocking tasks at any one time @Macmod
+- [@Macmod](https://github.com/Macmod) Update how enumeration performs concurrent requests by limiting the number of blocking tasks at any one time
 
 ## v3.0.3 (11/10/2023)
-- Add username and password file validation @parispjones
+- [@parispjones](https://github.com/parispjones) Add username and password file validation
 
 ## v3.0.2 (12/11/2022)
 - Add scope, resource, and client_id randomization for the `oauth2` enumeration and spraying modules
