@@ -91,7 +91,7 @@ class Defaults:
         "AADSTS50128":  ["INVALID_DOMAIN",   "Tenant for account doesn't exist"],
         "AADSTS50034":  ["USER_NOT_FOUND",   "User does not exist"],
         "AADSTS50079":  ["VALID_MFA",        "Response indicates MFA (Microsoft)"],
-        "AADSTS50076":  ["VALID_MFA",        "Response indicates MFA (Microsoft)"],
+        "AADSTS50076":  ["VALID_MFA",        "Response indicates MFA (Microsoft) must be onboarded"],
         "AADSTS50158":  ["SEC_CHAL",         "Response indicates conditional access (MFA: DUO or other)"],
         "AADSTS500011": ["INVALID_RESOURCE", "Invalid resource name"],
         "AADSTS700016": ["INVALID_APPID",    "Invalid application client ID"],
