@@ -173,13 +173,15 @@ class SprayerBase(BaseHandler):
             # authentication has been processed
             # Also account for expired passwords which only trigger
             # after valid authentication
+            err = Defaults.AADSTS_CODES[code][0]
+            msg = Defaults.AADSTS_CODES[code][1]
             if code in Defaults.VALID_AADSTS_CODES:
                 tested = f"{email}:{password}"
                 if self.writer:
                     self.valid_writer.write(tested)
                 self.VALID_CREDENTIALS.append(tested)
                 logging.info(
-                    f"[{text_colors.OKGREEN}VALID{text_colors.ENDC}] {email}:{password}"
+                    f"[{text_colors.OKGREEN}VALID{text_colors.ENDC}] {email}:{password} {text_colors.OKGREEN}({msg}.){text_colors.ENDC}"
                 )
 
             else:
