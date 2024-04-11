@@ -159,9 +159,9 @@ Debug:
 * autologon
 * oauth2 (default)
 * rst
-* activesync (deprecated)
-* autodiscover (deprecated)
-* reporting (deprecated)
+* activesync `deprecated`
+* autodiscover `deprecated`
+* reporting `deprecated`
 
 > The oAuth2 module can be used for federated spraying, but it should be noted that this will ONLY work when the target tenant has enabled password synchronization - otherwise authentication will always fail. The default mechanic is to default to the 'adfs' module when federation is identified.
 
@@ -190,13 +190,13 @@ To use FireProx with o365spray, create a proxy URL for the given o365spray modul
 
 | Module       | Base URL |
 | ---          | ---      |
-| activesync   | `https://outlook.office365.com/` |
 | adfs         | Currently not implemented |
-| autodiscover | `https://autodiscover-s.outlook.com/` |
 | autologon    | `https://autologon.microsoftazuread-sso.com/` |
 | oauth2       | `https://login.microsoftonline.com/` |
-| reporting    | `https://reports.office365.com/` |
 | rst          | `https://login.microsoftonline.com/` |
+| activesync   | Deprecated |
+| autodiscover | Deprecated |
+| reporting    | Deprecated |
 
 ## User Agent Randomization
 
