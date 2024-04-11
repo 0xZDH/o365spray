@@ -40,7 +40,7 @@ Perform password spraying against a given domain:<br>
 ```
 usage: o365spray [flags]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.4
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.1.0
 
 options:
   -h, --help            show this help message and exit
@@ -155,13 +155,13 @@ Debug:
 > The onedrive module relies on the target user(s) having previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
 
 ### Spraying
-* activesync
 * adfs
-* autodiscover
 * autologon
 * oauth2 (default)
-* reporting
 * rst
+* activesync (deprecated)
+* autodiscover (deprecated)
+* reporting (deprecated)
 
 > The oAuth2 module can be used for federated spraying, but it should be noted that this will ONLY work when the target tenant has enabled password synchronization - otherwise authentication will always fail. The default mechanic is to default to the 'adfs' module when federation is identified.
 

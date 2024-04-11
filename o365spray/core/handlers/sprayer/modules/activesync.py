@@ -31,6 +31,13 @@ class SprayModule_activesync(SprayerBase):
             Exception: generic handler so we can successfully fail without
               crashing the run
         """
+        # https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online
+        logging.error(
+            f"The ActiveSync module has been deprecated due to Microsoft's deprecation of BasicAuth"
+        )
+        self.exit = True
+        return self.shutdown()
+
         try:
             # Grab external headers from config.py and add special header
             # for ActiveSync
