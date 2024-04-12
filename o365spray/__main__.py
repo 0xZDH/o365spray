@@ -9,6 +9,7 @@ from pathlib import Path
 from random import randint
 
 from o365spray import __version__
+from o365spray.core.fire import helper as fire
 from o365spray.core.handlers.enumerator import enumerate
 from o365spray.core.handlers.sprayer import spray
 from o365spray.core.handlers.validator import validate
@@ -149,9 +150,7 @@ def parse_args() -> argparse.Namespace:
         "--poolsize",
         type=int,
         default=10000,
-        help=(
-            "Maximum size of the ThreadPoolExecutor. Default: 10000"
-        ),
+        help="Maximum size of the ThreadPoolExecutor. Default: 10000",
     )
     scan_args.add_argument(
         "--safe",
@@ -198,6 +197,53 @@ def parse_args() -> argparse.Namespace:
         ),
     )
 
+    # FireProx configuration
+    fp_args = parser.add_argument_group(title="Fireprox Configuration")
+    fp_args.add_argument(
+        "--profile-name",
+        type=str,
+        help="AWS Profile Name to store/retrieve credentials.",
+    )
+    fp_args.add_argument(
+        "--access-key",
+        type=str,
+        help="AWS Access Key.",
+    )
+    fp_args.add_argument(
+        "--secret-access-key",
+        type=str,
+        help="AWS Secret Access Key.",
+    )
+    fp_args.add_argument(
+        "--session-token",
+        type=str,
+        help="AWS Session Token.",
+    )
+    fp_args.add_argument(
+        "--region",
+        type=str,
+        choices=fire.AWS_REGIONS,
+        help="AWS Region.",
+    )
+
+    # FireProx utilities
+    fpu_args = parser.add_argument_group(title="Fireprox Utilities")
+    fpu_args.add_argument(
+        "--api-list",
+        action="store_true",
+        help="List all fireprox APIs.",
+    )
+    fpu_args.add_argument(
+        "--api-destroy",
+        type=str,
+        help="Destroy single API instance, by API ID.",
+    )
+    # fpu_args.add_argument(
+    #     "--api-destroy-all",
+    #     action="store_true",
+    #     help="Destroy all fireprox AWS APIs from every region (Warning: this is irreversible).",
+    # )
+
     debug_args = parser.add_argument_group(title="Debug")
     debug_args.add_argument(
         "-v", "--version", action="store_true", help="Print the tool version."
@@ -217,6 +263,66 @@ def parse_args() -> argparse.Namespace:
 
     # If not getting the tool version and flags have been provided, ensure
     # all required flags and valid flag combinations are present
+
+    # FireProx handling
+    args.fireprox_args = None
+    if (
+        args.profile_name
+        or args.access_key
+        or args.secret_access_key
+        or args.session_token
+        or args.region
+        or args.api_list
+        or args.api_destroy
+        # or args.api_destroy_all
+    ):
+        # Build initial fire.py argument handling
+        args.fireprox_args = {
+            "profile_name": args.profile_name,
+            "access_key": args.access_key,
+            "secret_access_key": args.secret_access_key,
+            "session_token": args.session_token,
+            "region": args.region,
+            "api_id": args.api_destroy,
+        }
+
+        # Handle fire.py api callers
+        if args.api_list:
+            sys.exit(fire.list_api(**args.fireprox_args))
+
+        if args.api_destroy:
+            sys.exit(fire.destroy_api(**args.fireprox_args))
+
+        # if args.api_destroy_all:
+        #     sys.exit(fire.destroy_all_apis(**args.fireprox_args))
+
+        # Handle fire.py conflicts
+        if args.validate:
+            parser.error("the validate module does not support fire.py handling")
+
+        if args.proxy_url:
+            parser.error("proxy url already provided, can not run fire.py")
+
+        # Get the base url to proxy through FireProx based on module name
+        enum_module_base_url = None
+        if args.enum:
+            enum_module_base_url = fire.get_module_url(args.enum_module, "enum")
+
+        spray_module_base_url = None
+        if args.spray:
+            spray_module_base_url = fire.get_module_url(args.spray_module, "spray")
+
+        # If enum and spray both enabled, make sure the module base urls are
+        # the same to avoid conflicts (for now)
+        if (
+            enum_module_base_url
+            and spray_module_base_url
+            and (enum_module_base_url != spray_module_base_url)
+        ):
+            parser.error("can not use conflicting enum and spray modules with fire.py")
+
+        # Add module URL to fire.py argument handling
+        args.fireprox_args["url"] = enum_module_base_url or spray_module_base_url
 
     # Ensure a domain has been provided
     if not args.domain:
@@ -304,6 +410,14 @@ def main():
         # Perform domain validation
         args = validate(args)
 
+    # Handle fire.py api creation
+    if args.fireprox_args and (args.enum or args.spray):
+        api = fire.create_api(**args.fireprox_args)
+
+        # Update args namespace
+        args.proxy_url = api["proxy_url"]
+        args.fireprox_args["api_id"] = api["api_gateway_id"]
+
     # Perform user enumeration
     if args.enum:
         enum = enumerate(args, output_directory)
@@ -312,6 +426,10 @@ def main():
 
     if args.spray:
         spray(args, output_directory, enum)
+
+    # Handle internal creation/deletion with fire.py
+    if args.fireprox_args and args.fireprox_args.get("api_id", None):
+        fire.destroy_api(**args.fireprox_args)
 
     elapsed = time.time() - start
     logging.debug(f"o365spray executed in {elapsed:.2f} seconds.")

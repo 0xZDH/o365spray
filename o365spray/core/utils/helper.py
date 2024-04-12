@@ -20,6 +20,7 @@ from typing import (
     Dict,
     List,
     Union,
+    Generator,
 )
 
 
@@ -133,7 +134,7 @@ class Helper:
         cls,
         list_: List[Any],
         n: int,
-    ) -> List[Any]:
+    ) -> Generator[Any]:
         """Yield chunks of a given size, N, from a provided list.
 
         Arguments:
@@ -318,9 +319,16 @@ class Helper:
                     or arg == "safe"
                 ) and not args.spray:
                     continue
+                # 4) Don't show FireProx keys and custom settings
+                if arg.startswith("api_"):
+                    continue
+                if arg.endswith("_key"):
+                    continue
+                if arg in ["region", "profile_name"]:
+                    continue
 
+                label = arg
                 value = _args[arg]
-                space = " " * (15 - len(arg))
 
                 # Handle conditions to show custom values
                 # 1) If a user agents file is provided, show 'random' instead
@@ -328,7 +336,13 @@ class Helper:
                 if arg == "useragents" and args.useragents:
                     value = f"random ({len(_args[arg])})"
 
-                BANNER += "\n   > %s%s:  %s" % (arg, space, str(value))
+                # Handle how FireProx is shown when enabled
+                if arg == "fireprox_args":
+                    label = "fire.py"
+                    value = "Enabled"
+
+                space = " " * (15 - len(label))
+                BANNER += "\n   > %s%s:  %s" % (label, space, str(value))
 
                 # Add data meanings
                 if arg == "count":
