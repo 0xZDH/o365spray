@@ -134,7 +134,7 @@ class Helper:
         cls,
         list_: List[Any],
         n: int,
-    ) -> Generator[Any]:
+    ) -> Generator[List[Any], None, None]:
         """Yield chunks of a given size, N, from a provided list.
 
         Arguments:
