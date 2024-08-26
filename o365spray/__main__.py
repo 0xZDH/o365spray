@@ -283,7 +283,7 @@ def main():
 
     # If an output directory provided, get or create it
     if args.output:
-        output_directory = args.output.strip("/")
+        output_directory = args.output.rstrip("/")
         Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     # If no output provided, default to the current working directory
