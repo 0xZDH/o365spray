@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## v3.1.0 (04/11/2024)
+## v3.1.0 (08/27/2024)
 - [Oddvar Moe](https://github.com/api0cradle) Update MFA message for `AADSTS50079`
 - Update `office` enumeration module to continue past request throttling as it is per user
 - Remove spraying modules that use Basic Authentication (ActiveSync, Autodiscover, Reporting) due to [Microsoft's Deprecation of Basic Authentication](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
 - Remove the sleep and jitter during domain validation
 - Add support for FireProx handling directly through the tool via fire.py
+- Update tested data written to include timestamps and resource/client id
 
 ## v3.0.4 (11/19/2023)
 - [@Macmod](https://github.com/Macmod) Update how enumeration performs concurrent requests by limiting the number of blocking tasks at any one time

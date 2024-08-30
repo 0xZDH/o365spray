@@ -37,13 +37,14 @@ class FireProx(object):
     ):
         """Initialize FireProx
 
-        :param url: url to proxy
-        :param profile_name: aws profile name to store/retrieve credentials
-        :param access_key: aws access key
-        :param secret_access_key: aws secret access key
-        :param session_token: aws session token
-        :param region: aws region
-        :param api_id: api id
+        Arguments:
+            url: url to proxy
+            profile_name: aws profile name to store/retrieve credentials
+            access_key: aws access key
+            secret_access_key: aws secret access key
+            session_token: aws session token
+            region: aws region
+            api_id: api id
         """
         # fmt: off
         self.url               = url
@@ -66,7 +67,8 @@ class FireProx(object):
     def _try_instance_profile(self) -> bool:
         """Try instance profile credentials
 
-        :returns: boolean if client session created
+        Returns:
+            boolean if client session created
         """
         try:
             # Create a new boto3 low-level client
@@ -91,7 +93,8 @@ class FireProx(object):
         """Load credentials from AWS config and credentials
         files if present
 
-        :returns: boolean if credentials loaded
+        Returns:
+            boolean if credentials loaded
         """
         # If no access_key, secret_key, or profile_name provided -
         # try instance credentials
@@ -175,8 +178,11 @@ class FireProx(object):
     def _get_template(self, url: str = None) -> bytes:
         """Create AWS instance template
 
-        :param url: target url to create proxy for
-        :returns: aws instance template
+        Arguments:
+            url: target url to create proxy for
+
+        Returns:
+            aws instance template
         """
         url = url or self.url
 
@@ -287,8 +293,11 @@ class FireProx(object):
     def _create_deployment(self, api_id: str) -> Tuple[str, str]:
         """Create application revision deployment
 
-        :param api_id: fireprox instance id
-        :returns: (resource_id, fireprox url)
+        Arguments:
+            api_id: fireprox instance id
+
+        Returns:
+            (resource_id, fireprox url)
         """
         response = self.client.create_deployment(
             restApiId=api_id,
@@ -305,8 +314,11 @@ class FireProx(object):
     def _get_resource(self, api_id: str) -> str:
         """Get resources for a given API instance
 
-        :param api_id: fireprox instance id
-        :returns: item id for fireprox resource
+        Arguments:
+            api_id: fireprox instance id
+
+        Returns:
+            item id for fireprox resource
         """
         response = self.client.get_resources(restApiId=api_id)
 
@@ -320,8 +332,11 @@ class FireProx(object):
     def _get_integration(self, api_id: str) -> str:
         """Get API instance integration settings
 
-        :param api_id: fireprox instance id
-        :returns: api url being proxied
+        Arguments:
+            api_id: fireprox instance id
+
+        Returns:
+            api url being proxied
         """
         resource_id = self._get_resource(api_id)
 
@@ -336,8 +351,11 @@ class FireProx(object):
     def create_api(self, url: str = None) -> Tuple[str, str]:
         """Create FireProx instance
 
-        :param url: target url to create proxy for
-        :returns: (api_id, proxy_url)
+        Arguments:
+            url: target url to create proxy for
+
+        Returns:
+            (api_id, proxy_url)
         """
         template = self._get_template(url=url)
         response = self.client.import_rest_api(
@@ -351,9 +369,12 @@ class FireProx(object):
     def update_api(self, api_id: str, url: str) -> bool:
         """Update FireProx instance
 
-        :param api_id: fireprox instance id
-        :param url: target url to create proxy for
-        :returns: boolean if api instance was updated
+        Arguments:
+            api_id: fireprox instance id
+            url: target url to create proxy for
+
+        Returns:
+            boolean if api instance was updated
         """
         url = url.rstrip("/")
 
@@ -383,8 +404,11 @@ class FireProx(object):
     def delete_api(self, api_id: str) -> bool:
         """Delete FireProx instance
 
-        :param api_id: fireprox instance id
-        :returns: boolean if api instance deleted
+        Arguments:
+            api_id: fireprox instance id
+
+        Returns:
+            boolean if api instance deleted
         """
         items = self.list_api()
 
@@ -400,7 +424,8 @@ class FireProx(object):
     def list_api(self) -> List[str]:
         """List FireProx instance(s)
 
-        :returns: list of apis
+        Returns:
+            list of apis
         """
         response = self.client.get_rest_apis()
         return response["items"]
@@ -409,7 +434,8 @@ class FireProx(object):
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments and return namespace
 
-    :return: Namespace for arguments
+    Returns:
+        Namespace for arguments
     """
     parser = argparse.ArgumentParser(description="FireProx API Gateway Manager")
     parser.add_argument(

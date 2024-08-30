@@ -45,8 +45,12 @@ class SprayModule_oauth2(SprayerBase):
             # Build email if not already built
             email = self.HELPER.check_email(user, domain)
 
+            # Grab these values and include them in the tested output for logging
+            resource = Helper.get_random_element_from_list(Defaults.RESOURCES)
+            client_id = Helper.get_random_element_from_list(Defaults.CLIENT_IDS)
+
             # Write the tested user
-            tested = f"{email}:{password}"
+            tested = f"{email}:{password} | {client_id} | {resource}"
             if self.writer:
                 self.tested_writer.write(tested)
 
@@ -56,8 +60,8 @@ class SprayModule_oauth2(SprayerBase):
             # to complete
             scope = Helper.get_random_sublist_from_list(Defaults.SCOPES)
             data = {
-                "resource": Helper.get_random_element_from_list(Defaults.RESOURCES),
-                "client_id": Helper.get_random_element_from_list(Defaults.CLIENT_IDS),
+                "resource": resource,
+                "client_id": client_id,
                 "grant_type": "password",
                 "username": email,
                 "password": password,

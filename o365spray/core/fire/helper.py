@@ -63,9 +63,12 @@ MODULE_MAP = {
 def get_module_url(module: str, module_type: str) -> str:
     """Get the base url for a given module
 
-    :param module: module name
-    :param module_type: module type (enum, spray)
-    :returns: module base url
+    Arguments:
+        module: module name
+        module_type: module type (enum, spray)
+
+    Returns:
+        module base url
     """
     if module_type not in ["enum", "spray"]:
         raise FireProxException(f"Invalid module type: {module_type}")
@@ -104,11 +107,12 @@ def list_api(
 ):
     """List all AWS API Gateways
 
-    :param profile_name: aws profile name to store/retrieve credentials
-    :param access_key: aws access key
-    :param secret_access_key: aws secret access key
-    :param session_token: aws session token
-    :param region: aws region
+    Arguments:
+        profile_name: aws profile name to store/retrieve credentials
+        access_key: aws access key
+        secret_access_key: aws secret access key
+        session_token: aws session token
+        region: aws region
     """
     fp = FireProx(
         profile_name=profile_name,
@@ -136,13 +140,16 @@ def create_api(
 ) -> Dict[str, str]:
     """Create an AWS API Gateway
 
-    :param url: target url to create proxy for
-    :param profile_name: aws profile name to store/retrieve credentials
-    :param access_key: aws access key
-    :param secret_access_key: aws secret access key
-    :param session_token: aws session token
-    :param region: aws region
-    :returns: gateway id and url
+    Arguments:
+        url: target url to create proxy for
+        profile_name: aws profile name to store/retrieve credentials
+        access_key: aws access key
+        secret_access_key: aws secret access key
+        session_token: aws session token
+        region: aws region
+
+    Returns:
+        gateway id and url
     """
     fp = FireProx(
         url=url,
@@ -171,11 +178,12 @@ def destroy_api(
 ):
     """Destroy a single AWS API Gateway instance based on ID
 
-    :param api_id: fireprox api instance id
-    :param profile_name: aws profile name to store/retrieve credentials
-    :param access_key: aws access key
-    :param secret_access_key: aws secret access key
-    :param session_token: aws session token
+    Arguments:
+        api_id: fireprox api instance id
+        profile_name: aws profile name to store/retrieve credentials
+        access_key: aws access key
+        secret_access_key: aws secret access key
+        session_token: aws session token
     """
     for region in AWS_REGIONS:
         fp = FireProx(
@@ -206,10 +214,11 @@ def destroy_all_apis(
 ):
     """Clear all AWS API Gateway instances
 
-    :param profile_name: aws profile name to store/retrieve credentials
-    :param access_key: aws access key
-    :param secret_access_key: aws secret access key
-    :param session_token: aws session token
+    Arguments:
+        profile_name: aws profile name to store/retrieve credentials
+        access_key: aws access key
+        secret_access_key: aws secret access key
+        session_token: aws session token
     """
     clear_count = 0
 

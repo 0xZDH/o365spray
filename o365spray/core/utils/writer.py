@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 from pathlib import Path
+from time import time
 
 
 class ThreadWriter(object):
-
     """Custom class to write data to a file accross threads"""
 
     def __init__(self, file_: str, out_dir: str):
@@ -28,7 +29,8 @@ class ThreadWriter(object):
         Arguments:
             data: data to write to file
         """
-        self.out_file.write(f"{data}\n")
+        ts = datetime.fromtimestamp(time()).strftime("%Y-%m-%d %H:%M:%S")
+        self.out_file.write(f"[{ts}] {data}\n")
 
     def flush(self):
         """Flush the file buffer"""
