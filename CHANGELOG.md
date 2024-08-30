@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v3.1.0 (08/27/2024)
+## v3.1.20240830 (08/30/2024)
 - [Oddvar Moe](https://github.com/api0cradle) Update MFA message for `AADSTS50079`
 - Update `office` enumeration module to continue past request throttling as it is per user
 - Remove spraying modules that use Basic Authentication (ActiveSync, Autodiscover, Reporting) due to [Microsoft's Deprecation of Basic Authentication](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)

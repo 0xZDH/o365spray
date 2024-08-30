@@ -40,7 +40,7 @@ Perform password spraying against a given domain:<br>
 ```
 usage: o365spray [flags]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.1.0
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.1.20240830
 
 options:
   -h, --help            show this help message and exit
@@ -191,7 +191,7 @@ Debug:
 Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
 
 There are two methods to using FireProx with o365spray:
-1. As of v3.1.0, FireProx management can be done directly through o365spray. See the `Fireprox Configuration` and `Fireprox Utilities` command line flags.
+1. As of v3.1, FireProx management can be done directly through o365spray. See the `Fireprox Configuration` and `Fireprox Utilities` command line flags.
 2. Create a proxy URL for the given o365spray module based on the URL tables below. The proxy URL should then be passed in via `--proxy-url`.
   - *NOTE*: Make sure to use the correct `--enum-module` or `--spray-module` value corresponding with the base URL used to create the FireProx URL.
 
