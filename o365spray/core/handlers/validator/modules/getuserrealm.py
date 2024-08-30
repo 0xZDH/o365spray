@@ -35,8 +35,8 @@ class ValidateModule_getuserrealm(ValidatorBase):
             headers=headers,
             proxies=self.proxies,
             timeout=self.timeout,
-            sleep=self.sleep,
-            jitter=self.jitter,
+            sleep=0,  # Default to 0
+            jitter=0,  # Default to 0
         )
 
         # Parse the XML response and find the NameSpaceType value in the

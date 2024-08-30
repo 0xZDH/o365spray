@@ -98,12 +98,9 @@ class EnumerateModule_office(EnumeratorBase):
                 if_exists_result = int(body["IfExistsResult"])
                 is_request_throttled = int(body["ThrottleStatus"])
 
-                # Check if the requests are being throttled and shutdown
-                # if so
+                # Check if the requests are being throttled for the given user
                 if is_request_throttled != 0 or if_exists_result == 2:
-                    logging.info(f"Requests are being throttled. Shutting down...")
-                    self.exit = True
-                    return self.shutdown()
+                    logging.info(f"Requests are being throttled for: {email}")
 
                 # It appears that both 0 and 6 response codes indicate a valid user
                 # whereas 5 indicates the use of a different identity provider -- let's

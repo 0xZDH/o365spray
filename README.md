@@ -13,7 +13,7 @@ o365spray is a username enumeration and password spraying tool aimed at Microsof
   - [Validation](#validation)
   - [Enumeration](#enumeration)
   - [Spraying](#spraying)
-- [FireProx URLs](#fireprox-base-urls)
+- [FireProx](#fireprox)
   - [Enumeration](#enumeration-1)
   - [Spraying](#spraying-1)
 - [User Agent Randomization](#user-agent-randomization)
@@ -40,7 +40,7 @@ Perform password spraying against a given domain:<br>
 ```
 usage: o365spray [flags]
 
-o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.0.4
+o365spray | Microsoft O365 User Enumerator and Password Sprayer -- v3.1.20240830
 
 options:
   -h, --help            show this help message and exit
@@ -134,6 +134,27 @@ Output Configuration:
   --output OUTPUT       Output directory for results and test case files.
                         Default: current directory
 
+Fireprox Configuration:
+  --profile-name PROFILE_NAME
+                        AWS Profile Name to store/retrieve credentials.
+
+  --access-key ACCESS_KEY
+                        AWS Access Key.
+
+  --secret-access-key SECRET_ACCESS_KEY
+                        AWS Secret Access Key.
+
+  --session-token SESSION_TOKEN
+                        AWS Session Token.
+
+  --region REGION       AWS Region.
+
+Fireprox Utilities:
+  --api-list            List all fireprox APIs.
+
+  --api-destroy API_ID
+                        Destroy single API instance, by API ID.
+
 Debug:
   -v, --version         Print the tool version.
 
@@ -155,23 +176,24 @@ Debug:
 > The onedrive module relies on the target user(s) having previously logged into OneDrive. If a valid user has not yet used OneDrive, their account will show as 'invalid'.
 
 ### Spraying
-* activesync
 * adfs
-* autodiscover
 * autologon
 * oauth2 (default)
-* reporting
 * rst
+* activesync `deprecated`
+* autodiscover `deprecated`
+* reporting `deprecated`
 
 > The oAuth2 module can be used for federated spraying, but it should be noted that this will ONLY work when the target tenant has enabled password synchronization - otherwise authentication will always fail. The default mechanic is to default to the 'adfs' module when federation is identified.
 
-## FireProx Base URLs
+## FireProx
 
 Microsoft has made it more difficult to perform password spraying, so using tools like [FireProx](https://github.com/ustayready/fireprox) help to bypass rate-limiting based on IP addresses.
 
-To use FireProx with o365spray, create a proxy URL for the given o365spray module based on the base URL tables below. The proxy URL can then be passed in via `--proxy-url`.
-
-> NOTE: Make sure to use the correct `--enum-module` or `--spray-module` flag with the base URL used to create the FireProx URL.
+There are two methods to using FireProx with o365spray:
+1. As of v3.1, FireProx management can be done directly through o365spray. See the `Fireprox Configuration` and `Fireprox Utilities` command line flags.
+2. Create a proxy URL for the given o365spray module based on the URL tables below. The proxy URL should then be passed in via `--proxy-url`.
+  - *NOTE*: Make sure to use the correct `--enum-module` or `--spray-module` value corresponding with the base URL used to create the FireProx URL.
 
 ### Enumeration
 
@@ -190,13 +212,13 @@ To use FireProx with o365spray, create a proxy URL for the given o365spray modul
 
 | Module       | Base URL |
 | ---          | ---      |
-| activesync   | `https://outlook.office365.com/` |
 | adfs         | Currently not implemented |
-| autodiscover | `https://autodiscover-s.outlook.com/` |
 | autologon    | `https://autologon.microsoftazuread-sso.com/` |
 | oauth2       | `https://login.microsoftonline.com/` |
-| reporting    | `https://reports.office365.com/` |
 | rst          | `https://login.microsoftonline.com/` |
+| activesync   | Deprecated |
+| autodiscover | Deprecated |
+| reporting    | Deprecated |
 
 ## User Agent Randomization
 
@@ -204,11 +226,13 @@ User-Agent randomization is now supported and can be accomplished by providing a
 
 The agents in the example data set were collected from the following:
 - https://github.com/sqlmapproject/sqlmap/blob/master/data/txt/user-agents.txt
-- https://www.useragentstring.com/pages/useragentstring.php?name=<browser>
+- https://www.useragentstring.com/pages/useragentstring.php?name=browser
 
 ## Omnispray
 
-The o365spray framework has been ported to a new tool: [Omnispray](https://github.com/0xZDH/Omnispray). This tool is meant to modularize the original enumeration and spraying framework to allow for generic targeting, not just O365. Omnispray includes template modules for enumeration and spraying that can be modified and leveraged for any target.
+The o365spray framework was previously ported to a new tool: [Omnispray](https://github.com/0xZDH/Omnispray). This tool is meant to modularize the original enumeration and spraying framework to allow for generic targeting, not just O365. Omnispray includes template modules for enumeration and spraying that can be modified and leveraged for any target.
+
+Omnispray is **not** meant to replace o365spray, but instead offer an alternative for varying targets.
 
 ## Acknowledgments
 
@@ -226,19 +250,8 @@ The o365spray framework has been ported to a new tool: [Omnispray](https://githu
 | [Optiv](https://github.com/optiv) (Several Authors) | Go365: RST user enumeration and password spraying module | [Go365](https://github.com/optiv/Go365) |
 | [byt3bl33d3r](https://github.com/byt3bl33d3r) | SprayingToolkit: Code references | [SprayingToolkit](https://github.com/byt3bl33d3r/SprayingToolkit/) |
 | [sensepost](https://github.com/sensepost) | ruler: Code references | [Ruler](https://github.com/sensepost/ruler/) |
+| [ustayready](https://github.com/ustayready) | FireProx: AWS API Gateway management tool | [FireProx](https://github.com/ustayready/fireprox) |
 
 ## Bugs
 
-If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix). See the [section below](#using-previous-versions) for more information about using previous versions.
-
-## Using Previous Versions
-
-If issues are encountered, try checking out previous versions prior to code rewrites:
-
-```bash
-# v1.3.7
-git checkout e235abdcebad61dbd2cde80974aca21ddb188704
-
-# v2.0.4
-git checkout a585432f269a8f527d61f064822bb08880c887ef
-```
+If any bugs/errors are encountered, please open an Issue with the details (or a Pull Request with the proposed fix).
