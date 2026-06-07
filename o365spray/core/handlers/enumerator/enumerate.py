@@ -40,7 +40,7 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> object:
     if args.username:
         userlist += args.username.split(",")
     if args.userfile:
-        userlist += Helper.get_list_from_file(args.userfile)
+        userlist += Helper.get_list_from_file(args.userfile, skip_comments=True)
 
     logging.info(f"Running user enumeration against {len(userlist)} potential users")
 
