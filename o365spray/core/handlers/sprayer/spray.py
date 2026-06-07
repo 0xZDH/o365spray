@@ -66,7 +66,7 @@ def spray(args: argparse.Namespace, output_dir: str, enum: object):
         if args.username:
             userlist += args.username.split(",")
         if args.userfile:
-            userlist += Helper.get_list_from_file(args.userfile)
+            userlist += Helper.get_list_from_file(args.userfile, skip_comments=True)
 
     # Validate we have a scope of users to spray
     if len(userlist) < 1:
