@@ -150,16 +150,15 @@ class Helper:
     def get_list_from_file(
         cls,
         file_: str,
-        skip_comments: bool = False,   # ← new parameter
+        skip_comments: bool = False,
     ) -> List[Any]:
         """Read a file's lines into a list.
     
         Arguments:
             file_: file to read into a list
-            skip_comments: if True, skip blank lines and lines whose first
-                non-whitespace character is '#'. Intended for username files
-                where operators annotate invalid entries. Must NOT be used
-                for password files, as '#' is a valid password character.
+            skip_comments: if True, skip lines whose first non-whitespace
+                character is '#'. Use for username files only. Must NOT be
+                set for password files — '#' is a valid password character.
     
         Returns:
             list of file lines
@@ -168,9 +167,9 @@ class Helper:
             list_ = []
             for line in f:
                 line = line.strip()
-                if not line:                              # skip blank lines
+                if not line:
                     continue
-                if skip_comments and line.startswith("#"):  # skip comment lines
+                if skip_comments and line.startswith("#"):
                     continue
                 list_.append(line)
         return list_
