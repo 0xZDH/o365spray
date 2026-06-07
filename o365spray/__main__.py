@@ -250,7 +250,7 @@ def parse_args() -> argparse.Namespace:
             parser.error("invalid user agent file provided")
 
         else:
-            args.useragents = Helper.get_list_from_file(args.useragents)
+            args.useragents = Helper.get_list_from_file(args.useragents, skip_comments=True)
 
     # Handle sleep randomization
     if args.sleep == -1:
