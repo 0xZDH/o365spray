@@ -30,7 +30,11 @@ def spray(args: argparse.Namespace, output_dir: str, enum: object):
     output_directory = f"{output_dir}/spray/"
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     # Support both password(s) and a password file being provided
     passlist = []

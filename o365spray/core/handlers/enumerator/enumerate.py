@@ -32,7 +32,11 @@ def enumerate(args: argparse.Namespace, output_dir: str) -> object:
     output_directory = f"{output_dir}/enum/"
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     # Support both username(s) and a username file being provided
     password = "Password1" if not args.password else args.password.split(",")[0]
